@@ -1,37 +1,47 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { useState, useCallback, useEffect } from 'react';
 
-interface AppSettings {
-  theme: 'light' | 'dark' | 'system'
-  language: string
-  notifications: boolean
+export interface AppSettings {
+  activeFileId: string | null;
+  activeFileName: string | null;
 }
+
+const SETTINGS_KEY = 'rca-app-settings';
 
 const defaultSettings: AppSettings = {
-  theme: 'system',
-  language: 'en',
-  notifications: true
-}
+  activeFileId: null,
+  activeFileName: null,
+};
 
-export function useAppSettings() {
+export const useAppSettings = () => {
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
-      const saved = localStorage.getItem('app-settings')
-      return saved ? JSON.parse(saved) : defaultSettings
+      const stored = localStorage.getItem(SETTINGS_KEY);
+      return stored ? { ...defaultSettings, ...JSON.parse(stored) } : defaultSettings;
     } catch {
-      return defaultSettings
+      return defaultSettings;
     }
-  })
+  });
 
-  const updateSettings = (newSettings: Partial<AppSettings>) => {
-    const updated = { ...settings, ...newSettings }
-    setSettings(updated)
-    localStorage.setItem('app-settings', JSON.stringify(updated))
-    toast.success('Settings updated')
-  }
+  const updateSettings = useCallback((updates: Partial<AppSettings>) => {
+    const newSettings = { ...settings, ...updates };
+    setSettings(newSettings);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(newSettings));
+  }, [settings]);
+
+  const setActiveFile = useCallback((fileId: string | null, fileName: string | null) => {
+    updateSettings({ activeFileId: fileId, activeFileName: fileName });
+  }, [updateSettings]);
+
+  const clearActiveFile = useCallback(() => {
+    updateSettings({ activeFileId: null, activeFileName: null });
+  }, [updateSettings]);
 
   return {
     settings,
-    updateSettings
-  }
-}
+    updateSettings,
+    setActiveFile,
+    clearActiveFile,
+    activeFileId: settings.activeFileId,
+    activeFileName: settings.activeFileName,
+  };
+};

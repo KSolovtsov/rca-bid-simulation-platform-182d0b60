@@ -1,63 +1,87 @@
-import { useState, useCallback } from 'react'
-import Papa from 'papaparse'
-import { toast } from 'sonner'
+import { useState, useCallback } from 'react';
 
-export interface CsvData {
-  headers: string[]
-  rows: any[][]
-  fileName: string
+export interface CsvFile {
+  id: string;
+  name: string;
+  notes: string;
+  uploadDate: string;
+  data: any[];
+  headers: string[];
+  size: number;
 }
 
-export function useCsvStorage() {
-  const [csvData, setCsvData] = useState<CsvData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+const CSV_STORAGE_KEY = 'rca-csv-files';
 
-  const parseCsv = useCallback((file: File): Promise<CsvData> => {
-    return new Promise((resolve, reject) => {
-      Papa.parse(file, {
-        header: false,
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            reject(new Error('CSV parsing failed'))
-            return
-          }
-          
-          const [headers, ...rows] = results.data as string[][]
-          resolve({
-            headers,
-            rows,
-            fileName: file.name
-          })
-        },
-        error: reject
-      })
-    })
-  }, [])
-
-  const uploadCsv = useCallback(async (file: File) => {
-    setIsLoading(true)
+export const useCsvStorage = () => {
+  const [files, setFiles] = useState<CsvFile[]>(() => {
     try {
-      const data = await parseCsv(file)
-      setCsvData(data)
-      toast.success(`CSV file "${file.name}" uploaded successfully`)
-      return data
-    } catch (error) {
-      toast.error('Failed to upload CSV file')
-      throw error
-    } finally {
-      setIsLoading(false)
+      const stored = localStorage.getItem(CSV_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
     }
-  }, [parseCsv])
+  });
 
-  const clearCsv = useCallback(() => {
-    setCsvData(null)
-    toast.success('CSV data cleared')
-  }, [])
+  const saveToStorage = useCallback((newFiles: CsvFile[]) => {
+    try {
+      const dataSize = JSON.stringify(newFiles).length;
+      const maxSize = 5 * 1024 * 1024; // 5MB limit for localStorage
+      
+      if (dataSize > maxSize) {
+        throw new Error('File too large for storage. Please use smaller files (under 5MB total).');
+      }
+      
+      localStorage.setItem(CSV_STORAGE_KEY, JSON.stringify(newFiles));
+      setFiles(newFiles);
+    } catch (error) {
+      console.error('Failed to save files to storage:', error);
+      throw error; // Re-throw to handle in UI
+    }
+  }, []);
+
+  const addFile = useCallback((file: Omit<CsvFile, 'id' | 'uploadDate'>) => {
+    const newFile: CsvFile = {
+      ...file,
+      id: crypto.randomUUID(),
+      uploadDate: new Date().toISOString(),
+    };
+    const updatedFiles = [...files, newFile];
+    
+    try {
+      saveToStorage(updatedFiles);
+      return newFile;
+    } catch (error) {
+      throw error; // Re-throw to handle in UI
+    }
+  }, [files, saveToStorage]);
+
+  const updateFile = useCallback((id: string, updates: Partial<CsvFile>) => {
+    const updatedFiles = files.map(file => 
+      file.id === id ? { ...file, ...updates } : file
+    );
+    saveToStorage(updatedFiles);
+  }, [files, saveToStorage]);
+
+  const deleteFile = useCallback((id: string) => {
+    const updatedFiles = files.filter(file => file.id !== id);
+    saveToStorage(updatedFiles);
+  }, [files, saveToStorage]);
+
+  const getFile = useCallback((id: string) => {
+    return files.find(file => file.id === id);
+  }, [files]);
+
+  const clearAllFiles = useCallback(() => {
+    localStorage.removeItem(CSV_STORAGE_KEY);
+    setFiles([]);
+  }, []);
 
   return {
-    csvData,
-    isLoading,
-    uploadCsv,
-    clearCsv
-  }
-}
+    files,
+    addFile,
+    updateFile,
+    deleteFile,
+    getFile,
+    clearAllFiles,
+  };
+};
