@@ -23,46 +23,8 @@ interface UnderbiddingData {
 }
 
 const UnderbiddingWidget: React.FC<UnderbiddingAnalysisProps> = ({ data }) => {
-  // Calculate underbidding potential based on low ACOS but declining orders
-  const underbiddingData = useMemo((): UnderbiddingData[] => {
-    if (!data || !Array.isArray(data)) return [];
-
-    return data
-      .map((row: any) => {
-        const avgCpcPeriod1 = parseFloat(row['Avg CPC Reporting Period # 1']) || 0;
-        const avgCpcPeriod2 = parseFloat(row['Avg CPC Reporting Period # 2']) || 0;
-        const avgAcosPeriod1 = parseFloat(row['Avg ACOS Reporting Period # 1']) || 0;
-        const avgAcosPeriod2 = parseFloat(row['Avg ACOS Reporting Period # 2']) || 0;
-        const avgDailyOrdersPeriod1 = parseFloat(row['Avg Daily Orders Reporting Period # 1']) || 0;
-        const avgDailyOrdersPeriod2 = parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0;
-        
-        // Calculate underbidding score based on low ACOS (<30%) but declining orders
-        const ordersDecline = avgDailyOrdersPeriod1 > avgDailyOrdersPeriod2 ? 
-          (avgDailyOrdersPeriod1 - avgDailyOrdersPeriod2) / avgDailyOrdersPeriod1 : 0;
-        const lowAcos = Math.min(avgAcosPeriod1 > 0 ? avgAcosPeriod1 : 100, avgAcosPeriod2 > 0 ? avgAcosPeriod2 : 100);
-        const underbiddingScore = (lowAcos < 30 ? (30 - lowAcos) * 2 : 0) + (ordersDecline * 100);
-
-        return {
-          asin: row['ASIN'] || '',
-          campaign: row['Campaign'] || '',
-          kw: row['KW'] || row['Search Term'] || '',
-          matchType: row['Match Type'] || '',
-          avgCpcPeriod1,
-          avgCpcPeriod2,
-          avgAcosPeriod1,
-          avgAcosPeriod2,
-          avgDailyOrdersPeriod1,
-          avgDailyOrdersPeriod2,
-          underbiddingScore
-        };
-      })
-      .filter((item: UnderbiddingData) => 
-        item.underbiddingScore > 20 && // Significant underbidding opportunity
-        (item.avgDailyOrdersPeriod1 > 0 || item.avgDailyOrdersPeriod2 > 0) // Has orders data
-      )
-      .sort((a: UnderbiddingData, b: UnderbiddingData) => b.underbiddingScore - a.underbiddingScore)
-      .slice(0, 10); // Top 10 underbidding opportunities
-  }, [data]);
+  // TODO: Implement underbidding analysis logic
+  const underbiddingData: UnderbiddingData[] = [];
 
   const formatCurrency = (value: number) => {
     return value > 0 ? `$${value.toFixed(2)}` : '--';

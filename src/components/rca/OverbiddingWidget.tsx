@@ -21,41 +21,8 @@ interface OverbiddingData {
 }
 
 const OverbiddingWidget: React.FC<OverbiddingAnalysisProps> = ({ data }) => {
-  // Calculate overbidding potential based on high ACOS and high CPC
-  const overbiddingData = useMemo((): OverbiddingData[] => {
-    if (!data || !Array.isArray(data)) return [];
-
-    return data
-      .map((row: any) => {
-        const avgCpcPeriod1 = parseFloat(row['Avg CPC Reporting Period # 1']) || 0;
-        const avgCpcPeriod2 = parseFloat(row['Avg CPC Reporting Period # 2']) || 0;
-        const avgAcosPeriod1 = parseFloat(row['Avg ACOS Reporting Period # 1']) || 0;
-        const avgAcosPeriod2 = parseFloat(row['Avg ACOS Reporting Period # 2']) || 0;
-        
-        // Calculate overbidding score based on high ACOS (>50%) and high CPC increase
-        const cpcIncrease = avgCpcPeriod2 > avgCpcPeriod1 ? (avgCpcPeriod2 - avgCpcPeriod1) / avgCpcPeriod1 : 0;
-        const highAcos = Math.max(avgAcosPeriod1, avgAcosPeriod2);
-        const overbiddingScore = (highAcos > 50 ? highAcos : 0) + (cpcIncrease * 100);
-
-        return {
-          asin: row['ASIN'] || '',
-          campaign: row['Campaign'] || '',
-          kw: row['KW'] || row['Search Term'] || '',
-          matchType: row['Match Type'] || '',
-          avgCpcPeriod1,
-          avgCpcPeriod2,
-          avgAcosPeriod1,
-          avgAcosPeriod2,
-          overbiddingScore
-        };
-      })
-      .filter((item: OverbiddingData) => 
-        item.overbiddingScore > 30 && // High overbidding risk
-        (item.avgAcosPeriod1 > 0 || item.avgAcosPeriod2 > 0) // Has ACOS data
-      )
-      .sort((a: OverbiddingData, b: OverbiddingData) => b.overbiddingScore - a.overbiddingScore)
-      .slice(0, 10); // Top 10 overbidding risks
-  }, [data]);
+  // TODO: Implement overbidding analysis logic
+  const overbiddingData: OverbiddingData[] = [];
 
   const formatCurrency = (value: number) => {
     return value > 0 ? `$${value.toFixed(2)}` : '--';
