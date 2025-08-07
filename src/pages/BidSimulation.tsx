@@ -441,7 +441,35 @@ const BidSimulation = () => {
     setColumnsPopoverOpen(false);
   };
 
-  const formatCellValue = (value: any, header: string) => {
+  const formatCellValue = (value: any, header: string, row?: any) => {
+    // Calculate delta values if they're missing or blank
+    if (header === 'Δ (Current Bid As displayed on Amazon Seller Central - Previous Bid As displayed on Amazon Seller Central )' && row) {
+      let currentBid, previousBid;
+      
+      if (Array.isArray(row)) {
+        const currentBidIndex = activeFile?.headers?.indexOf('Current Bid As displayed on Amazon Seller Central') ?? -1;
+        const previousBidIndex = activeFile?.headers?.indexOf('Previous Bid As displayed on Amazon Seller Central') ?? -1;
+        currentBid = currentBidIndex >= 0 ? parseFloat(row[currentBidIndex] || '0') : 0;
+        previousBid = previousBidIndex >= 0 ? parseFloat(row[previousBidIndex] || '0') : 0;
+      } else {
+        currentBid = parseFloat(row['Current Bid As displayed on Amazon Seller Central'] || '0');
+        previousBid = parseFloat(row['Previous Bid As displayed on Amazon Seller Central'] || '0');
+      }
+      
+      if (!isNaN(currentBid) && !isNaN(previousBid) && (currentBid > 0 || previousBid > 0)) {
+        const delta = currentBid - previousBid;
+        return delta.toFixed(2);
+      }
+      
+      // If calculation fails or original value exists, use original value
+      if (value !== null && value !== undefined && value !== '') {
+        const numValue = parseFloat(String(value));
+        return !isNaN(numValue) ? numValue.toFixed(2) : value;
+      }
+      
+      return '--';
+    }
+    
     // Check if this is a numeric column that needs 2 decimal places formatting (check this FIRST)
     const numericColumns = [
       'Previous Bid As displayed on Amazon Seller Central',
@@ -923,7 +951,7 @@ const BidSimulation = () => {
                                 cellValue = row[header];
                               }
                               
-                              const formattedValue = formatCellValue(cellValue, header);
+                              const formattedValue = formatCellValue(cellValue, header, row);
                               
                               return (
                                 <div key={cellIndex} className="p-2 border-r last:border-r-0 flex items-center">
