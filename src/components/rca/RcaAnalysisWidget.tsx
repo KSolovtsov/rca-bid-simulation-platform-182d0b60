@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Filter, TrendingUp, AlertCircle } from 'lucide-react';
 import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
 import { useAppSettings } from '@/hooks/use-app-settings';
+import OverbiddingWidget from './OverbiddingWidget';
+import UnderbiddingWidget from './UnderbiddingWidget';
 
 interface RcaAnalysisData {
   asin: string;
@@ -174,97 +177,117 @@ const RcaAnalysisWidget = () => {
   }
 
   return (
-    <Card className="shadow-card animate-slide-up">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-xl">Performance Analysis</CardTitle>
-              <CardDescription>
-                Data from: {fileData.name.replace(/\.csv$/i, '')}
-              </CardDescription>
-            </div>
-          </div>
-          <Badge variant="outline" className="text-xs">
-            {transformedData.length} total records
-          </Badge>
-        </div>
+    <div className="space-y-6">
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Performance Overview</TabsTrigger>
+          <TabsTrigger value="overbidding">Overbidding Analysis</TabsTrigger>
+          <TabsTrigger value="underbidding">Underbidding Opportunities</TabsTrigger>
+        </TabsList>
         
-        {/* Filter Indicators */}
-        <div className="flex items-center gap-2 mt-4">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Active Filters:</span>
-          <Badge variant="secondary" className="text-xs">
-            Daily Orders Period #1 &gt; 0
-          </Badge>
-          <span className="text-muted-foreground text-xs">OR</span>
-          <Badge variant="secondary" className="text-xs">
-            Daily Orders Period #2 &gt; 0
-          </Badge>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold">ASIN</TableHead>
-                <TableHead className="font-semibold">Campaign</TableHead>
-                <TableHead className="font-semibold">KW</TableHead>
-                <TableHead className="font-semibold">Match Type</TableHead>
-                <TableHead className="text-center font-semibold">Daily Orders P1</TableHead>
-                <TableHead className="text-center font-semibold">Daily Orders P2</TableHead>
-                <TableHead className="text-center font-semibold">Avg CPC P1</TableHead>
-                <TableHead className="text-center font-semibold">Avg CPC P2</TableHead>
-                <TableHead className="text-center font-semibold">Avg ACOS P1</TableHead>
-                <TableHead className="text-center font-semibold">Avg ACOS P2</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.map((item, index) => (
-                <TableRow 
-                  key={index} 
-                  className="hover:bg-muted/30 transition-colors cursor-pointer hover:shadow-sm"
-                  onClick={() => navigateToDetailedView(item)}
-                  title="Click to view detailed analysis in Bid Simulation"
-                >
-                  <TableCell className="font-mono text-sm">{item.asin}</TableCell>
-                  <TableCell className="max-w-[150px] truncate">{item.campaign}</TableCell>
-                  <TableCell className="max-w-[120px] truncate">{item.kw}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {item.matchType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">{formatOrders(item.avgDailyOrdersPeriod1)}</TableCell>
-                  <TableCell className="text-center">{formatOrders(item.avgDailyOrdersPeriod2)}</TableCell>
-                  <TableCell className="text-center">{formatCurrency(item.avgCpcPeriod1)}</TableCell>
-                  <TableCell className="text-center">{formatCurrency(item.avgCpcPeriod2)}</TableCell>
-                  <TableCell className="text-center">{formatAcos(item.avgAcosPeriod1)}</TableCell>
-                  <TableCell className="text-center">{formatAcos(item.avgAcosPeriod2)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <TabsContent value="overview" className="mt-6">
+          <Card className="shadow-card animate-slide-up">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Performance Analysis</CardTitle>
+                    <CardDescription>
+                      Data from: {fileData.name.replace(/\.csv$/i, '')}
+                    </CardDescription>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  {transformedData.length} total records
+                </Badge>
+              </div>
+              
+              {/* Filter Indicators */}
+              <div className="flex items-center gap-2 mt-4">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Active Filters:</span>
+                <Badge variant="secondary" className="text-xs">
+                  Daily Orders Period #1 &gt; 0
+                </Badge>
+                <span className="text-muted-foreground text-xs">OR</span>
+                <Badge variant="secondary" className="text-xs">
+                  Daily Orders Period #2 &gt; 0
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="font-semibold">ASIN</TableHead>
+                      <TableHead className="font-semibold">Campaign</TableHead>
+                      <TableHead className="font-semibold">KW</TableHead>
+                      <TableHead className="font-semibold">Match Type</TableHead>
+                      <TableHead className="text-center font-semibold">Daily Orders P1</TableHead>
+                      <TableHead className="text-center font-semibold">Daily Orders P2</TableHead>
+                      <TableHead className="text-center font-semibold">Avg CPC P1</TableHead>
+                      <TableHead className="text-center font-semibold">Avg CPC P2</TableHead>
+                      <TableHead className="text-center font-semibold">Avg ACOS P1</TableHead>
+                      <TableHead className="text-center font-semibold">Avg ACOS P2</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredData.map((item, index) => (
+                      <TableRow 
+                        key={index} 
+                        className="hover:bg-muted/30 transition-colors cursor-pointer hover:shadow-sm"
+                        onClick={() => navigateToDetailedView(item)}
+                        title="Click to view detailed analysis in Bid Simulation"
+                      >
+                        <TableCell className="font-mono text-sm">{item.asin}</TableCell>
+                        <TableCell className="max-w-[150px] truncate">{item.campaign}</TableCell>
+                        <TableCell className="max-w-[120px] truncate">{item.kw}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">
+                            {item.matchType}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center">{formatOrders(item.avgDailyOrdersPeriod1)}</TableCell>
+                        <TableCell className="text-center">{formatOrders(item.avgDailyOrdersPeriod2)}</TableCell>
+                        <TableCell className="text-center">{formatCurrency(item.avgCpcPeriod1)}</TableCell>
+                        <TableCell className="text-center">{formatCurrency(item.avgCpcPeriod2)}</TableCell>
+                        <TableCell className="text-center">{formatAcos(item.avgAcosPeriod1)}</TableCell>
+                        <TableCell className="text-center">{formatAcos(item.avgAcosPeriod2)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {filteredData.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No data matches the current filter criteria
+                </div>
+              )}
+              
+              <div className="px-6 py-3 bg-muted/20 border-t">
+                <p className="text-sm text-muted-foreground">
+                  Showing {filteredData.length} of {transformedData.length} records from {fileData.name.replace(/\.csv$/i, '')}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
-        {filteredData.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            No data matches the current filter criteria
-          </div>
-        )}
+        <TabsContent value="overbidding" className="mt-6">
+          <OverbiddingWidget data={fileData.data} />
+        </TabsContent>
         
-        <div className="px-6 py-3 bg-muted/20 border-t">
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredData.length} of {transformedData.length} records from {fileData.name.replace(/\.csv$/i, '')}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+        <TabsContent value="underbidding" className="mt-6">
+          <UnderbiddingWidget data={fileData.data} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
