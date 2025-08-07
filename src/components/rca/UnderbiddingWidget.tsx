@@ -54,9 +54,6 @@ const UnderbiddingWidget: React.FC<UnderbiddingAnalysisProps> = ({ data }) => {
             </div>
             <div>
               <CardTitle className="text-xl">Underbidding Opportunities</CardTitle>
-              <CardDescription>
-                Keywords with low ACOS and potential for increased bids
-              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -80,9 +77,6 @@ const UnderbiddingWidget: React.FC<UnderbiddingAnalysisProps> = ({ data }) => {
             </div>
             <div>
               <CardTitle className="text-xl">Underbidding Opportunities</CardTitle>
-              <CardDescription>
-                Keywords with low ACOS and potential for increased bids
-              </CardDescription>
             </div>
           </div>
           <Badge variant="outline" className="text-xs">

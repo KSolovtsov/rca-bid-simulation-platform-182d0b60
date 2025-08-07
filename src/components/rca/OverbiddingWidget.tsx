@@ -48,9 +48,6 @@ const OverbiddingWidget: React.FC<OverbiddingAnalysisProps> = ({ data }) => {
             </div>
             <div>
               <CardTitle className="text-xl">Overbidding Analysis</CardTitle>
-              <CardDescription>
-                Keywords with high ACOS and increasing CPCs
-              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -74,9 +71,6 @@ const OverbiddingWidget: React.FC<OverbiddingAnalysisProps> = ({ data }) => {
             </div>
             <div>
               <CardTitle className="text-xl">Overbidding Analysis</CardTitle>
-              <CardDescription>
-                Keywords with high ACOS and increasing CPCs
-              </CardDescription>
             </div>
           </div>
           <Badge variant="outline" className="text-xs">
