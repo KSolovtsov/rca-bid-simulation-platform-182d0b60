@@ -248,39 +248,6 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
       
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Agency Underbidding Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingDown className="h-4 w-4 text-green-500" />
-              <h4 className="font-medium text-foreground">Agency Underbidding:</h4>
-            </div>
-            
-            <div className="space-y-3">
-              {agencyUnderbiddingData.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer"
-                  onClick={() => navigateToSimulation('agency_underbidding_1')}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0`}>
-                      <TrendingDown className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm text-foreground">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">Low Bid need Human Loop</p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <p className="font-bold text-lg text-foreground">{item.count}</p>
-                    <p className="text-xs text-muted-foreground">({item.percentage}%)</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Agency Overbidding Section */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -306,6 +273,39 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
                     <div>
                       <p className="font-medium text-sm text-foreground">{item.title}</p>
                       <p className="text-xs text-muted-foreground">{getOverbiddingDescription(index)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <p className="font-bold text-lg text-foreground">{item.count}</p>
+                    <p className="text-xs text-muted-foreground">({item.percentage}%)</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Agency Underbidding Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingDown className="h-4 w-4 text-green-500" />
+              <h4 className="font-medium text-foreground">Agency Underbidding:</h4>
+            </div>
+            
+            <div className="space-y-3">
+              {agencyUnderbiddingData.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => navigateToSimulation('agency_underbidding_1')}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0`}>
+                      <TrendingDown className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">Low Bid need Human Loop</p>
                     </div>
                   </div>
                   
