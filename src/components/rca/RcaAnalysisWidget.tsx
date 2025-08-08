@@ -30,21 +30,20 @@ const RcaAnalysisWidget = () => {
   const { activeFileId } = useAppSettings();
   const navigate = useNavigate();
 
-  // Get active file data - wait for initialization
-  const activeFile = useMemo(async () => {
-    if (!activeFileId) return null;
-    return await getFile(activeFileId);
-  }, [activeFileId, getFile]);
-
   // State to hold the actual file data
   const [fileData, setFileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
 
   // Load file data when activeFileId changes
   useEffect(() => {
     const loadFile = async () => {
+      console.log('Loading file with activeFileId:', activeFileId);
       setLoading(true);
+      setHasAttemptedLoad(true);
+      
       if (!activeFileId) {
+        console.log('No activeFileId found');
         setFileData(null);
         setLoading(false);
         return;
@@ -52,6 +51,7 @@ const RcaAnalysisWidget = () => {
       
       try {
         const file = await getFile(activeFileId);
+        console.log('File loaded successfully:', file?.name);
         setFileData(file);
       } catch (error) {
         console.error('Error loading file:', error);
@@ -61,7 +61,9 @@ const RcaAnalysisWidget = () => {
       }
     };
 
-    loadFile();
+    // Small delay to ensure localStorage is properly initialized
+    const timer = setTimeout(loadFile, 100);
+    return () => clearTimeout(timer);
   }, [activeFileId, getFile]);
 
   // Transform CSV data to our format
@@ -138,7 +140,7 @@ const RcaAnalysisWidget = () => {
 
 
   // Show loading state
-  if (loading) {
+  if (loading || !hasAttemptedLoad) {
     return (
       <Card className="shadow-card animate-slide-up">
         <CardContent className="flex flex-col items-center justify-center py-12">
