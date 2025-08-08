@@ -178,15 +178,22 @@ const BidSimulation = () => {
                latestBid7 === 0.02;
 
       case 'portal_underbidding_2':
-        const syncStatus8 = toBool(getValue('Sync Status'));
         const appliedAcos8 = toNumber(getValue('I: Applied ACOS'));
         const adSpend8 = toNumber(getValue('J: Ad Spend'));
         const targetAcos8 = toNumber(getValue('G: Target ACOS'));
         const price8 = toNumber(getValue('K: Price'));
         const latestBid8 = toNumber(getValue('Latest Bid Calculated by the System'));
         
-        return syncStatus8 && 
-               appliedAcos8 === 9999 && 
+        console.log('Portal Underbidding #2 filter check:', {
+          appliedAcos: appliedAcos8,
+          adSpend: adSpend8,
+          targetAcos: targetAcos8,
+          price: price8,
+          latestBid: latestBid8,
+          result: appliedAcos8 === 9999 && adSpend8 < (targetAcos8 * price8) && latestBid8 === 0.02
+        });
+        
+        return appliedAcos8 === 9999 && 
                adSpend8 < (targetAcos8 * price8) && 
                latestBid8 === 0.02;
 
