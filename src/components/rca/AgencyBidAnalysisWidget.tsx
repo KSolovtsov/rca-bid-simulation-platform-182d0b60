@@ -8,6 +8,15 @@ interface AgencyBidAnalysisWidgetProps {
 }
 
 const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
+  
+  const getOverbiddingDescription = (index: number) => {
+    const descriptions = [
+      'ACOS Greater than Global ACOS',
+      'High ACOS without sales', 
+      'ACOS >35% Need Human Loop'
+    ];
+    return descriptions[index] || '';
+  };
   // Debug: Log the data structure
   console.log('Agency Widget - CSV Data:', data);
   console.log('Agency Widget - Sample record:', data[0]);
@@ -104,61 +113,71 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
         <CardTitle className="text-lg font-semibold text-foreground">
           Agency Bids RCA
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Total Records: {totalRecords}
         </p>
       </CardHeader>
       
-      <CardContent>
-        <div className="grid grid-cols-2 gap-6">
-          {/* Agency Underbidding */}
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Agency Underbidding Section */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">📉</span>
-              <h4 className="font-medium text-sm text-green-600">Agency Underbidding:</h4>
+              <TrendingDown className="h-4 w-4 text-green-500" />
+              <h4 className="font-medium text-foreground">Agency Underbidding:</h4>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               {agencyUnderbiddingData.map((item, index) => (
                 <div
                   key={index}
-                  className="flex flex-col p-3 rounded border border-green-200 bg-green-50/50 hover:bg-green-100/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                    <span className="text-xs font-medium text-foreground">{item.title}</span>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
+                      <TrendingDown className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">Low Bid need Human Loop</p>
+                    </div>
                   </div>
                   
                   <div className="text-right">
-                    <span className="font-bold text-foreground">{item.count}</span>
-                    <span className="text-xs text-muted-foreground ml-1">({item.percentage}%)</span>
+                    <p className="font-bold text-lg text-foreground">{item.count}</p>
+                    <p className="text-xs text-muted-foreground">({item.percentage}%)</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Agency Overbidding */}
+          {/* Agency Overbidding Section */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">📈</span>
-              <h4 className="font-medium text-sm text-red-600">Agency Overbidding:</h4>
+              <TrendingUp className="h-4 w-4 text-red-500" />
+              <h4 className="font-medium text-foreground">Agency Overbidding:</h4>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               {agencyOverbiddingData.map((item, index) => (
                 <div
                   key={index}
-                  className="flex flex-col p-3 rounded border border-red-200 bg-red-50/50 hover:bg-red-100/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                    <span className="text-xs font-medium text-foreground">{item.title}</span>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
+                      <TrendingUp className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">{getOverbiddingDescription(index)}</p>
+                    </div>
                   </div>
                   
                   <div className="text-right">
-                    <span className="font-bold text-foreground">{item.count}</span>
-                    <span className="text-xs text-muted-foreground ml-1">({item.percentage}%)</span>
+                    <p className="font-bold text-lg text-foreground">{item.count}</p>
+                    <p className="text-xs text-muted-foreground">({item.percentage}%)</p>
                   </div>
                 </div>
               ))}
