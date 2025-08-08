@@ -17,7 +17,7 @@ const BidSimulation = () => {
   const { activeFileId } = useAppSettings();
   const { files, isInitialized } = useIndexedDbStorage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filters, setFilters] = useState<Record<string, { operator: string; value: string; valueFrom?: string; valueTo?: string }>>({});
+  const [filters, setFilters] = useState<Record<string, { operator: string; value: string; valueFrom?: string; valueTo?: string; source?: string }>>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [isResizing, setIsResizing] = useState(false);
@@ -40,6 +40,164 @@ const BidSimulation = () => {
   const activeFile = useMemo(() => {
     return files.find(file => file.id === activeFileId);
   }, [files, activeFileId]);
+
+  // Helper function for RCA complex filtering logic
+  const applyRcaComplexFilter = (row: any, filterType: string, source: string) => {
+    // Helper functions to safely get values from row
+    const getValue = (columnName: string) => {
+      if (Array.isArray(row)) {
+        const index = activeFile?.headers?.indexOf(columnName) ?? -1;
+        return index >= 0 ? row[index] : null;
+      }
+      return row[columnName];
+    };
+    
+    const toNumber = (value: any): number => {
+      if (value === null || value === undefined || value === '') return 0;
+      const num = parseFloat(value.toString().replace(/[,$%]/g, ''));
+      return isNaN(num) ? 0 : num;
+    };
+
+    const toBool = (value: any): boolean => {
+      if (typeof value === 'boolean') return value;
+      const str = value?.toString().toLowerCase();
+      return str === 'true' || str === '1' || str === 'yes';
+    };
+
+    // Implement specific RCA filter logic
+    switch (filterType) {
+      case 'agency_underbidding_1':
+        const syncStatus1 = toBool(getValue('Sync Status'));
+        const appliedAcos1 = toNumber(getValue('I: Applied ACOS'));
+        const adSpend1 = toNumber(getValue('J: Ad Spend'));
+        const tosPercent1 = toNumber(getValue('M: TOS%'));
+        const minSuggestedBid1 = toNumber(getValue('O: Min. Suggested Bid'));
+        const currentBid1 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
+        
+        console.log('Agency Underbidding #1 filter check:', {
+          syncStatus: !syncStatus1,
+          appliedAcos: appliedAcos1,
+          adSpend: adSpend1,
+          tosPercent: tosPercent1,
+          minSuggestedBid: minSuggestedBid1,
+          currentBid: currentBid1,
+          result: !syncStatus1 && appliedAcos1 === 9999 && adSpend1 === 0 && tosPercent1 <= 0 && minSuggestedBid1 > currentBid1
+        });
+        
+        return !syncStatus1 && 
+               appliedAcos1 === 9999 && 
+               adSpend1 === 0 && 
+               tosPercent1 <= 0 && 
+               minSuggestedBid1 > currentBid1;
+
+      case 'agency_overbidding_1':
+        const syncStatus2 = toBool(getValue('Sync Status'));
+        const appliedAcos2 = toNumber(getValue('I: Applied ACOS'));
+        const targetAcos2 = toNumber(getValue('G: Target ACOS'));
+        const currentBid2 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
+        
+        return !syncStatus2 && 
+               appliedAcos2 < 9999 && 
+               appliedAcos2 < targetAcos2 && 
+               currentBid2 > 0.2;
+
+      case 'agency_overbidding_2':
+        const syncStatus3 = toBool(getValue('Sync Status'));
+        const appliedAcos3 = toNumber(getValue('I: Applied ACOS'));
+        const adSpend3 = toNumber(getValue('J: Ad Spend'));
+        const targetAcos3 = toNumber(getValue('G: Target ACOS'));
+        const price3 = toNumber(getValue('K: Price'));
+        const currentBid3 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
+        
+        return !syncStatus3 && 
+               appliedAcos3 === 9999 && 
+               adSpend3 > (targetAcos3 * price3) && 
+               currentBid3 > 0.2;
+
+      case 'agency_overbidding_3':
+        const syncStatus4 = toBool(getValue('Sync Status'));
+        const appliedAcos4 = toNumber(getValue('I: Applied ACOS'));
+        const currentBid4 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
+        
+        return !syncStatus4 && 
+               appliedAcos4 < 9999 && 
+               appliedAcos4 > 0.35 && 
+               currentBid4 > 0.2;
+
+      case 'portal_overbidding_1':
+        const syncStatus5 = toBool(getValue('Sync Status'));
+        const appliedAcos5 = toNumber(getValue('I: Applied ACOS'));
+        const targetAcos5 = toNumber(getValue('G: Target ACOS'));
+        const latestBid5 = toNumber(getValue('Latest Bid Calculated by the System'));
+        
+        return syncStatus5 && 
+               appliedAcos5 < 9999 && 
+               appliedAcos5 > targetAcos5 && 
+               latestBid5 > 0.02;
+
+      case 'portal_overbidding_2':
+        const syncStatus6 = toBool(getValue('Sync Status'));
+        const appliedAcos6 = toNumber(getValue('I: Applied ACOS'));
+        const adSpend6 = toNumber(getValue('J: Ad Spend'));
+        const targetAcos6 = toNumber(getValue('G: Target ACOS'));
+        const price6 = toNumber(getValue('K: Price'));
+        const latestBid6 = toNumber(getValue('Latest Bid Calculated by the System'));
+        
+        return syncStatus6 && 
+               appliedAcos6 === 9999 && 
+               adSpend6 > (targetAcos6 * price6) && 
+               latestBid6 > 0.02;
+
+      case 'portal_underbidding_1':
+        const syncStatus7 = toBool(getValue('Sync Status'));
+        const appliedAcos7 = toNumber(getValue('I: Applied ACOS'));
+        const targetAcos7 = toNumber(getValue('G: Target ACOS'));
+        const latestBid7 = toNumber(getValue('Latest Bid Calculated by the System'));
+        
+        return syncStatus7 && 
+               appliedAcos7 < 9999 && 
+               appliedAcos7 < targetAcos7 && 
+               latestBid7 === 0.02;
+
+      case 'portal_underbidding_2':
+        const syncStatus8 = toBool(getValue('Sync Status'));
+        const appliedAcos8 = toNumber(getValue('I: Applied ACOS'));
+        const adSpend8 = toNumber(getValue('J: Ad Spend'));
+        const targetAcos8 = toNumber(getValue('G: Target ACOS'));
+        const price8 = toNumber(getValue('K: Price'));
+        const latestBid8 = toNumber(getValue('Latest Bid Calculated by the System'));
+        
+        return syncStatus8 && 
+               appliedAcos8 === 9999 && 
+               adSpend8 < (targetAcos8 * price8) && 
+               latestBid8 === 0.02;
+
+      case 'portal_underbidding_3':
+        const syncStatus9 = toBool(getValue('Sync Status'));
+        const minSuggestedBid9 = toNumber(getValue('O: Min. Suggested Bid'));
+        const latestBid9 = toNumber(getValue('Latest Bid Calculated by the System'));
+        const adSpend9 = toNumber(getValue('J: Ad Spend'));
+        
+        return syncStatus9 && 
+               minSuggestedBid9 > latestBid9 && 
+               adSpend9 === 0;
+
+      case 'portal_underbidding_4':
+        const syncStatus10 = toBool(getValue('Sync Status'));
+        const appliedAcos10 = toNumber(getValue('I: Applied ACOS'));
+        const targetAcos10 = toNumber(getValue('G: Target ACOS'));
+        const currentBidAmazon10 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
+        const latestBid10 = toNumber(getValue('Latest Bid Calculated by the System'));
+        const delta10 = currentBidAmazon10 - latestBid10;
+        
+        return !syncStatus10 && 
+               appliedAcos10 < targetAcos10 && 
+               delta10 > 0.26;
+
+      default:
+        return true;
+    }
+  };
 
   // Initialize visible columns when file changes
   useEffect(() => {
@@ -192,59 +350,23 @@ const BidSimulation = () => {
         }
       });
     } else if (source === 'rca_portal' || source === 'rca_agency') {
-      // Handle RCA Portal/Agency format (simplified for main conditions)
+      // Handle RCA Portal/Agency format with complex logic
       const filterType = searchParams.get('filter_type');
       
+      console.log('RCA Filter Debug:', {
+        source,
+        filterType,
+        allParams: Object.fromEntries(searchParams.entries())
+      });
+      
       if (filterType) {
-        // Extract primary filters that we can apply directly
-        const syncStatus = searchParams.get('value_sync_status');
-        const appliedAcos = searchParams.get('value_applied_acos');
-        const targetAcos = searchParams.get('value_target_acos');
-        const currentBid = searchParams.get('value_current_bid');
-        const latestBid = searchParams.get('value_latest_bid');
-        const adSpend = searchParams.get('value_ad_spend');
+        // Store the complex filter type for special handling
+        newFilters['__rca_filter_type__'] = {
+          operator: 'rca_complex',
+          value: filterType
+        };
         
-        // Apply Sync Status filter if present
-        if (syncStatus) {
-          newFilters['Sync Status'] = {
-            operator: 'equals',
-            value: syncStatus
-          };
-        }
-        
-        // Apply Applied ACOS filter if present and not complex logic
-        if (appliedAcos && appliedAcos !== '9999') {
-          newFilters['I: Applied ACOS'] = {
-            operator: searchParams.get('operator_applied_acos') || 'equals',
-            value: appliedAcos
-          };
-        }
-        
-        // Apply Current Bid filter if present
-        if (currentBid) {
-          newFilters['Current Bid As displayed on Amazon Seller Central'] = {
-            operator: searchParams.get('operator_current_bid') || 'greater',
-            value: currentBid
-          };
-        }
-        
-        // Apply Latest Bid filter if present
-        if (latestBid) {
-          newFilters['Latest Bid Calculated by the System'] = {
-            operator: searchParams.get('operator_latest_bid') || 'greater',
-            value: latestBid
-          };
-        }
-        
-        // Apply Ad Spend filter if present
-        if (adSpend) {
-          newFilters['J: Ad Spend'] = {
-            operator: searchParams.get('operator_ad_spend') || 'equals',
-            value: adSpend
-          };
-        }
-        
-        console.log(`Applied RCA ${source === 'rca_portal' ? 'Portal' : 'Agency'} filters for: ${filterType}`, newFilters);
+        console.log('Applied RCA complex filter:', filterType);
       }
     }
     
@@ -262,6 +384,10 @@ const BidSimulation = () => {
 
     return activeFile.data.filter((row) => {
       return Object.entries(filters).every(([column, filter]) => {
+        // Handle RCA complex filters
+        if (filter.operator === 'rca_complex') {
+          return applyRcaComplexFilter(row, filter.value, column === '__rca_filter_type__' ? 'agency' : 'portal');
+        }
         // For between filter, check if at least one value is provided
         if (filter.operator === 'between' && (!filter.valueFrom && !filter.valueTo)) {
           return true; // Skip filtering if both values are empty
