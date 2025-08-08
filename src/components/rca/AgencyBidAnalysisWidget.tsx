@@ -11,9 +11,22 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
   // Debug: Log the data structure and available columns
   React.useEffect(() => {
     if (data && data.length > 0) {
-      console.log('Agency Widget - Available columns:', Object.keys(data[0]));
-      console.log('Agency Widget - Sample record:', data[0]);
-      console.log('Agency Widget - Total records:', data.length);
+      console.log('=== AGENCY WIDGET DEBUG ===');
+      console.log('Available columns:', Object.keys(data[0]));
+      console.log('Total records:', data.length);
+      console.log('Sample row data:', data[0]);
+      
+      // Check specific columns that we need
+      const sampleRow = data[0];
+      console.log('Key column values:');
+      console.log('- Sync Status:', sampleRow['Sync Status'], typeof sampleRow['Sync Status']);
+      console.log('- Applied ACOS:', sampleRow['Applied ACOS'], typeof sampleRow['Applied ACOS']);
+      console.log('- Target ACOS:', sampleRow['Target ACOS'], typeof sampleRow['Target ACOS']);
+      console.log('- Current Bid As displayed on Amazon Seller Central:', sampleRow['Current Bid As displayed on Amazon Seller Central']);
+      console.log('- Ad Spend:', sampleRow['Ad Spend']);
+      console.log('- TOS%:', sampleRow['TOS%']);
+      console.log('- Min. Suggested Bid:', sampleRow['Min. Suggested Bid']);
+      console.log('=== END AGENCY DEBUG ===');
     }
   }, [data]);
 
