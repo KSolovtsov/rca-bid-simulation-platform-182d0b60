@@ -96,9 +96,17 @@ const BidSimulation = () => {
         const targetAcos2 = toNumber(getValue('G: Target ACOS'));
         const currentBid2 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
         
+        console.log('Agency Overbidding #1 filter check:', {
+          syncStatus: !syncStatus2,
+          appliedAcos: appliedAcos2,
+          targetAcos: targetAcos2,
+          currentBid: currentBid2,
+          result: !syncStatus2 && appliedAcos2 < 9999 && appliedAcos2 > targetAcos2 && currentBid2 > 0.2
+        });
+        
         return !syncStatus2 && 
                appliedAcos2 < 9999 && 
-               appliedAcos2 < targetAcos2 && 
+               appliedAcos2 > targetAcos2 && 
                currentBid2 > 0.2;
 
       case 'agency_overbidding_2':
@@ -386,7 +394,24 @@ const BidSimulation = () => {
       return Object.entries(filters).every(([column, filter]) => {
         // Handle RCA complex filters
         if (filter.operator === 'rca_complex') {
-          return applyRcaComplexFilter(row, filter.value, column === '__rca_filter_type__' ? 'agency' : 'portal');
+          // Determine source from the URL searchParams if column doesn't help
+          const urlSource = new URLSearchParams(window.location.search).get('source');
+          let actualSource = 'agency'; // default
+          
+          if (urlSource === 'rca_portal') {
+            actualSource = 'portal';
+          } else if (urlSource === 'rca_agency') {
+            actualSource = 'agency';
+          }
+          
+          console.log('RCA Complex Filter Apply:', {
+            filterValue: filter.value,
+            actualSource,
+            urlSource,
+            column
+          });
+          
+          return applyRcaComplexFilter(row, filter.value, actualSource);
         }
         // For between filter, check if at least one value is provided
         if (filter.operator === 'between' && (!filter.valueFrom && !filter.valueTo)) {
