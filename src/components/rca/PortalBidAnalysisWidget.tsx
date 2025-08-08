@@ -1,29 +1,149 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 
 interface PortalBidAnalysisWidgetProps {
   data: any[];
 }
 
 const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
-  // Mock data for now - will be replaced with actual calculations
+  // Helper function to safely convert values to numbers
+  const toNumber = (value: any): number => {
+    if (value === null || value === undefined || value === '') return 0;
+    const num = parseFloat(value.toString().replace(/[,$%]/g, ''));
+    return isNaN(num) ? 0 : num;
+  };
+
+  const toBool = (value: any): boolean => {
+    if (typeof value === 'boolean') return value;
+    const str = value?.toString().toLowerCase();
+    return str === 'true' || str === '1' || str === 'yes';
+  };
+
+  // Calculate Portal Overbidding cases
+  const portalOverbidding1 = data.filter(row => {
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedAcos = toNumber(row['Applied ACOS']);
+    const targetAcos = toNumber(row['Target ACOS']);
+    const latestBid = toNumber(row['Latest Bid Calculated by the System']);
+    
+    return syncStatus && 
+           appliedAcos < 9999 && 
+           appliedAcos > targetAcos && 
+           latestBid > 0.02;
+  });
+
+  const portalOverbidding2 = data.filter(row => {
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedAcos = toNumber(row['Applied ACOS']);
+    const adSpend = toNumber(row['Ad Spend']);
+    const targetAcos = toNumber(row['Target ACOS']);
+    const price = toNumber(row['Price']);
+    const latestBid = toNumber(row['Latest Bid Calculated by the System']);
+    
+    return syncStatus && 
+           appliedAcos === 9999 && 
+           adSpend > (targetAcos * price) && 
+           latestBid > 0.02;
+  });
+
+  // Calculate Portal Underbidding cases
+  const portalUnderbidding1 = data.filter(row => {
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedAcos = toNumber(row['Applied ACOS']);
+    const targetAcos = toNumber(row['Target ACOS']);
+    const latestBid = toNumber(row['Latest Bid Calculated by the System']);
+    
+    return syncStatus && 
+           appliedAcos < 9999 && 
+           appliedAcos < targetAcos && 
+           latestBid === 0.02;
+  });
+
+  const portalUnderbidding2 = data.filter(row => {
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedAcos = toNumber(row['Applied ACOS']);
+    const adSpend = toNumber(row['Ad Spend']);
+    const targetAcos = toNumber(row['Target ACOS']);
+    const price = toNumber(row['Price']);
+    const latestBid = toNumber(row['Latest Bid Calculated by the System']);
+    
+    return syncStatus && 
+           appliedAcos === 9999 && 
+           adSpend < (targetAcos * price) && 
+           latestBid === 0.02;
+  });
+
+  const portalUnderbidding3 = data.filter(row => {
+    const syncStatus = toBool(row['Sync Status']);
+    const minSuggestedBid = toNumber(row['Min. Suggested Bid']);
+    const latestBid = toNumber(row['Latest Bid Calculated by the System']);
+    const adSpend = toNumber(row['Ad Spend']);
+    
+    return syncStatus && 
+           minSuggestedBid > latestBid && 
+           adSpend === 0;
+  });
+
+  const portalUnderbidding4 = data.filter(row => {
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedAcos = toNumber(row['Applied ACOS']);
+    const targetAcos = toNumber(row['Target ACOS']);
+    const currentBidAmazon = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
+    const latestBid = toNumber(row['Latest Bid Calculated by the System']);
+    const delta = currentBidAmazon - latestBid;
+    
+    return !syncStatus && 
+           appliedAcos < targetAcos && 
+           delta > 0.26;
+  });
+
   const overbiddingCases = [
-    { type: 'Campaign Level CVR', count: 727, percentage: 38.2, level: 'Level 3', color: 'bg-orange-500' },
-    { type: 'ASIN Level CVR', count: 198, percentage: 10.4, level: 'Level 4', color: 'bg-purple-500' },
-    { type: 'Default CVR', count: 963, percentage: 50.6, level: 'Level 5', color: 'bg-pink-500' },
-    { type: 'KW Level CVR', count: 7, percentage: 0.4, level: 'Level 2', color: 'bg-blue-500' },
-    { type: 'ST Level CVR', count: 8, percentage: 0.4, level: 'Level 1', color: 'bg-blue-400' }
+    { 
+      type: 'Portal Overbidding #1', 
+      count: portalOverbidding1.length, 
+      description: 'Portal engineers Issues',
+      color: 'bg-red-500' 
+    },
+    { 
+      type: 'Portal Overbidding #2', 
+      count: portalOverbidding2.length, 
+      description: 'Portal engineers Issues',
+      color: 'bg-orange-500' 
+    }
   ];
 
   const underbiddingCases = [
-    { type: 'High Performance KW', count: 156, percentage: 8.2, level: 'Opportunity', color: 'bg-green-500' },
-    { type: 'Low ACOS Targets', count: 89, percentage: 4.7, level: 'Potential', color: 'bg-emerald-500' },
-    { type: 'Scaled Campaigns', count: 234, percentage: 12.3, level: 'Review', color: 'bg-teal-500' }
+    { 
+      type: 'Portal Underbidding #1', 
+      count: portalUnderbidding1.length, 
+      description: 'Portal CVR Logic issue',
+      color: 'bg-blue-500' 
+    },
+    { 
+      type: 'Portal Underbidding #2', 
+      count: portalUnderbidding2.length, 
+      description: 'Portal CVR Logic issue',
+      color: 'bg-indigo-500' 
+    },
+    { 
+      type: 'Portal Underbidding #3', 
+      count: portalUnderbidding3.length, 
+      description: 'Portal Bid Limit, Expensive Bids need Human Loop',
+      color: 'bg-purple-500' 
+    },
+    { 
+      type: 'Portal Underbidding #4', 
+      count: portalUnderbidding4.length, 
+      description: 'Portal Bid Limit Expensive Bids need Human Loop',
+      color: 'bg-pink-500' 
+    }
   ];
 
-  const totalRecords = 1903;
+  const totalRecords = data.length;
+  const totalOverbidding = portalOverbidding1.length + portalOverbidding2.length;
+  const totalUnderbidding = portalUnderbidding1.length + portalUnderbidding2.length + portalUnderbidding3.length + portalUnderbidding4.length;
 
   return (
     <Card className="shadow-card animate-slide-up">
@@ -59,13 +179,13 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
                   </div>
                   <div>
                     <p className="font-medium text-sm text-foreground">{item.type}</p>
-                    <p className="text-xs text-muted-foreground">{item.level}</p>
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
                   </div>
                 </div>
                 
                 <div className="text-right">
                   <p className="font-bold text-lg text-foreground">{item.count}</p>
-                  <p className="text-xs text-muted-foreground">({item.percentage}%)</p>
+                  <p className="text-xs text-muted-foreground">({totalRecords > 0 ? ((item.count / totalRecords) * 100).toFixed(1) : 0}%)</p>
                 </div>
               </div>
             ))}
@@ -91,13 +211,13 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
                   </div>
                   <div>
                     <p className="font-medium text-sm text-foreground">{item.type}</p>
-                    <p className="text-xs text-muted-foreground">{item.level}</p>
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
                   </div>
                 </div>
                 
                 <div className="text-right">
                   <p className="font-bold text-lg text-foreground">{item.count}</p>
-                  <p className="text-xs text-muted-foreground">({item.percentage}%)</p>
+                  <p className="text-xs text-muted-foreground">({totalRecords > 0 ? ((item.count / totalRecords) * 100).toFixed(1) : 0}%)</p>
                 </div>
               </div>
             ))}
