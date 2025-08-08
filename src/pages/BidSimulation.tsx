@@ -203,6 +203,14 @@ const BidSimulation = () => {
         const latestBid9 = toNumber(getValue('Latest Bid Calculated by the System'));
         const adSpend9 = toNumber(getValue('J: Ad Spend'));
         
+        console.log('Portal Underbidding #3 filter check:', {
+          syncStatus: syncStatus9,
+          minSuggestedBid: minSuggestedBid9,
+          latestBid: latestBid9,
+          adSpend: adSpend9,
+          result: syncStatus9 && minSuggestedBid9 > latestBid9 && adSpend9 === 0
+        });
+        
         return syncStatus9 && 
                minSuggestedBid9 > latestBid9 && 
                adSpend9 === 0;
@@ -214,6 +222,16 @@ const BidSimulation = () => {
         const currentBidAmazon10 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
         const latestBid10 = toNumber(getValue('Latest Bid Calculated by the System'));
         const delta10 = currentBidAmazon10 - latestBid10;
+        
+        console.log('Portal Underbidding #4 filter check:', {
+          syncStatus: syncStatus10,
+          appliedAcos: appliedAcos10,
+          targetAcos: targetAcos10,
+          currentBidAmazon: currentBidAmazon10,
+          latestBid: latestBid10,
+          delta: delta10,
+          result: !syncStatus10 && appliedAcos10 < targetAcos10 && delta10 > 0.26
+        });
         
         return !syncStatus10 && 
                appliedAcos10 < targetAcos10 && 
