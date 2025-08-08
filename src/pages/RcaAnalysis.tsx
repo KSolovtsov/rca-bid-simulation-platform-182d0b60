@@ -27,7 +27,7 @@ const RcaAnalysis = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
-            RCA Analysis
+            Bids RCA Insights
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Root Cause Analysis with advanced pattern recognition and insights

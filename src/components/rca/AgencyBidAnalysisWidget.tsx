@@ -102,7 +102,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
     <Card className="shadow-card animate-slide-up">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-foreground">
-          Agency Bid RCA
+          Agency Bids RCA
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           Total Records: {totalRecords}
@@ -114,7 +114,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
           {/* Agency Underbidding */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-lg">📉</span>
               <h4 className="font-medium text-sm text-green-600">Agency Underbidding:</h4>
             </div>
             
@@ -141,7 +141,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
           {/* Agency Overbidding */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <span className="text-lg">📈</span>
               <h4 className="font-medium text-sm text-red-600">Agency Overbidding:</h4>
             </div>
             
