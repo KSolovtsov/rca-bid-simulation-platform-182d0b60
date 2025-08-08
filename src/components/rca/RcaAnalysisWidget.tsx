@@ -9,6 +9,8 @@ import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import OverbiddingWidget from './OverbiddingWidget';
 import UnderbiddingWidget from './UnderbiddingWidget';
+import PortalBidAnalysisWidget from './PortalBidAnalysisWidget';
+import AgencyBidAnalysisWidget from './AgencyBidAnalysisWidget';
 
 interface RcaAnalysisData {
   asin: string;
@@ -179,10 +181,9 @@ const RcaAnalysisWidget = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Performance Overview</TabsTrigger>
-          <TabsTrigger value="overbidding">Overbidding Analysis</TabsTrigger>
-          <TabsTrigger value="underbidding">Underbidding Opportunities</TabsTrigger>
+          <TabsTrigger value="rca-bid-analysis">RCA Bid Analysis</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-6">
@@ -279,12 +280,11 @@ const RcaAnalysisWidget = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="overbidding" className="mt-6">
-          <OverbiddingWidget data={fileData.data} />
-        </TabsContent>
-        
-        <TabsContent value="underbidding" className="mt-6">
-          <UnderbiddingWidget data={fileData.data} />
+        <TabsContent value="rca-bid-analysis" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PortalBidAnalysisWidget data={fileData.data} />
+            <AgencyBidAnalysisWidget data={fileData.data} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
