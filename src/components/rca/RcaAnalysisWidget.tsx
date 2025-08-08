@@ -180,10 +180,10 @@ const RcaAnalysisWidget = () => {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs defaultValue="rca-bid-analysis" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="overview">Performance Overview</TabsTrigger>
           <TabsTrigger value="rca-bid-analysis">Bids RCA</TabsTrigger>
+          <TabsTrigger value="overview">Performance Overview</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-6">
