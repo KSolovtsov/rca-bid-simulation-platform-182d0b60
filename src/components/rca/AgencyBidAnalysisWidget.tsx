@@ -8,7 +8,15 @@ interface AgencyBidAnalysisWidgetProps {
 }
 
 const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
-  
+  // Debug: Log the data structure and available columns
+  React.useEffect(() => {
+    if (data && data.length > 0) {
+      console.log('Agency Widget - Available columns:', Object.keys(data[0]));
+      console.log('Agency Widget - Sample record:', data[0]);
+      console.log('Agency Widget - Total records:', data.length);
+    }
+  }, [data]);
+
   const getOverbiddingDescription = (index: number) => {
     const descriptions = [
       'ACOS Greater than Global ACOS',
@@ -17,18 +25,38 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
     ];
     return descriptions[index] || '';
   };
-  // Debug: Log the data structure
-  console.log('Agency Widget - CSV Data:', data);
-  console.log('Agency Widget - Sample record:', data[0]);
   
+  // Helper functions to safely convert values
+  const toNumber = (value: any): number => {
+    if (value === null || value === undefined || value === '') return 0;
+    const num = parseFloat(value.toString().replace(/[,$%]/g, ''));
+    return isNaN(num) ? 0 : num;
+  };
+
+  const toBool = (value: any): boolean => {
+    if (typeof value === 'boolean') return value;
+    const str = value?.toString().toLowerCase();
+    return str === 'false';
+  };
+
   // Calculate Agency Underbidding
   const agencyUnderbidding1 = data.filter(row => {
-    const syncStatus = row['Sync Status']?.toString().toLowerCase() === 'false';
-    const appliedACOS = parseFloat(row['Applied ACOS']) || 0;
-    const adSpend = parseFloat(row['Ad Spend']) || 0;
-    const tosPercent = parseFloat(row['TOS%']) || 0;
-    const minSuggestedBid = parseFloat(row['Min. Suggested Bid']) || 0;
-    const currentBid = parseFloat(row['Current Bid']) || 0;
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedACOS = toNumber(row['Applied ACOS']);
+    const adSpend = toNumber(row['Ad Spend']);
+    const tosPercent = toNumber(row['TOS%']);
+    const minSuggestedBid = toNumber(row['Min. Suggested Bid']);
+    const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
+    
+    console.log('Agency Underbidding #1 check:', {
+      syncStatus,
+      appliedACOS,
+      adSpend,
+      tosPercent,
+      minSuggestedBid,
+      currentBid,
+      passes: syncStatus && appliedACOS === 9999 && adSpend === 0 && tosPercent <= 0 && minSuggestedBid > currentBid
+    });
     
     return syncStatus &&
            appliedACOS === 9999 &&
@@ -39,10 +67,18 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
 
   // Calculate Agency Overbidding
   const agencyOverbidding1 = data.filter(row => {
-    const syncStatus = row['Sync Status']?.toString().toLowerCase() === 'false';
-    const appliedACOS = parseFloat(row['Applied ACOS']) || 0;
-    const targetACOS = parseFloat(row['Target ACOS']) || 0;
-    const currentBid = parseFloat(row['Current Bid']) || 0;
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedACOS = toNumber(row['Applied ACOS']);
+    const targetACOS = toNumber(row['Target ACOS']);
+    const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
+    
+    console.log('Agency Overbidding #1 check:', {
+      syncStatus,
+      appliedACOS,
+      targetACOS,
+      currentBid,
+      passes: syncStatus && appliedACOS < 9999 && appliedACOS < targetACOS && currentBid > 0.2
+    });
     
     return syncStatus &&
            appliedACOS < 9999 &&
@@ -51,12 +87,12 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
   });
 
   const agencyOverbidding2 = data.filter(row => {
-    const syncStatus = row['Sync Status']?.toString().toLowerCase() === 'false';
-    const appliedACOS = parseFloat(row['Applied ACOS']) || 0;
-    const adSpend = parseFloat(row['Ad Spend']) || 0;
-    const targetACOS = parseFloat(row['Target ACOS']) || 0;
-    const price = parseFloat(row['Price']) || 0;
-    const currentBid = parseFloat(row['Current Bid']) || 0;
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedACOS = toNumber(row['Applied ACOS']);
+    const adSpend = toNumber(row['Ad Spend']);
+    const targetACOS = toNumber(row['Target ACOS']);
+    const price = toNumber(row['Price']);
+    const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
     return syncStatus &&
            appliedACOS === 9999 &&
@@ -65,9 +101,9 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
   });
 
   const agencyOverbidding3 = data.filter(row => {
-    const syncStatus = row['Sync Status']?.toString().toLowerCase() === 'false';
-    const appliedACOS = parseFloat(row['Applied ACOS']) || 0;
-    const currentBid = parseFloat(row['Current Bid']) || 0;
+    const syncStatus = toBool(row['Sync Status']);
+    const appliedACOS = toNumber(row['Applied ACOS']);
+    const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
     return syncStatus &&
            appliedACOS < 9999 &&
