@@ -34,7 +34,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
 
   const getOverbiddingDescription = (index: number) => {
     const descriptions = [
-      'ACOS Greater than Global ACOS',
+      'ACOS Greater than Target ACOS',
       'High ACOS without sales', 
       'ACOS >35% Need Human Loop'
     ];
@@ -216,7 +216,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
 
   const agencyOverbiddingData = [
     { 
-      title: 'Agency Overbidding #1 (ACOS Greater than Global ACOS)', 
+      title: 'Agency Overbidding #1 (ACOS Greater than Target ACOS)', 
       count: agencyOverbidding1.length, 
       percentage: totalRecords > 0 ? ((agencyOverbidding1.length / totalRecords) * 100).toFixed(2) : '0.00',
       color: 'bg-red-500' 
