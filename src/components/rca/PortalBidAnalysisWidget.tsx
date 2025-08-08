@@ -46,9 +46,9 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
 
   // Calculate Portal Overbidding cases
   const portalOverbidding1 = data.filter(row => {
-    const syncStatus = toBool(row['Sync Status']);
-    const appliedAcos = toNumber(row['Applied ACOS']);
-    const targetAcos = toNumber(row['Target ACOS']);
+    const syncStatus = !toBool(row['Sync Status']); // Sync Status = True
+    const appliedAcos = toNumber(row['I: Applied ACOS']);
+    const targetAcos = toNumber(row['G: Target ACOS']);
     const latestBid = toNumber(row['Latest Bid Calculated by the System']);
     
     return syncStatus && 
@@ -58,11 +58,11 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
   });
 
   const portalOverbidding2 = data.filter(row => {
-    const syncStatus = toBool(row['Sync Status']);
-    const appliedAcos = toNumber(row['Applied ACOS']);
-    const adSpend = toNumber(row['Ad Spend']);
-    const targetAcos = toNumber(row['Target ACOS']);
-    const price = toNumber(row['Price']);
+    const syncStatus = !toBool(row['Sync Status']); // Sync Status = True
+    const appliedAcos = toNumber(row['I: Applied ACOS']);
+    const adSpend = toNumber(row['J: Ad Spend']);
+    const targetAcos = toNumber(row['G: Target ACOS']);
+    const price = toNumber(row['K: Price']);
     const latestBid = toNumber(row['Latest Bid Calculated by the System']);
     
     return syncStatus && 
@@ -73,9 +73,9 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
 
   // Calculate Portal Underbidding cases
   const portalUnderbidding1 = data.filter(row => {
-    const syncStatus = toBool(row['Sync Status']);
-    const appliedAcos = toNumber(row['Applied ACOS']);
-    const targetAcos = toNumber(row['Target ACOS']);
+    const syncStatus = !toBool(row['Sync Status']); // Sync Status = True
+    const appliedAcos = toNumber(row['I: Applied ACOS']);
+    const targetAcos = toNumber(row['G: Target ACOS']);
     const latestBid = toNumber(row['Latest Bid Calculated by the System']);
     
     return syncStatus && 
@@ -85,11 +85,11 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
   });
 
   const portalUnderbidding2 = data.filter(row => {
-    const syncStatus = toBool(row['Sync Status']);
-    const appliedAcos = toNumber(row['Applied ACOS']);
-    const adSpend = toNumber(row['Ad Spend']);
-    const targetAcos = toNumber(row['Target ACOS']);
-    const price = toNumber(row['Price']);
+    const syncStatus = !toBool(row['Sync Status']); // Sync Status = True
+    const appliedAcos = toNumber(row['I: Applied ACOS']);
+    const adSpend = toNumber(row['J: Ad Spend']);
+    const targetAcos = toNumber(row['G: Target ACOS']);
+    const price = toNumber(row['K: Price']);
     const latestBid = toNumber(row['Latest Bid Calculated by the System']);
     
     return syncStatus && 
@@ -99,10 +99,10 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
   });
 
   const portalUnderbidding3 = data.filter(row => {
-    const syncStatus = toBool(row['Sync Status']);
-    const minSuggestedBid = toNumber(row['Min. Suggested Bid']);
+    const syncStatus = !toBool(row['Sync Status']); // Sync Status = True
+    const minSuggestedBid = toNumber(row['O: Min. Suggested Bid']);
     const latestBid = toNumber(row['Latest Bid Calculated by the System']);
-    const adSpend = toNumber(row['Ad Spend']);
+    const adSpend = toNumber(row['J: Ad Spend']);
     
     return syncStatus && 
            minSuggestedBid > latestBid && 
@@ -110,14 +110,14 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
   });
 
   const portalUnderbidding4 = data.filter(row => {
-    const syncStatus = toBool(row['Sync Status']);
-    const appliedAcos = toNumber(row['Applied ACOS']);
-    const targetAcos = toNumber(row['Target ACOS']);
+    const syncStatus = toBool(row['Sync Status']); // Sync Status = False
+    const appliedAcos = toNumber(row['I: Applied ACOS']);
+    const targetAcos = toNumber(row['G: Target ACOS']);
     const currentBidAmazon = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     const latestBid = toNumber(row['Latest Bid Calculated by the System']);
     const delta = currentBidAmazon - latestBid;
     
-    return !syncStatus && 
+    return syncStatus && 
            appliedAcos < targetAcos && 
            delta > 0.26;
   });

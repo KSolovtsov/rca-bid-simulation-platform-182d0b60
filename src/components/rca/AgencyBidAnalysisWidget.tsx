@@ -55,10 +55,10 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
   // Calculate Agency Underbidding
   const agencyUnderbidding1 = data.filter(row => {
     const syncStatus = toBool(row['Sync Status']);
-    const appliedACOS = toNumber(row['Applied ACOS']);
-    const adSpend = toNumber(row['Ad Spend']);
-    const tosPercent = toNumber(row['TOS%']);
-    const minSuggestedBid = toNumber(row['Min. Suggested Bid']);
+    const appliedACOS = toNumber(row['I: Applied ACOS']);
+    const adSpend = toNumber(row['J: Ad Spend']);
+    const tosPercent = toNumber(row['M: TOS%']);
+    const minSuggestedBid = toNumber(row['O: Min. Suggested Bid']);
     const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
     console.log('Agency Underbidding #1 check:', {
@@ -81,8 +81,8 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
   // Calculate Agency Overbidding
   const agencyOverbidding1 = data.filter(row => {
     const syncStatus = toBool(row['Sync Status']);
-    const appliedACOS = toNumber(row['Applied ACOS']);
-    const targetACOS = toNumber(row['Target ACOS']);
+    const appliedACOS = toNumber(row['I: Applied ACOS']);
+    const targetACOS = toNumber(row['G: Target ACOS']);
     const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
     console.log('Agency Overbidding #1 check:', {
@@ -101,10 +101,10 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
 
   const agencyOverbidding2 = data.filter(row => {
     const syncStatus = toBool(row['Sync Status']);
-    const appliedACOS = toNumber(row['Applied ACOS']);
-    const adSpend = toNumber(row['Ad Spend']);
-    const targetACOS = toNumber(row['Target ACOS']);
-    const price = toNumber(row['Price']);
+    const appliedACOS = toNumber(row['I: Applied ACOS']);
+    const adSpend = toNumber(row['J: Ad Spend']);
+    const targetACOS = toNumber(row['G: Target ACOS']);
+    const price = toNumber(row['K: Price']);
     const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
     return syncStatus &&
@@ -115,7 +115,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
 
   const agencyOverbidding3 = data.filter(row => {
     const syncStatus = toBool(row['Sync Status']);
-    const appliedACOS = toNumber(row['Applied ACOS']);
+    const appliedACOS = toNumber(row['I: Applied ACOS']);
     const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
     return syncStatus &&
