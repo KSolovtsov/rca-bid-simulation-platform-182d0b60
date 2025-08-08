@@ -157,7 +157,7 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
     <Card className="shadow-card animate-slide-up">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-foreground">
-          Portal RCA Bid Analysis
+          Portal Bid RCA
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           Total Records: {totalRecords}
