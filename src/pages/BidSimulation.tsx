@@ -192,31 +192,59 @@ const BidSimulation = () => {
         }
       });
     } else if (source === 'rca_portal' || source === 'rca_agency') {
-      // Handle RCA Portal/Agency format (complex logic filters)
+      // Handle RCA Portal/Agency format (simplified for main conditions)
       const filterType = searchParams.get('filter_type');
       
       if (filterType) {
-        // Apply basic filters from URL params
-        searchParams.forEach((value, key) => {
-          if (key.startsWith('filter_') && !key.includes('_type')) {
-            const columnName = value;
-            const operatorKey = key.replace('filter_', 'operator_');
-            const valueKey = key.replace('filter_', 'value_');
-            
-            const operator = searchParams.get(operatorKey) || 'equals';
-            const filterValue = searchParams.get(valueKey);
-            
-            if (filterValue) {
-              newFilters[columnName] = {
-                operator,
-                value: filterValue
-              };
-            }
-          }
-        });
+        // Extract primary filters that we can apply directly
+        const syncStatus = searchParams.get('value_sync_status');
+        const appliedAcos = searchParams.get('value_applied_acos');
+        const targetAcos = searchParams.get('value_target_acos');
+        const currentBid = searchParams.get('value_current_bid');
+        const latestBid = searchParams.get('value_latest_bid');
+        const adSpend = searchParams.get('value_ad_spend');
         
-        // Add note about complex filtering logic
-        console.log(`Applied RCA ${source === 'rca_portal' ? 'Portal' : 'Agency'} filters for: ${filterType}`);
+        // Apply Sync Status filter if present
+        if (syncStatus) {
+          newFilters['Sync Status'] = {
+            operator: 'equals',
+            value: syncStatus
+          };
+        }
+        
+        // Apply Applied ACOS filter if present and not complex logic
+        if (appliedAcos && appliedAcos !== '9999') {
+          newFilters['I: Applied ACOS'] = {
+            operator: searchParams.get('operator_applied_acos') || 'equals',
+            value: appliedAcos
+          };
+        }
+        
+        // Apply Current Bid filter if present
+        if (currentBid) {
+          newFilters['Current Bid As displayed on Amazon Seller Central'] = {
+            operator: searchParams.get('operator_current_bid') || 'greater',
+            value: currentBid
+          };
+        }
+        
+        // Apply Latest Bid filter if present
+        if (latestBid) {
+          newFilters['Latest Bid Calculated by the System'] = {
+            operator: searchParams.get('operator_latest_bid') || 'greater',
+            value: latestBid
+          };
+        }
+        
+        // Apply Ad Spend filter if present
+        if (adSpend) {
+          newFilters['J: Ad Spend'] = {
+            operator: searchParams.get('operator_ad_spend') || 'equals',
+            value: adSpend
+          };
+        }
+        
+        console.log(`Applied RCA ${source === 'rca_portal' ? 'Portal' : 'Agency'} filters for: ${filterType}`, newFilters);
       }
     }
     
