@@ -191,6 +191,33 @@ const BidSimulation = () => {
           }
         }
       });
+    } else if (source === 'rca_portal' || source === 'rca_agency') {
+      // Handle RCA Portal/Agency format (complex logic filters)
+      const filterType = searchParams.get('filter_type');
+      
+      if (filterType) {
+        // Apply basic filters from URL params
+        searchParams.forEach((value, key) => {
+          if (key.startsWith('filter_') && !key.includes('_type')) {
+            const columnName = value;
+            const operatorKey = key.replace('filter_', 'operator_');
+            const valueKey = key.replace('filter_', 'value_');
+            
+            const operator = searchParams.get(operatorKey) || 'equals';
+            const filterValue = searchParams.get(valueKey);
+            
+            if (filterValue) {
+              newFilters[columnName] = {
+                operator,
+                value: filterValue
+              };
+            }
+          }
+        });
+        
+        // Add note about complex filtering logic
+        console.log(`Applied RCA ${source === 'rca_portal' ? 'Portal' : 'Agency'} filters for: ${filterType}`);
+      }
     }
     
     // Apply filters if any were found

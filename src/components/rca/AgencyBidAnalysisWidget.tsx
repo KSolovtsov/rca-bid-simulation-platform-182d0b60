@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown } from 'lucide-react';
@@ -8,6 +9,7 @@ interface AgencyBidAnalysisWidgetProps {
 }
 
 const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
+  const navigate = useNavigate();
   // Debug: Log the data structure and available columns
   React.useEffect(() => {
     if (data && data.length > 0) {
@@ -50,6 +52,83 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
     if (typeof value === 'boolean') return value;
     const str = value?.toString().toLowerCase();
     return str === 'false';
+  };
+
+  // Navigation function for RCA Agency filters
+  const navigateToSimulation = (filterType: string) => {
+    const params = new URLSearchParams();
+    params.append('source', 'rca_agency');
+    params.append('filter_type', filterType);
+    
+    // Add common conditions for Agency widgets
+    params.append('filter_sync_status', 'Sync Status');
+    params.append('value_sync_status', 'false');
+    params.append('operator_sync_status', 'equals');
+    
+    // Add specific conditions based on filter type
+    switch (filterType) {
+      case 'agency_underbidding_1':
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'equals');
+        
+        params.append('filter_ad_spend', 'J: Ad Spend');
+        params.append('value_ad_spend', '0');
+        params.append('operator_ad_spend', 'equals');
+        
+        params.append('filter_tos_percent', 'M: TOS%');
+        params.append('value_tos_percent', '0');
+        params.append('operator_tos_percent', 'lessEqual');
+        
+        params.append('filter_min_suggested_bid', 'O: Min. Suggested Bid');
+        params.append('filter_current_bid', 'Current Bid As displayed on Amazon Seller Central');
+        params.append('operator_bid_comparison', 'min_greater_than_current');
+        break;
+        
+      case 'agency_overbidding_1':
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'less');
+        
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('operator_acos_comparison', 'applied_less_than_target');
+        
+        params.append('filter_current_bid', 'Current Bid As displayed on Amazon Seller Central');
+        params.append('value_current_bid', '0.2');
+        params.append('operator_current_bid', 'greater');
+        break;
+        
+      case 'agency_overbidding_2':
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'equals');
+        
+        params.append('filter_ad_spend', 'J: Ad Spend');
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('filter_price', 'K: Price');
+        params.append('operator_spend_comparison', 'ad_spend_greater_than_target_price');
+        
+        params.append('filter_current_bid', 'Current Bid As displayed on Amazon Seller Central');
+        params.append('value_current_bid', '0.2');
+        params.append('operator_current_bid', 'greater');
+        break;
+        
+      case 'agency_overbidding_3':
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'less');
+        
+        params.append('filter_applied_acos_threshold', 'I: Applied ACOS');
+        params.append('value_applied_acos_threshold', '0.35');
+        params.append('operator_applied_acos_threshold', 'greater');
+        
+        params.append('filter_current_bid', 'Current Bid As displayed on Amazon Seller Central');
+        params.append('value_current_bid', '0.2');
+        params.append('operator_current_bid', 'greater');
+        break;
+    }
+    
+    navigate(`/bid-simulation?${params.toString()}`);
   };
 
   // Calculate Agency Underbidding
@@ -180,7 +259,8 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
               {agencyUnderbiddingData.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => navigateToSimulation('agency_underbidding_1')}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0`}>
@@ -212,7 +292,12 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
               {agencyOverbiddingData.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => {
+                    const filterType = index === 0 ? 'agency_overbidding_1' : 
+                                     index === 1 ? 'agency_overbidding_2' : 'agency_overbidding_3';
+                    navigateToSimulation(filterType);
+                  }}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0`}>

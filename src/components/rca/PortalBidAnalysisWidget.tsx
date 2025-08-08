@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
@@ -8,6 +9,7 @@ interface PortalBidAnalysisWidgetProps {
 }
 
 const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
+  const navigate = useNavigate();
   // Debug: Log available columns
   React.useEffect(() => {
     if (data && data.length > 0) {
@@ -42,6 +44,118 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
     if (typeof value === 'boolean') return value;
     const str = value?.toString().toLowerCase();
     return str === 'true' || str === '1' || str === 'yes';
+  };
+
+  // Navigation function for RCA Portal filters
+  const navigateToSimulation = (filterType: string) => {
+    const params = new URLSearchParams();
+    params.append('source', 'rca_portal');
+    params.append('filter_type', filterType);
+    
+    // Add specific conditions based on filter type
+    switch (filterType) {
+      case 'portal_overbidding_1':
+        params.append('filter_sync_status', 'Sync Status');
+        params.append('value_sync_status', 'true');
+        params.append('operator_sync_status', 'equals');
+        
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'less');
+        
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('operator_acos_comparison', 'applied_greater_than_target');
+        
+        params.append('filter_latest_bid', 'Latest Bid Calculated by the System');
+        params.append('value_latest_bid', '0.02');
+        params.append('operator_latest_bid', 'greater');
+        break;
+        
+      case 'portal_overbidding_2':
+        params.append('filter_sync_status', 'Sync Status');
+        params.append('value_sync_status', 'true');
+        params.append('operator_sync_status', 'equals');
+        
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'equals');
+        
+        params.append('filter_ad_spend', 'J: Ad Spend');
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('filter_price', 'K: Price');
+        params.append('operator_spend_comparison', 'ad_spend_greater_than_target_price');
+        
+        params.append('filter_latest_bid', 'Latest Bid Calculated by the System');
+        params.append('value_latest_bid', '0.02');
+        params.append('operator_latest_bid', 'greater');
+        break;
+        
+      case 'portal_underbidding_1':
+        params.append('filter_sync_status', 'Sync Status');
+        params.append('value_sync_status', 'true');
+        params.append('operator_sync_status', 'equals');
+        
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'less');
+        
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('operator_acos_comparison', 'applied_less_than_target');
+        
+        params.append('filter_latest_bid', 'Latest Bid Calculated by the System');
+        params.append('value_latest_bid', '0.02');
+        params.append('operator_latest_bid', 'equals');
+        break;
+        
+      case 'portal_underbidding_2':
+        params.append('filter_sync_status', 'Sync Status');
+        params.append('value_sync_status', 'true');
+        params.append('operator_sync_status', 'equals');
+        
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('value_applied_acos', '9999');
+        params.append('operator_applied_acos', 'equals');
+        
+        params.append('filter_ad_spend', 'J: Ad Spend');
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('filter_price', 'K: Price');
+        params.append('operator_spend_comparison', 'ad_spend_less_than_target_price');
+        
+        params.append('filter_latest_bid', 'Latest Bid Calculated by the System');
+        params.append('value_latest_bid', '0.02');
+        params.append('operator_latest_bid', 'equals');
+        break;
+        
+      case 'portal_underbidding_3':
+        params.append('filter_sync_status', 'Sync Status');
+        params.append('value_sync_status', 'true');
+        params.append('operator_sync_status', 'equals');
+        
+        params.append('filter_min_suggested_bid', 'O: Min. Suggested Bid');
+        params.append('filter_latest_bid', 'Latest Bid Calculated by the System');
+        params.append('operator_bid_comparison', 'min_greater_than_latest');
+        
+        params.append('filter_ad_spend', 'J: Ad Spend');
+        params.append('value_ad_spend', '0');
+        params.append('operator_ad_spend', 'equals');
+        break;
+        
+      case 'portal_underbidding_4':
+        params.append('filter_sync_status', 'Sync Status');
+        params.append('value_sync_status', 'false');
+        params.append('operator_sync_status', 'equals');
+        
+        params.append('filter_applied_acos', 'I: Applied ACOS');
+        params.append('filter_target_acos', 'G: Target ACOS');
+        params.append('operator_acos_comparison', 'applied_less_than_target');
+        
+        params.append('filter_current_bid', 'Current Bid As displayed on Amazon Seller Central');
+        params.append('filter_latest_bid', 'Latest Bid Calculated by the System');
+        params.append('operator_delta_comparison', 'delta_greater_than_0_26');
+        break;
+    }
+    
+    navigate(`/bid-simulation?${params.toString()}`);
   };
 
   // Calculate Portal Overbidding cases
@@ -192,7 +306,11 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
               {overbiddingCases.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => {
+                    const filterType = index === 0 ? 'portal_overbidding_1' : 'portal_overbidding_2';
+                    navigateToSimulation(filterType);
+                  }}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
@@ -224,7 +342,13 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
               {underbiddingCases.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => {
+                    const filterType = index === 0 ? 'portal_underbidding_1' : 
+                                     index === 1 ? 'portal_underbidding_2' : 
+                                     index === 2 ? 'portal_underbidding_3' : 'portal_underbidding_4';
+                    navigateToSimulation(filterType);
+                  }}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
