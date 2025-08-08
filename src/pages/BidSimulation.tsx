@@ -133,13 +133,18 @@ const BidSimulation = () => {
                currentBid4 > 0.2;
 
       case 'portal_overbidding_1':
-        const syncStatus5 = toBool(getValue('Sync Status'));
         const appliedAcos5 = toNumber(getValue('I: Applied ACOS'));
         const targetAcos5 = toNumber(getValue('G: Target ACOS'));
         const latestBid5 = toNumber(getValue('Latest Bid Calculated by the System'));
         
-        return syncStatus5 && 
-               appliedAcos5 < 9999 && 
+        console.log('Portal Overbidding #1 filter check:', {
+          appliedAcos: appliedAcos5,
+          targetAcos: targetAcos5,
+          latestBid: latestBid5,
+          result: appliedAcos5 < 9999 && appliedAcos5 > targetAcos5 && latestBid5 > 0.02
+        });
+        
+        return appliedAcos5 < 9999 && 
                appliedAcos5 > targetAcos5 && 
                latestBid5 > 0.02;
 
