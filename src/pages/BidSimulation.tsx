@@ -198,21 +198,18 @@ const BidSimulation = () => {
                latestBid8 === 0.02;
 
       case 'portal_underbidding_3':
-        const syncStatus9 = toBool(getValue('Sync Status'));
         const minSuggestedBid9 = toNumber(getValue('O: Min. Suggested Bid'));
         const latestBid9 = toNumber(getValue('Latest Bid Calculated by the System'));
         const adSpend9 = toNumber(getValue('J: Ad Spend'));
         
         console.log('Portal Underbidding #3 filter check:', {
-          syncStatus: syncStatus9,
           minSuggestedBid: minSuggestedBid9,
           latestBid: latestBid9,
           adSpend: adSpend9,
-          result: syncStatus9 && minSuggestedBid9 > latestBid9 && adSpend9 === 0
+          result: minSuggestedBid9 > latestBid9 && adSpend9 === 0
         });
         
-        return syncStatus9 && 
-               minSuggestedBid9 > latestBid9 && 
+        return minSuggestedBid9 > latestBid9 && 
                adSpend9 === 0;
 
       case 'portal_underbidding_4':
