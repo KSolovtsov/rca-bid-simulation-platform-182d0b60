@@ -8,6 +8,14 @@ interface PortalBidAnalysisWidgetProps {
 }
 
 const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
+  // Debug: Log available columns
+  React.useEffect(() => {
+    if (data && data.length > 0) {
+      console.log('Available CSV columns:', Object.keys(data[0]));
+      console.log('Sample data row:', data[0]);
+    }
+  }, [data]);
+
   // Helper function to safely convert values to numbers
   const toNumber = (value: any): number => {
     if (value === null || value === undefined || value === '') return 0;
@@ -151,76 +159,75 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
         <CardTitle className="text-lg font-semibold text-foreground">
           Portal RCA Bid Analysis
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          CVR calculation priority distribution across keyword levels
-        </p>
         <p className="text-xs text-muted-foreground">
           Total Records: {totalRecords}
         </p>
       </CardHeader>
       
       <CardContent className="space-y-6">
-        {/* Overbidding Section */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-4 w-4 text-red-500" />
-            <h4 className="font-medium text-foreground">Overbidding:</h4>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Portal Overbidding Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="h-4 w-4 text-red-500" />
+              <h4 className="font-medium text-foreground">Portal Overbidding:</h4>
+            </div>
           
-          <div className="space-y-3">
-            {overbiddingCases.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
-                    <TrendingUp className="h-4 w-4 text-white" />
+            <div className="space-y-3">
+              {overbiddingCases.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
+                      <TrendingUp className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{item.type}</p>
+                      <p className="text-xs text-muted-foreground">{item.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm text-foreground">{item.type}</p>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
+                  
+                  <div className="text-right">
+                    <p className="font-bold text-lg text-foreground">{item.count}</p>
+                    <p className="text-xs text-muted-foreground">({totalRecords > 0 ? ((item.count / totalRecords) * 100).toFixed(1) : 0}%)</p>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <p className="font-bold text-lg text-foreground">{item.count}</p>
-                  <p className="text-xs text-muted-foreground">({totalRecords > 0 ? ((item.count / totalRecords) * 100).toFixed(1) : 0}%)</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Underbidding Section */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingDown className="h-4 w-4 text-green-500" />
-            <h4 className="font-medium text-foreground">Underbidding:</h4>
-          </div>
-          
-          <div className="space-y-3">
-            {underbiddingCases.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
-                    <TrendingDown className="h-4 w-4 text-white" />
+          {/* Portal Underbidding Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingDown className="h-4 w-4 text-green-500" />
+              <h4 className="font-medium text-foreground">Portal Underbidding:</h4>
+            </div>
+            
+            <div className="space-y-3">
+              {underbiddingCases.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
+                      <TrendingDown className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{item.type}</p>
+                      <p className="text-xs text-muted-foreground">{item.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm text-foreground">{item.type}</p>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
+                  
+                  <div className="text-right">
+                    <p className="font-bold text-lg text-foreground">{item.count}</p>
+                    <p className="text-xs text-muted-foreground">({totalRecords > 0 ? ((item.count / totalRecords) * 100).toFixed(1) : 0}%)</p>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <p className="font-bold text-lg text-foreground">{item.count}</p>
-                  <p className="text-xs text-muted-foreground">({totalRecords > 0 ? ((item.count / totalRecords) * 100).toFixed(1) : 0}%)</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </CardContent>
