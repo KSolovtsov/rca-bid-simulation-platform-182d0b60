@@ -236,29 +236,21 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
     }
   ];
 
-  // Tooltip content for filter logic
-  const getAgencyOverbiddingTooltip = () => {
-    return (
-      <div className="space-y-2">
-        <p className="font-semibold">Agency Overbidding Filters:</p>
-        <div className="text-xs space-y-1">
-          <p><strong>#1:</strong> Sync Status = False AND Applied ACOS &lt; 9999 AND Applied ACOS &gt; Target ACOS AND Current Bid &gt; 0.2</p>
-          <p><strong>#2:</strong> Sync Status = False AND Applied ACOS = 9999 AND Ad Spend &gt; (Target ACOS × Price) AND Current Bid &gt; 0.2</p>
-          <p><strong>#3:</strong> Sync Status = False AND Applied ACOS &lt; 9999 AND Applied ACOS &gt; 0.35 AND Current Bid &gt; 0.2</p>
-        </div>
-      </div>
-    );
+  // Individual tooltip content for each filter
+  const getAgencyOverbiddingTooltip = (index: number) => {
+    const tooltips = [
+      "Sync Status = False AND Applied ACOS < 9999 AND Applied ACOS > Target ACOS AND Current Bid > 0.2",
+      "Sync Status = False AND Applied ACOS = 9999 AND Ad Spend > (Target ACOS × Price) AND Current Bid > 0.2", 
+      "Sync Status = False AND Applied ACOS < 9999 AND Applied ACOS > 0.35 AND Current Bid > 0.2"
+    ];
+    return tooltips[index] || '';
   };
 
-  const getAgencyUnderbiddingTooltip = () => {
-    return (
-      <div className="space-y-2">
-        <p className="font-semibold">Agency Underbidding Filters:</p>
-        <div className="text-xs space-y-1">
-          <p><strong>#1:</strong> Sync Status = False AND Applied ACOS = 9999 AND Ad Spend = 0 AND TOS% ≤ 0 AND Min. Suggested Bid &gt; Current Bid</p>
-        </div>
-      </div>
-    );
+  const getAgencyUnderbiddingTooltip = (index: number) => {
+    const tooltips = [
+      "Sync Status = False AND Applied ACOS = 9999 AND Ad Spend = 0 AND TOS% ≤ 0 AND Min. Suggested Bid > Current Bid"
+    ];
+    return tooltips[index] || '';
   };
 
   return (
@@ -278,14 +270,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
             {/* Agency Overbidding Section */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TrendingUp className="h-4 w-4 text-red-500 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-md">
-                    {getAgencyOverbiddingTooltip()}
-                  </TooltipContent>
-                </Tooltip>
+                <TrendingUp className="h-4 w-4 text-red-500" />
                 <h4 className="font-medium text-foreground">Agency Overbidding:</h4>
               </div>
             
@@ -301,9 +286,18 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0`}>
-                      <TrendingUp className="h-4 w-4 text-white" />
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0 cursor-help`}>
+                          <TrendingUp className="h-4 w-4 text-white" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-md">
+                        <div className="text-xs">
+                          {getAgencyOverbiddingTooltip(index)}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
                     <div>
                       <p className="font-medium text-sm text-foreground">{item.title}</p>
                       <p className="text-xs text-muted-foreground">{getOverbiddingDescription(index)}</p>
@@ -322,14 +316,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
             {/* Agency Underbidding Section */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TrendingDown className="h-4 w-4 text-green-500 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-md">
-                    {getAgencyUnderbiddingTooltip()}
-                  </TooltipContent>
-                </Tooltip>
+                <TrendingDown className="h-4 w-4 text-green-500" />
                 <h4 className="font-medium text-foreground">Agency Underbidding:</h4>
               </div>
             
@@ -341,9 +328,18 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
                   onClick={() => navigateToSimulation('agency_underbidding_1')}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0`}>
-                      <TrendingDown className="h-4 w-4 text-white" />
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0 cursor-help`}>
+                          <TrendingDown className="h-4 w-4 text-white" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-md">
+                        <div className="text-xs">
+                          {getAgencyUnderbiddingTooltip(index)}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
                     <div>
                       <p className="font-medium text-sm text-foreground">{item.title}</p>
                       <p className="text-xs text-muted-foreground">Low Bid need Human Loop</p>

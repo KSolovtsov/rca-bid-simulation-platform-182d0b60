@@ -279,31 +279,23 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
     }
   ];
 
-  // Tooltip content for filter logic
-  const getOverbiddingTooltip = () => {
-    return (
-      <div className="space-y-2">
-        <p className="font-semibold">Portal Overbidding Filters:</p>
-        <div className="text-xs space-y-1">
-          <p><strong>#1:</strong> Sync Status = True AND Applied ACOS &lt; 9999 AND Applied ACOS &gt; Target ACOS AND Latest Bid &gt; 0.02</p>
-          <p><strong>#2:</strong> Sync Status = True AND Applied ACOS = 9999 AND Ad Spend &gt; (Target ACOS × Price) AND Latest Bid &gt; 0.02</p>
-        </div>
-      </div>
-    );
+  // Individual tooltip content for each filter
+  const getPortalOverbiddingTooltip = (index: number) => {
+    const tooltips = [
+      "Sync Status = True AND Applied ACOS < 9999 AND Applied ACOS > Target ACOS AND Latest Bid > 0.02",
+      "Sync Status = True AND Applied ACOS = 9999 AND Ad Spend > (Target ACOS × Price) AND Latest Bid > 0.02"
+    ];
+    return tooltips[index] || '';
   };
 
-  const getUnderbiddingTooltip = () => {
-    return (
-      <div className="space-y-2">
-        <p className="font-semibold">Portal Underbidding Filters:</p>
-        <div className="text-xs space-y-1">
-          <p><strong>#1:</strong> Sync Status = True AND Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS AND Latest Bid = 0.02</p>
-          <p><strong>#2:</strong> Sync Status = True AND Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price) AND Latest Bid = 0.02</p>
-          <p><strong>#3:</strong> Sync Status = True AND Min. Suggested Bid &gt; Latest Bid AND Ad Spend = 0</p>
-          <p><strong>#4:</strong> Sync Status = False AND Applied ACOS &lt; Target ACOS AND Delta &gt; 0.26</p>
-        </div>
-      </div>
-    );
+  const getPortalUnderbiddingTooltip = (index: number) => {
+    const tooltips = [
+      "Sync Status = True AND Applied ACOS < 9999 AND Applied ACOS < Target ACOS AND Latest Bid = 0.02",
+      "Sync Status = True AND Applied ACOS = 9999 AND Ad Spend < (Target ACOS × Price) AND Latest Bid = 0.02",
+      "Sync Status = True AND Min. Suggested Bid > Latest Bid AND Ad Spend = 0",
+      "Sync Status = False AND Applied ACOS < Target ACOS AND Delta > 0.26"
+    ];
+    return tooltips[index] || '';
   };
 
   const totalRecords = data.length;
@@ -327,14 +319,7 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
             {/* Portal Overbidding Section */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TrendingUp className="h-4 w-4 text-red-500 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-md">
-                    {getOverbiddingTooltip()}
-                  </TooltipContent>
-                </Tooltip>
+                <TrendingUp className="h-4 w-4 text-red-500" />
                 <h4 className="font-medium text-foreground">Portal Overbidding:</h4>
               </div>
           
@@ -349,9 +334,18 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
-                      <TrendingUp className="h-4 w-4 text-white" />
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center cursor-help`}>
+                          <TrendingUp className="h-4 w-4 text-white" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-md">
+                        <div className="text-xs">
+                          {getPortalOverbiddingTooltip(index)}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
                     <div>
                       <p className="font-medium text-sm text-foreground">{item.type}</p>
                       <p className="text-xs text-muted-foreground">{item.description}</p>
@@ -370,14 +364,7 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
             {/* Portal Underbidding Section */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TrendingDown className="h-4 w-4 text-green-500 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-md">
-                    {getUnderbiddingTooltip()}
-                  </TooltipContent>
-                </Tooltip>
+                <TrendingDown className="h-4 w-4 text-green-500" />
                 <h4 className="font-medium text-foreground">Portal Underbidding:</h4>
               </div>
             
@@ -394,9 +381,18 @@ const PortalBidAnalysisWidget = ({ data }: PortalBidAnalysisWidgetProps) => {
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center`}>
-                      <TrendingDown className="h-4 w-4 text-white" />
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center cursor-help`}>
+                          <TrendingDown className="h-4 w-4 text-white" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-md">
+                        <div className="text-xs">
+                          {getPortalUnderbiddingTooltip(index)}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
                     <div>
                       <p className="font-medium text-sm text-foreground">{item.type}</p>
                       <p className="text-xs text-muted-foreground">{item.description}</p>
