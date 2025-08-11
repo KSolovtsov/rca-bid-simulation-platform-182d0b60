@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Target, Filter, X, Columns } from 'lucide-react';
+import { ArrowLeft, Target, Filter, X, Columns, ChevronUp, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ const BidSimulation = () => {
   const [columnsPopoverOpen, setColumnsPopoverOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({});
   const [tempVisibleColumns, setTempVisibleColumns] = useState<Record<string, boolean>>({});
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const itemsPerPage = 30;
 
   const filterOperators = [
@@ -422,7 +423,7 @@ const BidSimulation = () => {
   const filteredData = useMemo(() => {
     if (!activeFile?.data || !activeFile?.headers) return [];
 
-    return activeFile.data.filter((row) => {
+    let filtered = activeFile.data.filter((row) => {
       return Object.entries(filters).every(([column, filter]) => {
         // Handle RCA complex filters
         if (filter.operator === 'rca_complex') {
@@ -519,7 +520,46 @@ const BidSimulation = () => {
         }
       });
     });
-  }, [activeFile, filters]);
+
+    // Apply sorting if configured
+    if (sortConfig) {
+      filtered.sort((a, b) => {
+        const getValue = (row: any, key: string) => {
+          if (Array.isArray(row)) {
+            const index = activeFile?.headers?.indexOf(key) ?? -1;
+            return index >= 0 ? row[index] : null;
+          }
+          return row[key];
+        };
+
+        const aVal = getValue(a, sortConfig.key);
+        const bVal = getValue(b, sortConfig.key);
+
+        // Handle null/undefined values
+        if (aVal == null && bVal == null) return 0;
+        if (aVal == null) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (bVal == null) return sortConfig.direction === 'asc' ? 1 : -1;
+
+        // Convert to numbers if both values are numeric
+        const aNum = parseFloat(String(aVal).replace(/[,$%]/g, ''));
+        const bNum = parseFloat(String(bVal).replace(/[,$%]/g, ''));
+        
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+        }
+
+        // String comparison
+        const aStr = String(aVal).toLowerCase();
+        const bStr = String(bVal).toLowerCase();
+        
+        if (aStr < bStr) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aStr > bStr) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [activeFile, filters, sortConfig]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -527,6 +567,29 @@ const BidSimulation = () => {
   }, [filteredData, currentPage]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const handleSort = (column: string) => {
+    setSortConfig(prevSort => {
+      if (prevSort?.key === column) {
+        if (prevSort.direction === 'asc') {
+          return { key: column, direction: 'desc' };
+        } else {
+          return null; // Clear sorting
+        }
+      } else {
+        return { key: column, direction: 'asc' };
+      }
+    });
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortConfig?.key === column) {
+      return sortConfig.direction === 'asc' ? 
+        <ChevronUp className="h-3 w-3 text-primary" /> : 
+        <ChevronDown className="h-3 w-3 text-primary" />;
+    }
+    return null;
+  };
 
   const handleFilterChange = (column: string, operator: string, value: string, valueFrom?: string, valueTo?: string) => {
     if (operator === 'between') {
@@ -1028,9 +1091,10 @@ const BidSimulation = () => {
                           <div key={header} className="border-r last:border-r-0 bg-card relative group">
                             <div className="p-2">
                               <div className="space-y-1">
-                                <div 
-                                  className="font-medium text-xs leading-tight h-20 overflow-hidden flex items-center justify-center text-center"
-                                  title={header}
+                               <div 
+                                  className="font-medium text-xs leading-tight h-20 overflow-hidden flex items-center justify-center text-center cursor-pointer hover:bg-muted/50 transition-colors rounded group"
+                                  title={`${header} - Click to sort`}
+                                  onClick={() => handleSort(header)}
                                   style={{
                                     wordBreak: 'break-word',
                                     hyphens: 'auto',
@@ -1040,7 +1104,10 @@ const BidSimulation = () => {
                                     WebkitBoxOrient: 'vertical'
                                   }}
                                 >
-                                  {header}
+                                  <div className="flex items-center gap-1 flex-wrap justify-center">
+                                    <span>{header}</span>
+                                    {getSortIcon(header)}
+                                  </div>
                                 </div>
                                 <Select
                                   value={filters[header]?.operator || 'contains'}
