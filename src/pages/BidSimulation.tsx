@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Target, Filter, X, Columns, ChevronUp, ChevronDown } from 'lucide-react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Target, Filter, X, Columns, ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
 import { format, parseISO, isValid } from 'date-fns';
 
 const BidSimulation = () => {
+  const navigate = useNavigate();
   const { activeFileId } = useAppSettings();
   const { files, isInitialized } = useIndexedDbStorage();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -932,6 +933,15 @@ const BidSimulation = () => {
       <div className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b shadow-sm">
         <div className="flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="shadow-card hover:shadow-elegant transition-all"
+              onClick={() => navigate(-1)}
+            >
+              <Undo2 className="mr-2 h-4 w-4" />
+              Назад
+            </Button>
             <Link to="/">
               <Button variant="outline" size="sm" className="shadow-card hover:shadow-elegant transition-all">
                 <ArrowLeft className="mr-2 h-4 w-4" />
