@@ -567,7 +567,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 KWs with desirable ACOS in RP # 2, why are we underbidding?
               </CardTitle>
               <CardDescription className="text-sm">
-                {activeFileName}
+                Active file: {activeFileName.replace('.csv', '')}
               </CardDescription>
             </div>
           </div>
