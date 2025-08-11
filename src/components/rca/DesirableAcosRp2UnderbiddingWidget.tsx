@@ -556,15 +556,15 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       
       <CardContent className="p-0 h-[calc(100%-120px)]">
         <Tabs defaultValue="grp1" className="h-full">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
-            <TabsTrigger value="grp1" className="text-xs">
+          <TabsList className="grid w-full grid-cols-3 mx-2 mt-2 gap-1">
+            <TabsTrigger value="grp1" className="text-[10px] px-1">
               <div className="flex items-center justify-between w-full">
-                <span>GRP # 1 ({analysisData.grp1.length})</span>
+                <span className="truncate">GRP#1 ({analysisData.grp1.length})</span>
                 {analysisData.grp1.length > 0 && (
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-5 px-2 ml-1 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    className="h-4 px-1 ml-1 text-[9px] bg-blue-500 text-white hover:bg-blue-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/bid-simulation', { 
@@ -587,14 +587,14 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 )}
               </div>
             </TabsTrigger>
-            <TabsTrigger value="grp2" className="text-xs">
+            <TabsTrigger value="grp2" className="text-[10px] px-1">
               <div className="flex items-center justify-between w-full">
-                <span>GRP # 2 ({analysisData.grp2.length})</span>
+                <span className="truncate">GRP#2 ({analysisData.grp2.length})</span>
                 {analysisData.grp2.length > 0 && (
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-5 px-2 ml-1 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    className="h-4 px-1 ml-1 text-[9px] bg-blue-500 text-white hover:bg-blue-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/bid-simulation', { 
@@ -618,14 +618,14 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 )}
               </div>
             </TabsTrigger>
-            <TabsTrigger value="grp3" className="text-xs">
+            <TabsTrigger value="grp3" className="text-[10px] px-1">
               <div className="flex items-center justify-between w-full">
-                <span>GRP # 3 ({analysisData.grp3.length})</span>
+                <span className="truncate">GRP#3 ({analysisData.grp3.length})</span>
                 {analysisData.grp3.length > 0 && (
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-5 px-2 ml-1 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    className="h-4 px-1 ml-1 text-[9px] bg-blue-500 text-white hover:bg-blue-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/bid-simulation', { 
