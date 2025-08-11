@@ -14,37 +14,63 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [] };
 
-    const filtered = data
+    // GRP # 1: Latest Bid Calculated by the System = effective_ceiling
+    const grp1 = data
       .filter(row => {
-        const acosRp2 = parseFloat(row['Avg ACOS Reporting Period # 2']) || 0;
-        const ordersRp2 = parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0;
-        const cpcRp1 = parseFloat(row['Avg CPC Reporting Period # 1']) || 0;
-        const cpcRp2 = parseFloat(row['Avg CPC Reporting Period # 2']) || 0;
-        
-        // Filter for desirable ACOS in RP#2 (assuming < 30% is desirable) and underbidding indicators
-        return acosRp2 > 0 && acosRp2 < 30 && ordersRp2 > 0 && cpcRp2 < cpcRp1;
+        const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
+        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+        return latestBid === effectiveCeiling;
       })
       .map(row => ({
         asin: row['ASIN'] || '',
         campaign: row['Campaign'] || '',
         kw: row['KW'] || row['Search Term'] || '',
         matchType: row['Match Type'] || '',
-        avgAcosRp2: parseFloat(row['Avg ACOS Reporting Period # 2']) || 0,
-        avgCpcRp1: parseFloat(row['Avg CPC Reporting Period # 1']) || 0,
-        avgCpcRp2: parseFloat(row['Avg CPC Reporting Period # 2']) || 0,
-        avgOrdersRp2: parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0,
-        bidReduction: ((parseFloat(row['Avg CPC Reporting Period # 1']) || 0) - (parseFloat(row['Avg CPC Reporting Period # 2']) || 0)),
-      }))
-      .sort((a, b) => b.bidReduction - a.bidReduction);
+        syncStatus: row['Sync Status'] || '',
+        nCvr: row['N: CVR'] || '',
+        cvrDateRange: row['CVR Date Range'] || '',
+      }));
 
-    // Split data into 3 groups
-    const totalItems = filtered.length;
-    const groupSize = Math.ceil(totalItems / 3);
+    // GRP # 2: Latest Bid <= effective_ceiling && Δ <= 0 && M: TOS% >= 0.5
+    const grp2Data = data.map(row => ({
+      asin: row['ASIN'] || '',
+      campaign: row['Campaign'] || '',
+      kw: row['KW'] || row['Search Term'] || '',
+      matchType: row['Match Type'] || '',
+      syncStatus: row['Sync Status'] || '',
+      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
+      mTos: parseFloat(row['M: TOS%']) || 0,
+    }));
+    
+    const grp2Violations = grp2Data.filter(item => {
+      return !(item.latestBid <= item.effectiveCeiling && item.bidDelta <= 0 && item.mTos >= 0.5);
+    });
+
+    // GRP # 3: Latest Bid < effective_ceiling && Δ > 0 && M: TOS%
+    const grp3Data = data.map(row => ({
+      asin: row['ASIN'] || '',
+      campaign: row['Campaign'] || '',
+      kw: row['KW'] || row['Search Term'] || '',
+      matchType: row['Match Type'] || '',
+      syncStatus: row['Sync Status'] || '',
+      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
+      mTos: parseFloat(row['M: TOS%']) || 0,
+    }));
+    
+    const grp3Violations = grp3Data.filter(item => {
+      return !(item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos > 0);
+    });
     
     return {
-      grp1: filtered.slice(0, groupSize),
-      grp2: filtered.slice(groupSize, groupSize * 2),
-      grp3: filtered.slice(groupSize * 2)
+      grp1,
+      grp2: grp2Violations,
+      grp3: grp3Violations,
+      grp2AllGood: grp2Violations.length === 0,
+      grp3AllGood: grp3Violations.length === 0,
     };
   }, [data]);
 
@@ -53,24 +79,25 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   
   const totalKeywords = analysisData.grp1.length + analysisData.grp2.length + analysisData.grp3.length;
 
-  const renderTable = (groupData: any[]) => (
+  const renderGrp1Table = (groupData: any[]) => (
     <ScrollArea className="h-full">
       <Table>
         <TableHeader className="sticky top-0 bg-background">
           <TableRow className="bg-muted/50">
             <TableHead className="font-semibold text-xs">ASIN</TableHead>
+            <TableHead className="font-semibold text-xs">Campaign</TableHead>
             <TableHead className="font-semibold text-xs">KW</TableHead>
-            <TableHead className="font-semibold text-xs">Match</TableHead>
-            <TableHead className="text-center font-semibold text-xs">ACOS RP#2</TableHead>
-            <TableHead className="text-center font-semibold text-xs">CPC RP#1</TableHead>
-            <TableHead className="text-center font-semibold text-xs">CPC RP#2</TableHead>
-            <TableHead className="text-center font-semibold text-xs">Orders RP#2</TableHead>
+            <TableHead className="font-semibold text-xs">Match Type</TableHead>
+            <TableHead className="font-semibold text-xs">Sync Status</TableHead>
+            <TableHead className="font-semibold text-xs">N: CVR</TableHead>
+            <TableHead className="font-semibold text-xs">CVR Date Range</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {groupData.map((item, index) => (
             <TableRow key={index} className="hover:bg-muted/30 transition-colors">
               <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+              <TableCell className="text-xs">{item.campaign}</TableCell>
               <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
                 {item.kw}
               </TableCell>
@@ -79,19 +106,9 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   {item.matchType}
                 </Badge>
               </TableCell>
-              <TableCell className="text-center">
-                <span className="text-emerald-600 font-medium text-xs">
-                  {formatAcos(item.avgAcosRp2)}
-                </span>
-              </TableCell>
-              <TableCell className="text-center text-xs">{formatCurrency(item.avgCpcRp1)}</TableCell>
-              <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-1">
-                  <TrendingDown className="h-3 w-3 text-orange-500" />
-                  <span className="text-orange-600 text-xs">{formatCurrency(item.avgCpcRp2)}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-center text-xs">{item.avgOrdersRp2.toFixed(1)}</TableCell>
+              <TableCell className="text-xs">{item.syncStatus}</TableCell>
+              <TableCell className="text-xs">{item.nCvr}</TableCell>
+              <TableCell className="text-xs">{item.cvrDateRange}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -104,6 +121,128 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       )}
     </ScrollArea>
   );
+
+  const renderGrp2Table = (groupData: any[]) => {
+    if (analysisData.grp2AllGood) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">All Good!!</h3>
+            <p className="text-muted-foreground">All conditions are met for this group</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <ScrollArea className="h-full">
+        <Table>
+          <TableHeader className="sticky top-0 bg-background">
+            <TableRow className="bg-muted/50">
+              <TableHead className="font-semibold text-xs">ASIN</TableHead>
+              <TableHead className="font-semibold text-xs">Campaign</TableHead>
+              <TableHead className="font-semibold text-xs">KW</TableHead>
+              <TableHead className="font-semibold text-xs">Match Type</TableHead>
+              <TableHead className="font-semibold text-xs">Sync Status</TableHead>
+              <TableHead className="font-semibold text-xs">Latest Bid</TableHead>
+              <TableHead className="font-semibold text-xs">Effective Ceiling</TableHead>
+              <TableHead className="font-semibold text-xs">Δ Bid</TableHead>
+              <TableHead className="font-semibold text-xs">M: TOS%</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {groupData.map((item, index) => (
+              <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+                <TableCell className="text-xs">{item.campaign}</TableCell>
+                <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                  {item.kw}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="text-xs px-1 py-0">
+                    {item.matchType}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-xs">{item.syncStatus}</TableCell>
+                <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
+                <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
+                <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
+                <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        
+        {groupData.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            No violations found in this group
+          </div>
+        )}
+      </ScrollArea>
+    );
+  };
+
+  const renderGrp3Table = (groupData: any[]) => {
+    if (analysisData.grp3AllGood) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">All Good!!</h3>
+            <p className="text-muted-foreground">All conditions are met for this group</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <ScrollArea className="h-full">
+        <Table>
+          <TableHeader className="sticky top-0 bg-background">
+            <TableRow className="bg-muted/50">
+              <TableHead className="font-semibold text-xs">ASIN</TableHead>
+              <TableHead className="font-semibold text-xs">Campaign</TableHead>
+              <TableHead className="font-semibold text-xs">KW</TableHead>
+              <TableHead className="font-semibold text-xs">Match Type</TableHead>
+              <TableHead className="font-semibold text-xs">Sync Status</TableHead>
+              <TableHead className="font-semibold text-xs">Latest Bid</TableHead>
+              <TableHead className="font-semibold text-xs">Effective Ceiling</TableHead>
+              <TableHead className="font-semibold text-xs">Δ Bid</TableHead>
+              <TableHead className="font-semibold text-xs">M: TOS%</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {groupData.map((item, index) => (
+              <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+                <TableCell className="text-xs">{item.campaign}</TableCell>
+                <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                  {item.kw}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="text-xs px-1 py-0">
+                    {item.matchType}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-xs">{item.syncStatus}</TableCell>
+                <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
+                <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
+                <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
+                <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        
+        {groupData.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            No violations found in this group
+          </div>
+        )}
+      </ScrollArea>
+    );
+  };
 
   return (
     <Card className="shadow-card animate-slide-up h-[600px]">
@@ -143,15 +282,15 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           </TabsList>
           
           <TabsContent value="grp1" className="mt-4 h-[calc(100%-56px)]">
-            {renderTable(analysisData.grp1)}
+            {renderGrp1Table(analysisData.grp1)}
           </TabsContent>
           
           <TabsContent value="grp2" className="mt-4 h-[calc(100%-56px)]">
-            {renderTable(analysisData.grp2)}
+            {renderGrp2Table(analysisData.grp2)}
           </TabsContent>
           
           <TabsContent value="grp3" className="mt-4 h-[calc(100%-56px)]">
-            {renderTable(analysisData.grp3)}
+            {renderGrp3Table(analysisData.grp3)}
           </TabsContent>
         </Tabs>
       </CardContent>
