@@ -1,16 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingDown, Target } from 'lucide-react';
+import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface WidgetProps {
   data: any[];
 }
 
 const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
+  const [sortConfig, setSortConfig] = useState<{
+    grp1: { field: string; direction: 'asc' | 'desc' } | null;
+    grp2: { field: string; direction: 'asc' | 'desc' } | null;
+    grp3: { field: string; direction: 'asc' | 'desc' } | null;
+  }>({
+    grp1: null,
+    grp2: null,
+    grp3: null,
+  });
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [] };
 
@@ -79,48 +89,153 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   
   const totalKeywords = analysisData.grp1.length + analysisData.grp2.length + analysisData.grp3.length;
 
-  const renderGrp1Table = (groupData: any[]) => (
-    <ScrollArea className="h-full">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background">
-          <TableRow className="bg-muted/50">
-            <TableHead className="font-semibold text-xs">ASIN</TableHead>
-            <TableHead className="font-semibold text-xs">Campaign</TableHead>
-            <TableHead className="font-semibold text-xs">KW</TableHead>
-            <TableHead className="font-semibold text-xs">Match Type</TableHead>
-            <TableHead className="font-semibold text-xs">Sync Status</TableHead>
-            <TableHead className="font-semibold text-xs">N: CVR</TableHead>
-            <TableHead className="font-semibold text-xs">CVR Date Range</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {groupData.map((item, index) => (
-            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-              <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-              <TableCell className="text-xs">{item.campaign}</TableCell>
-              <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
-                {item.kw}
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline" className="text-xs px-1 py-0">
-                  {item.matchType}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-xs">{item.syncStatus}</TableCell>
-              <TableCell className="text-xs">{item.nCvr}</TableCell>
-              <TableCell className="text-xs">{item.cvrDateRange}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+  const handleSort = (group: 'grp1' | 'grp2' | 'grp3', field: string) => {
+    const currentSort = sortConfig[group];
+    const direction = currentSort?.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc';
+    
+    setSortConfig(prev => ({
+      ...prev,
+      [group]: { field, direction }
+    }));
+  };
+
+  const sortData = (data: any[], group: 'grp1' | 'grp2' | 'grp3') => {
+    const sort = sortConfig[group];
+    if (!sort) return data;
+
+    return [...data].sort((a, b) => {
+      const aVal = a[sort.field];
+      const bVal = b[sort.field];
       
-      {groupData.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground text-sm">
-          No keywords found in this group
-        </div>
-      )}
-    </ScrollArea>
-  );
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sort.direction === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+      
+      return sort.direction === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+  };
+
+  const getSortIcon = (group: 'grp1' | 'grp2' | 'grp3', field: string) => {
+    const sort = sortConfig[group];
+    if (sort?.field !== field) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
+    return sort.direction === 'asc' 
+      ? <ArrowUp className="h-3 w-3" />
+      : <ArrowDown className="h-3 w-3" />;
+  };
+
+  const renderGrp1Table = (groupData: any[]) => {
+    const sortedData = sortData(groupData, 'grp1');
+    
+    return (
+      <div className="h-full relative">
+        <ScrollArea className="h-full">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10 border-b">
+              <TableRow className="bg-muted/50">
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'asin')}
+                  >
+                    ASIN {getSortIcon('grp1', 'asin')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'campaign')}
+                  >
+                    Campaign {getSortIcon('grp1', 'campaign')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'kw')}
+                  >
+                    KW {getSortIcon('grp1', 'kw')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'matchType')}
+                  >
+                    Match Type {getSortIcon('grp1', 'matchType')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'syncStatus')}
+                  >
+                    Sync Status {getSortIcon('grp1', 'syncStatus')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'nCvr')}
+                  >
+                    N: CVR {getSortIcon('grp1', 'nCvr')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp1', 'cvrDateRange')}
+                  >
+                    CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+                  </Button>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedData.map((item, index) => (
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+                  <TableCell className="text-xs">{item.campaign}</TableCell>
+                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                    {item.kw}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      {item.matchType}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-xs">{item.syncStatus}</TableCell>
+                  <TableCell className="text-xs">{item.nCvr}</TableCell>
+                  <TableCell className="text-xs">{item.cvrDateRange}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No keywords found in this group
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    );
+  };
 
   const renderGrp2Table = (groupData: any[]) => {
     if (analysisData.grp2AllGood) {
@@ -135,51 +250,136 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
+    const sortedData = sortData(groupData, 'grp2');
+
     return (
-      <ScrollArea className="h-full">
-        <Table>
-          <TableHeader className="sticky top-0 bg-background">
-            <TableRow className="bg-muted/50">
-              <TableHead className="font-semibold text-xs">ASIN</TableHead>
-              <TableHead className="font-semibold text-xs">Campaign</TableHead>
-              <TableHead className="font-semibold text-xs">KW</TableHead>
-              <TableHead className="font-semibold text-xs">Match Type</TableHead>
-              <TableHead className="font-semibold text-xs">Sync Status</TableHead>
-              <TableHead className="font-semibold text-xs">Latest Bid</TableHead>
-              <TableHead className="font-semibold text-xs">Effective Ceiling</TableHead>
-              <TableHead className="font-semibold text-xs">Δ Bid</TableHead>
-              <TableHead className="font-semibold text-xs">M: TOS%</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {groupData.map((item, index) => (
-              <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                <TableCell className="text-xs">{item.campaign}</TableCell>
-                <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
-                  {item.kw}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-xs px-1 py-0">
-                    {item.matchType}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-xs">{item.syncStatus}</TableCell>
-                <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
-                <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
-                <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
-                <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+      <div className="h-full relative">
+        <ScrollArea className="h-full">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10 border-b">
+              <TableRow className="bg-muted/50">
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'asin')}
+                  >
+                    ASIN {getSortIcon('grp2', 'asin')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'campaign')}
+                  >
+                    Campaign {getSortIcon('grp2', 'campaign')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'kw')}
+                  >
+                    KW {getSortIcon('grp2', 'kw')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'matchType')}
+                  >
+                    Match Type {getSortIcon('grp2', 'matchType')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'syncStatus')}
+                  >
+                    Sync Status {getSortIcon('grp2', 'syncStatus')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'latestBid')}
+                  >
+                    Latest Bid {getSortIcon('grp2', 'latestBid')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'effectiveCeiling')}
+                  >
+                    Effective Ceiling {getSortIcon('grp2', 'effectiveCeiling')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'bidDelta')}
+                  >
+                    Δ Bid {getSortIcon('grp2', 'bidDelta')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp2', 'mTos')}
+                  >
+                    M: TOS% {getSortIcon('grp2', 'mTos')}
+                  </Button>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        
-        {groupData.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground text-sm">
-            No violations found in this group
-          </div>
-        )}
-      </ScrollArea>
+            </TableHeader>
+            <TableBody>
+              {sortedData.map((item, index) => (
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+                  <TableCell className="text-xs">{item.campaign}</TableCell>
+                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                    {item.kw}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      {item.matchType}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-xs">{item.syncStatus}</TableCell>
+                  <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
+                  <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
+                  <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
+                  <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No violations found in this group
+            </div>
+          )}
+        </ScrollArea>
+      </div>
     );
   };
 
@@ -196,51 +396,136 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
+    const sortedData = sortData(groupData, 'grp3');
+
     return (
-      <ScrollArea className="h-full">
-        <Table>
-          <TableHeader className="sticky top-0 bg-background">
-            <TableRow className="bg-muted/50">
-              <TableHead className="font-semibold text-xs">ASIN</TableHead>
-              <TableHead className="font-semibold text-xs">Campaign</TableHead>
-              <TableHead className="font-semibold text-xs">KW</TableHead>
-              <TableHead className="font-semibold text-xs">Match Type</TableHead>
-              <TableHead className="font-semibold text-xs">Sync Status</TableHead>
-              <TableHead className="font-semibold text-xs">Latest Bid</TableHead>
-              <TableHead className="font-semibold text-xs">Effective Ceiling</TableHead>
-              <TableHead className="font-semibold text-xs">Δ Bid</TableHead>
-              <TableHead className="font-semibold text-xs">M: TOS%</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {groupData.map((item, index) => (
-              <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                <TableCell className="text-xs">{item.campaign}</TableCell>
-                <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
-                  {item.kw}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-xs px-1 py-0">
-                    {item.matchType}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-xs">{item.syncStatus}</TableCell>
-                <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
-                <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
-                <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
-                <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+      <div className="h-full relative">
+        <ScrollArea className="h-full">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10 border-b">
+              <TableRow className="bg-muted/50">
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'asin')}
+                  >
+                    ASIN {getSortIcon('grp3', 'asin')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'campaign')}
+                  >
+                    Campaign {getSortIcon('grp3', 'campaign')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'kw')}
+                  >
+                    KW {getSortIcon('grp3', 'kw')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'matchType')}
+                  >
+                    Match Type {getSortIcon('grp3', 'matchType')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'syncStatus')}
+                  >
+                    Sync Status {getSortIcon('grp3', 'syncStatus')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'latestBid')}
+                  >
+                    Latest Bid {getSortIcon('grp3', 'latestBid')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'effectiveCeiling')}
+                  >
+                    Effective Ceiling {getSortIcon('grp3', 'effectiveCeiling')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'bidDelta')}
+                  >
+                    Δ Bid {getSortIcon('grp3', 'bidDelta')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold text-xs">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    onClick={() => handleSort('grp3', 'mTos')}
+                  >
+                    M: TOS% {getSortIcon('grp3', 'mTos')}
+                  </Button>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        
-        {groupData.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground text-sm">
-            No violations found in this group
-          </div>
-        )}
-      </ScrollArea>
+            </TableHeader>
+            <TableBody>
+              {sortedData.map((item, index) => (
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+                  <TableCell className="text-xs">{item.campaign}</TableCell>
+                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                    {item.kw}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      {item.matchType}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-xs">{item.syncStatus}</TableCell>
+                  <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
+                  <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
+                  <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
+                  <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No violations found in this group
+            </div>
+          )}
+        </ScrollArea>
+      </div>
     );
   };
 
