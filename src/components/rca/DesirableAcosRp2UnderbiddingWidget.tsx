@@ -69,7 +69,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         cvrDateRange: row['CVR Date Range'] || '',
       }));
 
-    // GRP # 2: Latest Bid <= effective_ceiling && Δ <= 0 && M: TOS% >= 0.5
+    // GRP # 2: NOT (Latest Bid Calculated by the System <= effective_ceiling && Δ <= 0 && M: TOS% >= 0.5)
     const grp2Data = data.map(row => ({
       asin: row['ASIN'] || '',
       campaign: row['Campaign'] || '',
@@ -86,7 +86,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       return !(item.latestBid <= item.effectiveCeiling && item.bidDelta <= 0 && item.mTos >= 0.5);
     });
 
-    // GRP # 3: Latest Bid < effective_ceiling && Δ > 0 && M: TOS%
+    // GRP # 3: NOT (Latest Bid Calculated by the System < effective_ceiling && Δ > 0 && M: TOS% < 0.5)
     const grp3Data = data.map(row => ({
       asin: row['ASIN'] || '',
       campaign: row['Campaign'] || '',
@@ -100,7 +100,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     }));
     
     const grp3Violations = grp3Data.filter(item => {
-      return !(item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos > 0);
+      return !(item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos < 0.5);
     });
     
     return {
@@ -713,7 +713,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
-                  <p className="text-xs">NOT (Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND M: TOS% &gt; 0)</p>
+                  <p className="text-xs">NOT (Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND M: TOS% &lt; 0.5)</p>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
