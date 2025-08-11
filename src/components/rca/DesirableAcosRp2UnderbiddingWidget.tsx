@@ -89,7 +89,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
   
-  const totalKeywords = analysisData.grp1.length + analysisData.grp2.length + analysisData.grp3.length;
+  const totalRows = data ? data.length : 0;
 
   const handleSort = (group: 'grp1' | 'grp2' | 'grp3', field: string) => {
     const currentSort = sortConfig[group];
@@ -549,7 +549,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             </div>
           </div>
           <Badge variant="outline" className="text-xs">
-            {totalKeywords} keywords
+            Total: {totalRows}
           </Badge>
         </div>
       </CardHeader>
