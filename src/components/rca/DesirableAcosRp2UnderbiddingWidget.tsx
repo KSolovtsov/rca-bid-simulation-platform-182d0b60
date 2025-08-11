@@ -564,7 +564,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-5 px-2 ml-2 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    className="h-5 px-2 ml-1 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/bid-simulation', { 
@@ -594,7 +594,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-5 px-2 ml-2 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    className="h-5 px-2 ml-1 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/bid-simulation', { 
@@ -625,7 +625,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-5 px-2 ml-2 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    className="h-5 px-2 ml-1 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate('/bid-simulation', { 
