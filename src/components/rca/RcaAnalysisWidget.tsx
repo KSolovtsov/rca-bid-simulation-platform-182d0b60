@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Filter, TrendingUp, AlertCircle } from 'lucide-react';
+import { Filter, TrendingUp, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import OverbiddingWidget from './OverbiddingWidget';
@@ -25,6 +25,13 @@ interface RcaAnalysisData {
   avgAcosPeriod2: number;
 }
 
+type SortDirection = 'asc' | 'desc' | null;
+
+interface SortConfig {
+  key: keyof RcaAnalysisData;
+  direction: SortDirection;
+}
+
 const RcaAnalysisWidget = () => {
   const { getFile } = useIndexedDbStorage();
   const { activeFileId } = useAppSettings();
@@ -34,6 +41,7 @@ const RcaAnalysisWidget = () => {
   const [fileData, setFileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
   // Load file data when activeFileId changes
   useEffect(() => {
@@ -84,12 +92,33 @@ const RcaAnalysisWidget = () => {
     }));
   }, [fileData]);
 
-  // Apply filters: show only rows where at least one period has >0 orders
+  // Apply filters and sorting
   const filteredData = useMemo(() => {
-    return transformedData.filter(item => 
+    let filtered = transformedData.filter(item => 
       item.avgDailyOrdersPeriod1 > 0 || item.avgDailyOrdersPeriod2 > 0
     );
-  }, [transformedData]);
+
+    // Apply sorting if a sort config is set
+    if (sortConfig) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        if (aValue === bValue) return 0;
+
+        let comparison = 0;
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          comparison = aValue.localeCompare(bValue);
+        } else {
+          comparison = aValue < bValue ? -1 : 1;
+        }
+
+        return sortConfig.direction === 'desc' ? -comparison : comparison;
+      });
+    }
+
+    return filtered;
+  }, [transformedData, sortConfig]);
 
   const formatCurrency = (value: number) => {
     return value > 0 ? `$${value.toFixed(2)}` : '--';
@@ -136,6 +165,29 @@ const RcaAnalysisWidget = () => {
     }
     
     navigate(`/bid-simulation?${params.toString()}`);
+  };
+
+  // Handle sorting
+  const handleSort = (key: keyof RcaAnalysisData) => {
+    setSortConfig(current => {
+      if (!current || current.key !== key) {
+        return { key, direction: 'asc' };
+      }
+      if (current.direction === 'asc') {
+        return { key, direction: 'desc' };
+      }
+      return null; // Remove sorting
+    });
+  };
+
+  // Get sort icon for a column
+  const getSortIcon = (key: keyof RcaAnalysisData) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <div className="h-4 w-4" />; // Empty space to maintain alignment
+    }
+    return sortConfig.direction === 'asc' ? 
+      <ChevronUp className="h-4 w-4" /> : 
+      <ChevronDown className="h-4 w-4" />;
   };
 
 
@@ -227,16 +279,96 @@ const RcaAnalysisWidget = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
-                      <TableHead className="font-semibold">ASIN</TableHead>
-                      <TableHead className="font-semibold">Campaign</TableHead>
-                      <TableHead className="font-semibold">KW</TableHead>
-                      <TableHead className="font-semibold">Match Type</TableHead>
-                      <TableHead className="text-center font-semibold">Daily Orders P1</TableHead>
-                      <TableHead className="text-center font-semibold">Daily Orders P2</TableHead>
-                      <TableHead className="text-center font-semibold">Avg CPC P1</TableHead>
-                      <TableHead className="text-center font-semibold">Avg CPC P2</TableHead>
-                      <TableHead className="text-center font-semibold">Avg ACOS P1</TableHead>
-                      <TableHead className="text-center font-semibold">Avg ACOS P2</TableHead>
+                      <TableHead 
+                        className="font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('asin')}
+                      >
+                        <div className="flex items-center justify-between">
+                          ASIN
+                          {getSortIcon('asin')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('campaign')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Campaign
+                          {getSortIcon('campaign')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('kw')}
+                      >
+                        <div className="flex items-center justify-between">
+                          KW
+                          {getSortIcon('kw')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('matchType')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Match Type
+                          {getSortIcon('matchType')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="text-center font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('avgDailyOrdersPeriod1')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Daily Orders P1
+                          {getSortIcon('avgDailyOrdersPeriod1')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="text-center font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('avgDailyOrdersPeriod2')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Daily Orders P2
+                          {getSortIcon('avgDailyOrdersPeriod2')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="text-center font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('avgCpcPeriod1')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Avg CPC P1
+                          {getSortIcon('avgCpcPeriod1')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="text-center font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('avgCpcPeriod2')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Avg CPC P2
+                          {getSortIcon('avgCpcPeriod2')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="text-center font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('avgAcosPeriod1')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Avg ACOS P1
+                          {getSortIcon('avgAcosPeriod1')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="text-center font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('avgAcosPeriod2')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Avg ACOS P2
+                          {getSortIcon('avgAcosPeriod2')}
+                        </div>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
