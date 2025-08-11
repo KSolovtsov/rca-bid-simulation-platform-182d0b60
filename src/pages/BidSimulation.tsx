@@ -949,8 +949,14 @@ const BidSimulation = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="shadow-card hover:shadow-elegant transition-all"
-              onClick={handleBack}
+              className="shadow-card hover:shadow-elegant transition-all relative z-10"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Back button clicked - event handler called');
+                handleBack();
+              }}
+              style={{ pointerEvents: 'auto' }}
             >
               <Undo2 className="mr-2 h-4 w-4" />
               Back
