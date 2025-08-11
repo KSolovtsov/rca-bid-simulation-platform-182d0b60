@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '@/hooks/use-app-settings';
@@ -37,6 +38,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     
     fetchActiveFileName();
   }, [settings.activeFileId, getFile]);
+  
   const [sortConfig, setSortConfig] = useState<{
     grp1: { field: string; direction: 'asc' | 'desc' } | null;
     grp2: { field: string; direction: 'asc' | 'desc' } | null;
@@ -46,6 +48,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     grp2: null,
     grp3: null,
   });
+  
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [] };
 
@@ -113,6 +116,11 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
   
   const totalRows = data ? data.length : 0;
+  
+  // Calculate percentages
+  const getPercentage = (count: number) => {
+    return totalRows > 0 ? ((count / totalRows) * 100).toFixed(1) : '0.0';
+  };
 
   const handleSort = (group: 'grp1' | 'grp2' | 'grp3', field: string) => {
     const currentSort = sortConfig[group];
@@ -579,100 +587,128 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       
       <CardContent className="p-0 h-[calc(100%-120px)]">
         <Tabs defaultValue="grp1" className="h-full">
-          <TabsList className="grid w-full grid-cols-3 mx-0 mt-2 gap-0">
-            <TabsTrigger value="grp1" className="text-[9px] px-0.5">
-              <div className="flex items-center justify-between w-full">
-                <span className="truncate">GRP#1 ({analysisData.grp1.length})</span>
-                {analysisData.grp1.length > 0 && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate('/bid-simulation', { 
-                        state: { 
-                          filteredData: analysisData.grp1.map(item => ({
-                            'ASIN': item.asin,
-                            'Campaign': item.campaign,
-                            'KW': item.kw,
-                            'Match Type': item.matchType,
-                            'Sync Status': item.syncStatus,
-                            'N: CVR': item.nCvr,
-                            'CVR Date Range': item.cvrDateRange
-                          }))
-                        }
-                      });
-                    }}
-                  >
-                    Details
-                  </Button>
-                )}
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="grp2" className="text-[9px] px-0.5">
-              <div className="flex items-center justify-between w-full">
-                <span className="truncate">GRP#2 ({analysisData.grp2.length})</span>
-                {analysisData.grp2.length > 0 && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate('/bid-simulation', { 
-                        state: { 
-                          filteredData: analysisData.grp2.map(item => ({
-                            'ASIN': item.asin,
-                            'Campaign': item.campaign,
-                            'KW': item.kw,
-                            'Match Type': item.matchType,
-                            'Sync Status': item.syncStatus,
-                            'Latest Bid Calculated by the System': item.latestBid,
-                            'effective_ceiling': item.effectiveCeiling,
-                            'M: TOS%': item.mTos
-                          }))
-                        }
-                      });
-                    }}
-                  >
-                    Details
-                  </Button>
-                )}
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="grp3" className="text-[9px] px-0.5">
-              <div className="flex items-center justify-between w-full">
-                <span className="truncate">GRP#3 ({analysisData.grp3.length})</span>
-                {analysisData.grp3.length > 0 && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate('/bid-simulation', { 
-                        state: { 
-                          filteredData: analysisData.grp3.map(item => ({
-                            'ASIN': item.asin,
-                            'Campaign': item.campaign,
-                            'KW': item.kw,
-                            'Match Type': item.matchType,
-                            'Sync Status': item.syncStatus,
-                            'Latest Bid Calculated by the System': item.latestBid,
-                            'effective_ceiling': item.effectiveCeiling,
-                            'M: TOS%': item.mTos
-                          }))
-                        }
-                      });
-                    }}
-                  >
-                    Details
-                  </Button>
-                )}
-              </div>
-            </TabsTrigger>
-          </TabsList>
+          <TooltipProvider>
+            <TabsList className="grid w-full grid-cols-3 mx-0 mt-2 gap-0">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="grp1" className="text-[9px] px-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">GRP#1 ({analysisData.grp1.length} - {getPercentage(analysisData.grp1.length)}%)</span>
+                      {analysisData.grp1.length > 0 && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/bid-simulation', { 
+                              state: { 
+                                filteredData: analysisData.grp1.map(item => ({
+                                  'ASIN': item.asin,
+                                  'Campaign': item.campaign,
+                                  'KW': item.kw,
+                                  'Match Type': item.matchType,
+                                  'Sync Status': item.syncStatus,
+                                  'N: CVR': item.nCvr,
+                                  'CVR Date Range': item.cvrDateRange
+                                }))
+                              }
+                            });
+                          }}
+                        >
+                          Details
+                        </Button>
+                      )}
+                    </div>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium mb-1">GRP # 1 Filter Logic:</p>
+                  <p className="text-xs">Latest Bid Calculated by the System = effective_ceiling</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="grp2" className="text-[9px] px-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">GRP#2 ({analysisData.grp2.length} - {getPercentage(analysisData.grp2.length)}%)</span>
+                      {analysisData.grp2.length > 0 && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/bid-simulation', { 
+                              state: { 
+                                filteredData: analysisData.grp2.map(item => ({
+                                  'ASIN': item.asin,
+                                  'Campaign': item.campaign,
+                                  'KW': item.kw,
+                                  'Match Type': item.matchType,
+                                  'Sync Status': item.syncStatus,
+                                  'Latest Bid Calculated by the System': item.latestBid,
+                                  'effective_ceiling': item.effectiveCeiling,
+                                  'M: TOS%': item.mTos
+                                }))
+                              }
+                            });
+                          }}
+                        >
+                          Details
+                        </Button>
+                      )}
+                    </div>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium mb-1">GRP # 2 Filter Logic:</p>
+                  <p className="text-xs">NOT (Latest Bid ≤ effective_ceiling AND Δ ≤ 0 AND M: TOS% ≥ 0.5)</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="grp3" className="text-[9px] px-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">GRP#3 ({analysisData.grp3.length} - {getPercentage(analysisData.grp3.length)}%)</span>
+                      {analysisData.grp3.length > 0 && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/bid-simulation', { 
+                              state: { 
+                                filteredData: analysisData.grp3.map(item => ({
+                                  'ASIN': item.asin,
+                                  'Campaign': item.campaign,
+                                  'KW': item.kw,
+                                  'Match Type': item.matchType,
+                                  'Sync Status': item.syncStatus,
+                                  'Latest Bid Calculated by the System': item.latestBid,
+                                  'effective_ceiling': item.effectiveCeiling,
+                                  'M: TOS%': item.mTos
+                                }))
+                              }
+                            });
+                          }}
+                        >
+                          Details
+                        </Button>
+                      )}
+                    </div>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
+                  <p className="text-xs">NOT (Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND M: TOS% &gt; 0)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TabsList>
+          </TooltipProvider>
           
           <TabsContent value="grp1" className="mt-4 h-[calc(100%-56px)]">
             {renderGrp1Table(analysisData.grp1)}
