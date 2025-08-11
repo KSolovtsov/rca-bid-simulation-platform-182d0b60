@@ -940,12 +940,12 @@ const BidSimulation = () => {
               onClick={() => navigate(-1)}
             >
               <Undo2 className="mr-2 h-4 w-4" />
-              Назад
+              Back
             </Button>
             <Link to="/">
               <Button variant="outline" size="sm" className="shadow-card hover:shadow-elegant transition-all">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
+                Home
               </Button>
             </Link>
             <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
