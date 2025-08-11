@@ -15,6 +15,19 @@ import { format, parseISO, isValid } from 'date-fns';
 
 const BidSimulation = () => {
   const navigate = useNavigate();
+  
+  const handleBack = () => {
+    console.log('Back button clicked');
+    console.log('Window history length:', window.history.length);
+    
+    // Проверяем, есть ли история для возврата
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      // Если истории нет, идем на главную страницу
+      navigate('/');
+    }
+  };
   const { activeFileId } = useAppSettings();
   const { files, isInitialized } = useIndexedDbStorage();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -937,7 +950,7 @@ const BidSimulation = () => {
               variant="outline" 
               size="sm" 
               className="shadow-card hover:shadow-elegant transition-all"
-              onClick={() => navigate(-1)}
+              onClick={handleBack}
             >
               <Undo2 className="mr-2 h-4 w-4" />
               Back
