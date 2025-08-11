@@ -134,94 +134,94 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <Table>
             <TableHeader className="sticky top-0 bg-background z-10 border-b">
               <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'asin')}
                   >
                     ASIN {getSortIcon('grp1', 'asin')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[100px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'campaign')}
                   >
                     Campaign {getSortIcon('grp1', 'campaign')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[90px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'kw')}
                   >
                     KW {getSortIcon('grp1', 'kw')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'matchType')}
                   >
-                    Match Type {getSortIcon('grp1', 'matchType')}
+                    Match {getSortIcon('grp1', 'matchType')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'syncStatus')}
                   >
-                    Sync Status {getSortIcon('grp1', 'syncStatus')}
+                    Sync {getSortIcon('grp1', 'syncStatus')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'nCvr')}
                   >
-                    N: CVR {getSortIcon('grp1', 'nCvr')}
+                    CVR {getSortIcon('grp1', 'nCvr')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp1', 'cvrDateRange')}
                   >
-                    CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+                    Date Range {getSortIcon('grp1', 'cvrDateRange')}
                   </Button>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedData.map((item, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                  <TableCell className="text-xs">{item.campaign}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors h-8">
+                  <TableCell className="font-mono text-[10px] px-1 py-1">{item.asin}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[100px] truncate" title={item.campaign}>{item.campaign}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[90px] truncate" title={item.kw}>
                     {item.kw}
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs px-1 py-0">
+                  <TableCell className="px-1 py-1">
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                       {item.matchType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs">{item.syncStatus}</TableCell>
-                  <TableCell className="text-xs">{item.nCvr}</TableCell>
-                  <TableCell className="text-xs">{item.cvrDateRange}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{item.syncStatus}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{item.nCvr}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[80px] truncate" title={item.cvrDateRange}>{item.cvrDateRange}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -258,116 +258,116 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <Table>
             <TableHeader className="sticky top-0 bg-background z-10 border-b">
               <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'asin')}
                   >
                     ASIN {getSortIcon('grp2', 'asin')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[90px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'campaign')}
                   >
                     Campaign {getSortIcon('grp2', 'campaign')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'kw')}
                   >
                     KW {getSortIcon('grp2', 'kw')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'matchType')}
                   >
-                    Match Type {getSortIcon('grp2', 'matchType')}
+                    Match {getSortIcon('grp2', 'matchType')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'syncStatus')}
                   >
-                    Sync Status {getSortIcon('grp2', 'syncStatus')}
+                    Sync {getSortIcon('grp2', 'syncStatus')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'latestBid')}
                   >
                     Latest Bid {getSortIcon('grp2', 'latestBid')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'effectiveCeiling')}
                   >
-                    Effective Ceiling {getSortIcon('grp2', 'effectiveCeiling')}
+                    Ceiling {getSortIcon('grp2', 'effectiveCeiling')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'bidDelta')}
                   >
                     Δ Bid {getSortIcon('grp2', 'bidDelta')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp2', 'mTos')}
                   >
-                    M: TOS% {getSortIcon('grp2', 'mTos')}
+                    TOS% {getSortIcon('grp2', 'mTos')}
                   </Button>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedData.map((item, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                  <TableCell className="text-xs">{item.campaign}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors h-8">
+                  <TableCell className="font-mono text-[10px] px-1 py-1">{item.asin}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[90px] truncate" title={item.campaign}>{item.campaign}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[80px] truncate" title={item.kw}>
                     {item.kw}
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs px-1 py-0">
+                  <TableCell className="px-1 py-1">
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                       {item.matchType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs">{item.syncStatus}</TableCell>
-                  <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
-                  <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
-                  <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
-                  <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{item.syncStatus}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{formatCurrency(item.latestBid)}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{formatCurrency(item.effectiveCeiling)}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{formatCurrency(item.bidDelta)}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{item.mTos.toFixed(1)}%</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -404,116 +404,116 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <Table>
             <TableHeader className="sticky top-0 bg-background z-10 border-b">
               <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'asin')}
                   >
                     ASIN {getSortIcon('grp3', 'asin')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[90px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'campaign')}
                   >
                     Campaign {getSortIcon('grp3', 'campaign')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'kw')}
                   >
                     KW {getSortIcon('grp3', 'kw')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'matchType')}
                   >
-                    Match Type {getSortIcon('grp3', 'matchType')}
+                    Match {getSortIcon('grp3', 'matchType')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'syncStatus')}
                   >
-                    Sync Status {getSortIcon('grp3', 'syncStatus')}
+                    Sync {getSortIcon('grp3', 'syncStatus')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'latestBid')}
                   >
                     Latest Bid {getSortIcon('grp3', 'latestBid')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'effectiveCeiling')}
                   >
-                    Effective Ceiling {getSortIcon('grp3', 'effectiveCeiling')}
+                    Ceiling {getSortIcon('grp3', 'effectiveCeiling')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'bidDelta')}
                   >
                     Δ Bid {getSortIcon('grp3', 'bidDelta')}
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-xs">
+                <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 font-semibold text-xs hover:bg-transparent"
+                    className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                     onClick={() => handleSort('grp3', 'mTos')}
                   >
-                    M: TOS% {getSortIcon('grp3', 'mTos')}
+                    TOS% {getSortIcon('grp3', 'mTos')}
                   </Button>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedData.map((item, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                  <TableCell className="text-xs">{item.campaign}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors h-8">
+                  <TableCell className="font-mono text-[10px] px-1 py-1">{item.asin}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[90px] truncate" title={item.campaign}>{item.campaign}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 max-w-[80px] truncate" title={item.kw}>
                     {item.kw}
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs px-1 py-0">
+                  <TableCell className="px-1 py-1">
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                       {item.matchType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs">{item.syncStatus}</TableCell>
-                  <TableCell className="text-xs">{formatCurrency(item.latestBid)}</TableCell>
-                  <TableCell className="text-xs">{formatCurrency(item.effectiveCeiling)}</TableCell>
-                  <TableCell className="text-xs">{formatCurrency(item.bidDelta)}</TableCell>
-                  <TableCell className="text-xs">{item.mTos.toFixed(1)}%</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{item.syncStatus}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{formatCurrency(item.latestBid)}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{formatCurrency(item.effectiveCeiling)}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{formatCurrency(item.bidDelta)}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1">{item.mTos.toFixed(1)}%</TableCell>
                 </TableRow>
               ))}
             </TableBody>
