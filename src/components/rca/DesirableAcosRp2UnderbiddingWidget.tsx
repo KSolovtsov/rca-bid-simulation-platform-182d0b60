@@ -4,14 +4,16 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface WidgetProps {
   data: any[];
 }
 
 const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
+  const navigate = useNavigate();
   const [sortConfig, setSortConfig] = useState<{
     grp1: { field: string; direction: 'asc' | 'desc' } | null;
     grp2: { field: string; direction: 'asc' | 'desc' } | null;
@@ -542,7 +544,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 KWs with desirable ACOS in RP # 2, why are we underbidding?
               </CardTitle>
               <CardDescription className="text-sm">
-                Keywords performing well but potentially leaving money on the table
+                Analysis of keyword groups
               </CardDescription>
             </div>
           </div>
@@ -555,14 +557,94 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <CardContent className="p-0 h-[calc(100%-120px)]">
         <Tabs defaultValue="grp1" className="h-full">
           <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
-            <TabsTrigger value="grp1" className="text-xs">
-              GRP # 1 ({analysisData.grp1.length})
+            <TabsTrigger value="grp1" className="text-xs flex items-center justify-between w-full">
+              <span>GRP # 1 ({analysisData.grp1.length})</span>
+              {analysisData.grp1.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-4 p-1 ml-2 text-[10px] hover:bg-muted"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/bid-simulation', { 
+                      state: { 
+                        filteredData: analysisData.grp1.map(item => ({
+                          'ASIN': item.asin,
+                          'Campaign': item.campaign,
+                          'KW': item.kw,
+                          'Match Type': item.matchType,
+                          'Sync Status': item.syncStatus,
+                          'N: CVR': item.nCvr,
+                          'CVR Date Range': item.cvrDateRange
+                        }))
+                      }
+                    });
+                  }}
+                >
+                  <ArrowRight className="h-3 w-3 mr-1" />
+                  Details
+                </Button>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="grp2" className="text-xs">
-              GRP # 2 ({analysisData.grp2.length})
+            <TabsTrigger value="grp2" className="text-xs flex items-center justify-between w-full">
+              <span>GRP # 2 ({analysisData.grp2.length})</span>
+              {analysisData.grp2.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-4 p-1 ml-2 text-[10px] hover:bg-muted"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/bid-simulation', { 
+                      state: { 
+                        filteredData: analysisData.grp2.map(item => ({
+                          'ASIN': item.asin,
+                          'Campaign': item.campaign,
+                          'KW': item.kw,
+                          'Match Type': item.matchType,
+                          'Sync Status': item.syncStatus,
+                          'Latest Bid Calculated by the System': item.latestBid,
+                          'effective_ceiling': item.effectiveCeiling,
+                          'M: TOS%': item.mTos
+                        }))
+                      }
+                    });
+                  }}
+                >
+                  <ArrowRight className="h-3 w-3 mr-1" />
+                  Details
+                </Button>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="grp3" className="text-xs">
-              GRP # 3 ({analysisData.grp3.length})
+            <TabsTrigger value="grp3" className="text-xs flex items-center justify-between w-full">
+              <span>GRP # 3 ({analysisData.grp3.length})</span>
+              {analysisData.grp3.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-4 p-1 ml-2 text-[10px] hover:bg-muted"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/bid-simulation', { 
+                      state: { 
+                        filteredData: analysisData.grp3.map(item => ({
+                          'ASIN': item.asin,
+                          'Campaign': item.campaign,
+                          'KW': item.kw,
+                          'Match Type': item.matchType,
+                          'Sync Status': item.syncStatus,
+                          'Latest Bid Calculated by the System': item.latestBid,
+                          'effective_ceiling': item.effectiveCeiling,
+                          'M: TOS%': item.mTos
+                        }))
+                      }
+                    });
+                  }}
+                >
+                  <ArrowRight className="h-3 w-3 mr-1" />
+                  Details
+                </Button>
+              )}
             </TabsTrigger>
           </TabsList>
           
