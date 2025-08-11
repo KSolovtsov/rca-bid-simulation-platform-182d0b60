@@ -579,7 +579,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       
       <CardContent className="p-0 h-[calc(100%-120px)]">
         <Tabs defaultValue="grp1" className="h-full">
-          <TabsList className="grid w-full grid-cols-3 mx-1 mt-2 gap-0.5">
+          <TabsList className="grid w-full grid-cols-3 mx-0 mt-2 gap-0">
             <TabsTrigger value="grp1" className="text-[9px] px-0.5">
               <div className="flex items-center justify-between w-full">
                 <span className="truncate">GRP#1 ({analysisData.grp1.length})</span>
