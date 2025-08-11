@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useAppSettings } from '@/hooks/use-app-settings';
+import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
 
 interface WidgetProps {
   data: any[];
@@ -14,6 +16,27 @@ interface WidgetProps {
 
 const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const navigate = useNavigate();
+  const { settings } = useAppSettings();
+  const { getFile } = useIndexedDbStorage();
+  const [activeFileName, setActiveFileName] = useState<string>('Analysis of keyword groups');
+
+  // Get active file name
+  React.useEffect(() => {
+    const fetchActiveFileName = async () => {
+      if (settings.activeFileId) {
+        try {
+          const file = await getFile(settings.activeFileId);
+          if (file) {
+            setActiveFileName(file.name);
+          }
+        } catch (error) {
+          console.error('Error fetching active file:', error);
+        }
+      }
+    };
+    
+    fetchActiveFileName();
+  }, [settings.activeFileId, getFile]);
   const [sortConfig, setSortConfig] = useState<{
     grp1: { field: string; direction: 'asc' | 'desc' } | null;
     grp2: { field: string; direction: 'asc' | 'desc' } | null;
@@ -544,7 +567,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 KWs with desirable ACOS in RP # 2, why are we underbidding?
               </CardTitle>
               <CardDescription className="text-sm">
-                Analysis of keyword groups
+                {activeFileName}
               </CardDescription>
             </div>
           </div>
