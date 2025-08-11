@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingDown, Target } from 'lucide-react';
 
 interface WidgetProps {
@@ -11,9 +12,9 @@ interface WidgetProps {
 
 const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const analysisData = useMemo(() => {
-    if (!data || !Array.isArray(data)) return [];
+    if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [] };
 
-    return data
+    const filtered = data
       .filter(row => {
         const acosRp2 = parseFloat(row['Avg ACOS Reporting Period # 2']) || 0;
         const ordersRp2 = parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0;
@@ -34,12 +35,75 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         avgOrdersRp2: parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0,
         bidReduction: ((parseFloat(row['Avg CPC Reporting Period # 1']) || 0) - (parseFloat(row['Avg CPC Reporting Period # 2']) || 0)),
       }))
-      .sort((a, b) => b.bidReduction - a.bidReduction)
-      .slice(0, 50);
+      .sort((a, b) => b.bidReduction - a.bidReduction);
+
+    // Split data into 3 groups
+    const totalItems = filtered.length;
+    const groupSize = Math.ceil(totalItems / 3);
+    
+    return {
+      grp1: filtered.slice(0, groupSize),
+      grp2: filtered.slice(groupSize, groupSize * 2),
+      grp3: filtered.slice(groupSize * 2)
+    };
   }, [data]);
 
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
+  
+  const totalKeywords = analysisData.grp1.length + analysisData.grp2.length + analysisData.grp3.length;
+
+  const renderTable = (groupData: any[]) => (
+    <ScrollArea className="h-full">
+      <Table>
+        <TableHeader className="sticky top-0 bg-background">
+          <TableRow className="bg-muted/50">
+            <TableHead className="font-semibold text-xs">ASIN</TableHead>
+            <TableHead className="font-semibold text-xs">KW</TableHead>
+            <TableHead className="font-semibold text-xs">Match</TableHead>
+            <TableHead className="text-center font-semibold text-xs">ACOS RP#2</TableHead>
+            <TableHead className="text-center font-semibold text-xs">CPC RP#1</TableHead>
+            <TableHead className="text-center font-semibold text-xs">CPC RP#2</TableHead>
+            <TableHead className="text-center font-semibold text-xs">Orders RP#2</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {groupData.map((item, index) => (
+            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+              <TableCell className="font-mono text-xs">{item.asin}</TableCell>
+              <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
+                {item.kw}
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className="text-xs px-1 py-0">
+                  {item.matchType}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-center">
+                <span className="text-emerald-600 font-medium text-xs">
+                  {formatAcos(item.avgAcosRp2)}
+                </span>
+              </TableCell>
+              <TableCell className="text-center text-xs">{formatCurrency(item.avgCpcRp1)}</TableCell>
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <TrendingDown className="h-3 w-3 text-orange-500" />
+                  <span className="text-orange-600 text-xs">{formatCurrency(item.avgCpcRp2)}</span>
+                </div>
+              </TableCell>
+              <TableCell className="text-center text-xs">{item.avgOrdersRp2.toFixed(1)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      
+      {groupData.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground text-sm">
+          No keywords found in this group
+        </div>
+      )}
+    </ScrollArea>
+  );
 
   return (
     <Card className="shadow-card animate-slide-up h-[600px]">
@@ -59,61 +123,37 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             </div>
           </div>
           <Badge variant="outline" className="text-xs">
-            {analysisData.length} keywords
+            {totalKeywords} keywords
           </Badge>
         </div>
       </CardHeader>
       
       <CardContent className="p-0 h-[calc(100%-120px)]">
-        <ScrollArea className="h-full">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background">
-              <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs">ASIN</TableHead>
-                <TableHead className="font-semibold text-xs">KW</TableHead>
-                <TableHead className="font-semibold text-xs">Match</TableHead>
-                <TableHead className="text-center font-semibold text-xs">ACOS RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs">CPC RP#1</TableHead>
-                <TableHead className="text-center font-semibold text-xs">CPC RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs">Orders RP#2</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {analysisData.map((item, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
-                    {item.kw}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs px-1 py-0">
-                      {item.matchType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <span className="text-emerald-600 font-medium text-xs">
-                      {formatAcos(item.avgAcosRp2)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-center text-xs">{formatCurrency(item.avgCpcRp1)}</TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <TrendingDown className="h-3 w-3 text-orange-500" />
-                      <span className="text-orange-600 text-xs">{formatCurrency(item.avgCpcRp2)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-xs">{item.avgOrdersRp2.toFixed(1)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <Tabs defaultValue="grp1" className="h-full">
+          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
+            <TabsTrigger value="grp1" className="text-xs">
+              GRP # 1 ({analysisData.grp1.length})
+            </TabsTrigger>
+            <TabsTrigger value="grp2" className="text-xs">
+              GRP # 2 ({analysisData.grp2.length})
+            </TabsTrigger>
+            <TabsTrigger value="grp3" className="text-xs">
+              GRP # 3 ({analysisData.grp3.length})
+            </TabsTrigger>
+          </TabsList>
           
-          {analysisData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No keywords found with desirable ACOS in RP#2 that show underbidding patterns
-            </div>
-          )}
-        </ScrollArea>
+          <TabsContent value="grp1" className="mt-4 h-[calc(100%-56px)]">
+            {renderTable(analysisData.grp1)}
+          </TabsContent>
+          
+          <TabsContent value="grp2" className="mt-4 h-[calc(100%-56px)]">
+            {renderTable(analysisData.grp2)}
+          </TabsContent>
+          
+          <TabsContent value="grp3" className="mt-4 h-[calc(100%-56px)]">
+            {renderTable(analysisData.grp3)}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
