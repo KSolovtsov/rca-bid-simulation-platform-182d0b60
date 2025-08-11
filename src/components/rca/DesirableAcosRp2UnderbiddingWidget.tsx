@@ -165,7 +165,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full relative">
         <ScrollArea className="h-full">
           <Table>
-            <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 border-b shadow-sm">
+            <TableHeader className="sticky top-0 bg-background z-30 border-b shadow-sm">
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
                   <Button
@@ -289,7 +289,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full relative">
         <ScrollArea className="h-full">
           <Table>
-            <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 border-b shadow-sm">
+            <TableHeader className="sticky top-0 bg-background z-30 border-b shadow-sm">
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
@@ -435,7 +435,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full relative">
         <ScrollArea className="h-full">
           <Table>
-            <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 border-b shadow-sm">
+            <TableHeader className="sticky top-0 bg-background z-30 border-b shadow-sm">
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
