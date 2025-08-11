@@ -11,6 +11,10 @@ import OverbiddingWidget from './OverbiddingWidget';
 import UnderbiddingWidget from './UnderbiddingWidget';
 import PortalBidAnalysisWidget from './PortalBidAnalysisWidget';
 import AgencyBidAnalysisWidget from './AgencyBidAnalysisWidget';
+import DesirableAcosRp2UnderbiddingWidget from './DesirableAcosRp2UnderbiddingWidget';
+import DesirableAcos1dUnderbiddingWidget from './DesirableAcos1dUnderbiddingWidget';
+import DesirableAcosRp2OverbiddingWidget from './DesirableAcosRp2OverbiddingWidget';
+import DesirableAcos1dOverbiddingWidget from './DesirableAcos1dOverbiddingWidget';
 
 interface RcaAnalysisData {
   asin: string;
@@ -235,9 +239,10 @@ const RcaAnalysisWidget = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="rca-bid-analysis" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="rca-bid-analysis">Bids RCA</TabsTrigger>
           <TabsTrigger value="overview">Performance Overview</TabsTrigger>
+          <TabsTrigger value="misc-filters">Misc filters</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-6">
@@ -418,6 +423,15 @@ const RcaAnalysisWidget = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <PortalBidAnalysisWidget data={fileData.data} />
             <AgencyBidAnalysisWidget data={fileData.data} />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="misc-filters" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DesirableAcosRp2UnderbiddingWidget data={fileData.data} />
+            <DesirableAcos1dUnderbiddingWidget data={fileData.data} />
+            <DesirableAcosRp2OverbiddingWidget data={fileData.data} />
+            <DesirableAcos1dOverbiddingWidget data={fileData.data} />
           </div>
         </TabsContent>
       </Tabs>
