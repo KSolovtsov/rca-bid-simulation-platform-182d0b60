@@ -134,7 +134,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full relative">
         <ScrollArea className="h-full">
           <Table>
-            <TableHeader className="sticky top-0 bg-background z-10 border-b">
+            <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 border-b shadow-sm">
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
                   <Button
@@ -258,7 +258,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full relative">
         <ScrollArea className="h-full">
           <Table>
-            <TableHeader className="sticky top-0 bg-background z-10 border-b">
+            <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 border-b shadow-sm">
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
@@ -404,7 +404,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full relative">
         <ScrollArea className="h-full">
           <Table>
-            <TableHeader className="sticky top-0 bg-background z-10 border-b">
+            <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 border-b shadow-sm">
               <TableRow className="bg-muted/50">
                 <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
                   <Button
@@ -557,94 +557,97 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <CardContent className="p-0 h-[calc(100%-120px)]">
         <Tabs defaultValue="grp1" className="h-full">
           <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
-            <TabsTrigger value="grp1" className="text-xs flex items-center justify-between w-full">
-              <span>GRP # 1 ({analysisData.grp1.length})</span>
-              {analysisData.grp1.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-4 p-1 ml-2 text-[10px] hover:bg-muted"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/bid-simulation', { 
-                      state: { 
-                        filteredData: analysisData.grp1.map(item => ({
-                          'ASIN': item.asin,
-                          'Campaign': item.campaign,
-                          'KW': item.kw,
-                          'Match Type': item.matchType,
-                          'Sync Status': item.syncStatus,
-                          'N: CVR': item.nCvr,
-                          'CVR Date Range': item.cvrDateRange
-                        }))
-                      }
-                    });
-                  }}
-                >
-                  <ArrowRight className="h-3 w-3 mr-1" />
-                  Details
-                </Button>
-              )}
+            <TabsTrigger value="grp1" className="text-xs">
+              <div className="flex items-center justify-between w-full">
+                <span>GRP # 1 ({analysisData.grp1.length})</span>
+                {analysisData.grp1.length > 0 && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-5 px-2 ml-2 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/bid-simulation', { 
+                        state: { 
+                          filteredData: analysisData.grp1.map(item => ({
+                            'ASIN': item.asin,
+                            'Campaign': item.campaign,
+                            'KW': item.kw,
+                            'Match Type': item.matchType,
+                            'Sync Status': item.syncStatus,
+                            'N: CVR': item.nCvr,
+                            'CVR Date Range': item.cvrDateRange
+                          }))
+                        }
+                      });
+                    }}
+                  >
+                    Details
+                  </Button>
+                )}
+              </div>
             </TabsTrigger>
-            <TabsTrigger value="grp2" className="text-xs flex items-center justify-between w-full">
-              <span>GRP # 2 ({analysisData.grp2.length})</span>
-              {analysisData.grp2.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-4 p-1 ml-2 text-[10px] hover:bg-muted"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/bid-simulation', { 
-                      state: { 
-                        filteredData: analysisData.grp2.map(item => ({
-                          'ASIN': item.asin,
-                          'Campaign': item.campaign,
-                          'KW': item.kw,
-                          'Match Type': item.matchType,
-                          'Sync Status': item.syncStatus,
-                          'Latest Bid Calculated by the System': item.latestBid,
-                          'effective_ceiling': item.effectiveCeiling,
-                          'M: TOS%': item.mTos
-                        }))
-                      }
-                    });
-                  }}
-                >
-                  <ArrowRight className="h-3 w-3 mr-1" />
-                  Details
-                </Button>
-              )}
+            <TabsTrigger value="grp2" className="text-xs">
+              <div className="flex items-center justify-between w-full">
+                <span>GRP # 2 ({analysisData.grp2.length})</span>
+                {analysisData.grp2.length > 0 && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-5 px-2 ml-2 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/bid-simulation', { 
+                        state: { 
+                          filteredData: analysisData.grp2.map(item => ({
+                            'ASIN': item.asin,
+                            'Campaign': item.campaign,
+                            'KW': item.kw,
+                            'Match Type': item.matchType,
+                            'Sync Status': item.syncStatus,
+                            'Latest Bid Calculated by the System': item.latestBid,
+                            'effective_ceiling': item.effectiveCeiling,
+                            'M: TOS%': item.mTos
+                          }))
+                        }
+                      });
+                    }}
+                  >
+                    Details
+                  </Button>
+                )}
+              </div>
             </TabsTrigger>
-            <TabsTrigger value="grp3" className="text-xs flex items-center justify-between w-full">
-              <span>GRP # 3 ({analysisData.grp3.length})</span>
-              {analysisData.grp3.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-4 p-1 ml-2 text-[10px] hover:bg-muted"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/bid-simulation', { 
-                      state: { 
-                        filteredData: analysisData.grp3.map(item => ({
-                          'ASIN': item.asin,
-                          'Campaign': item.campaign,
-                          'KW': item.kw,
-                          'Match Type': item.matchType,
-                          'Sync Status': item.syncStatus,
-                          'Latest Bid Calculated by the System': item.latestBid,
-                          'effective_ceiling': item.effectiveCeiling,
-                          'M: TOS%': item.mTos
-                        }))
-                      }
-                    });
-                  }}
-                >
-                  <ArrowRight className="h-3 w-3 mr-1" />
-                  Details
-                </Button>
-              )}
+            <TabsTrigger value="grp3" className="text-xs">
+              <div className="flex items-center justify-between w-full">
+                <span>GRP # 3 ({analysisData.grp3.length})</span>
+                {analysisData.grp3.length > 0 && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-5 px-2 ml-2 text-[10px] bg-blue-500 text-white hover:bg-blue-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/bid-simulation', { 
+                        state: { 
+                          filteredData: analysisData.grp3.map(item => ({
+                            'ASIN': item.asin,
+                            'Campaign': item.campaign,
+                            'KW': item.kw,
+                            'Match Type': item.matchType,
+                            'Sync Status': item.syncStatus,
+                            'Latest Bid Calculated by the System': item.latestBid,
+                            'effective_ceiling': item.effectiveCeiling,
+                            'M: TOS%': item.mTos
+                          }))
+                        }
+                      });
+                    }}
+                  >
+                    Details
+                  </Button>
+                )}
+              </div>
             </TabsTrigger>
           </TabsList>
           
