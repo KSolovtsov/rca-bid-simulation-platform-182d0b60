@@ -651,14 +651,23 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                             e.stopPropagation();
                             navigate('/bid-simulation', { 
                               state: { 
-                                filteredData: analysisData.grp1.map(item => ({
-                                  'ASIN': item.asin,
-                                  'Campaign': item.campaign,
-                                  'KW': item.kw,
-                                  'Match Type': item.matchType,
-                                  'Sync Status': item.syncStatus,
-                                  'N: CVR': item.nCvr,
-                                  'CVR Date Range': item.cvrDateRange
+                                filteredData: analysisData.globalFilteredData.filter(row => {
+                                  const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
+                                  const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+                                  return Math.abs(latestBid - effectiveCeiling) < 0.01;
+                                }).map(row => ({
+                                  'ASIN': row['ASIN'] || '',
+                                  'Campaign': row['Campaign'] || '',
+                                  'KW': row['KW'] || row['Search Term'] || '',
+                                  'Match Type': row['Match Type'] || '',
+                                  'Sync Status': row['Sync Status'] || '',
+                                  'Latest Bid Calculated by the System': row['Latest Bid Calculated by the System'] || '',
+                                  'effective_ceiling': row['effective_ceiling'] || '',
+                                  'I: Applied ACOS': row['I: Applied ACOS'] || '',
+                                  'G: Target ACOS': row['G: Target ACOS'] || '',
+                                  'Current Bid As displayed on Amazon Seller Central': row['Current Bid As displayed on Amazon Seller Central'] || '',
+                                  'J: Ad Spend': row['J: Ad Spend'] || '',
+                                  'K: Price': row['K: Price'] || ''
                                 }))
                               }
                             });
@@ -690,15 +699,30 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                             e.stopPropagation();
                             navigate('/bid-simulation', { 
                               state: { 
-                                filteredData: analysisData.grp2.map(item => ({
-                                  'ASIN': item.asin,
-                                  'Campaign': item.campaign,
-                                  'KW': item.kw,
-                                  'Match Type': item.matchType,
-                                  'Sync Status': item.syncStatus,
-                                  'Latest Bid Calculated by the System': item.latestBid,
-                                  'effective_ceiling': item.effectiveCeiling,
-                                  'M: TOS%': item.mTos
+                                filteredData: analysisData.globalFilteredData.filter(row => {
+                                  const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
+                                  const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+                                  const bidDelta = parseFloat(row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)']) || 0;
+                                  const tosPercent = parseFloat(row['M: TOS%']) || 0;
+                                  
+                                  // NOT (Latest Bid <= effective_ceiling && Δ <= 0 && M: TOS% >= 0.5)
+                                  const condition = latestBid <= effectiveCeiling && bidDelta <= 0 && tosPercent >= 0.5;
+                                  return !condition;
+                                }).map(row => ({
+                                  'ASIN': row['ASIN'] || '',
+                                  'Campaign': row['Campaign'] || '',
+                                  'KW': row['KW'] || row['Search Term'] || '',
+                                  'Match Type': row['Match Type'] || '',
+                                  'Sync Status': row['Sync Status'] || '',
+                                  'Latest Bid Calculated by the System': row['Latest Bid Calculated by the System'] || '',
+                                  'effective_ceiling': row['effective_ceiling'] || '',
+                                  'M: TOS%': row['M: TOS%'] || '',
+                                  'I: Applied ACOS': row['I: Applied ACOS'] || '',
+                                  'G: Target ACOS': row['G: Target ACOS'] || '',
+                                  'Current Bid As displayed on Amazon Seller Central': row['Current Bid As displayed on Amazon Seller Central'] || '',
+                                  'J: Ad Spend': row['J: Ad Spend'] || '',
+                                  'K: Price': row['K: Price'] || '',
+                                  'Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)': row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)'] || ''
                                 }))
                               }
                             });
@@ -730,15 +754,30 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                             e.stopPropagation();
                             navigate('/bid-simulation', { 
                               state: { 
-                                filteredData: analysisData.grp3.map(item => ({
-                                  'ASIN': item.asin,
-                                  'Campaign': item.campaign,
-                                  'KW': item.kw,
-                                  'Match Type': item.matchType,
-                                  'Sync Status': item.syncStatus,
-                                  'Latest Bid Calculated by the System': item.latestBid,
-                                  'effective_ceiling': item.effectiveCeiling,
-                                  'M: TOS%': item.mTos
+                                filteredData: analysisData.globalFilteredData.filter(row => {
+                                  const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
+                                  const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+                                  const bidDelta = parseFloat(row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)']) || 0;
+                                  const tosPercent = parseFloat(row['M: TOS%']) || 0;
+                                  
+                                  // NOT (Latest Bid < effective_ceiling && Δ > 0 && M: TOS% < 0.5)
+                                  const condition = latestBid < effectiveCeiling && bidDelta > 0 && tosPercent < 0.5;
+                                  return !condition;
+                                }).map(row => ({
+                                  'ASIN': row['ASIN'] || '',
+                                  'Campaign': row['Campaign'] || '',
+                                  'KW': row['KW'] || row['Search Term'] || '',
+                                  'Match Type': row['Match Type'] || '',
+                                  'Sync Status': row['Sync Status'] || '',
+                                  'Latest Bid Calculated by the System': row['Latest Bid Calculated by the System'] || '',
+                                  'effective_ceiling': row['effective_ceiling'] || '',
+                                  'M: TOS%': row['M: TOS%'] || '',
+                                  'I: Applied ACOS': row['I: Applied ACOS'] || '',
+                                  'G: Target ACOS': row['G: Target ACOS'] || '',
+                                  'Current Bid As displayed on Amazon Seller Central': row['Current Bid As displayed on Amazon Seller Central'] || '',
+                                  'J: Ad Spend': row['J: Ad Spend'] || '',
+                                  'K: Price': row['K: Price'] || '',
+                                  'Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)': row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)'] || ''
                                 }))
                               }
                             });
