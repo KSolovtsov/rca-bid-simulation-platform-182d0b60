@@ -654,7 +654,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                                 filteredData: analysisData.globalFilteredData.filter(row => {
                                   const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
                                   const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  return Math.abs(latestBid - effectiveCeiling) < 0.01;
+                                  return latestBid === effectiveCeiling;
                                 }).map(row => ({
                                   'ASIN': row['ASIN'] || '',
                                   'Campaign': row['Campaign'] || '',
@@ -702,7 +702,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                                 filteredData: analysisData.globalFilteredData.filter(row => {
                                   const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
                                   const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  const bidDelta = parseFloat(row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)']) || 0;
+                                  const bidDelta = (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0);
                                   const tosPercent = parseFloat(row['M: TOS%']) || 0;
                                   
                                   // NOT (Latest Bid <= effective_ceiling && Δ <= 0 && M: TOS% >= 0.5)
@@ -757,7 +757,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                                 filteredData: analysisData.globalFilteredData.filter(row => {
                                   const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
                                   const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  const bidDelta = parseFloat(row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)']) || 0;
+                                  const bidDelta = (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0);
                                   const tosPercent = parseFloat(row['M: TOS%']) || 0;
                                   
                                   // NOT (Latest Bid < effective_ceiling && Δ > 0 && M: TOS% < 0.5)
