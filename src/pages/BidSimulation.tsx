@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Target, Filter, X, Columns, ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { format, parseISO, isValid } from 'date-fns';
 
 const BidSimulation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleBack = () => {
     console.log('Back button clicked');
@@ -435,9 +436,13 @@ const BidSimulation = () => {
   }, [searchParams, setSearchParams]);
 
   const filteredData = useMemo(() => {
-    if (!activeFile?.data || !activeFile?.headers) return [];
+    // Use data from location.state if available (from Details buttons), otherwise use activeFile.data
+    const sourceData = location.state?.filteredData || activeFile?.data;
+    const headers = activeFile?.headers;
+    
+    if (!sourceData || !headers) return [];
 
-    let filtered = activeFile.data.filter((row) => {
+    let filtered = sourceData.filter((row) => {
       return Object.entries(filters).every(([column, filter]) => {
         // Handle RCA complex filters
         if (filter.operator === 'rca_complex') {
@@ -573,7 +578,7 @@ const BidSimulation = () => {
     }
 
     return filtered;
-  }, [activeFile, filters, sortConfig]);
+  }, [activeFile, filters, sortConfig, location.state?.filteredData]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -1021,7 +1026,7 @@ const BidSimulation = () => {
                  </CardTitle>
                 <CardDescription className="flex items-center justify-between">
                   <span>
-                    Total Records: {filteredData.length} / {activeFile.data.length} | 
+                    Total Records: {filteredData.length} / {location.state?.filteredData?.length || activeFile.data.length} | 
                     Showing {paginatedData.length} records (Page {currentPage} of {totalPages})
                   </span>
                   <div className="flex items-center gap-2">
