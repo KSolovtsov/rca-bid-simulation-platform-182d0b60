@@ -50,10 +50,28 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   });
   
   const analysisData = useMemo(() => {
-    if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [] };
+    if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [], filteredRows: 0 };
+
+    // Apply global widget filter first
+    const globalFilteredData = data.filter(row => {
+      const appliedAcos = parseFloat(row['I: Applied ACOS']) || 0;
+      const targetAcos = parseFloat(row['G: Target ACOS']) || 0;
+      const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
+      const currentBid = parseFloat(row['Current Bid As displayed on Amazon Seller Central']) || 0;
+      const adSpend = parseFloat(row['J: Ad Spend']) || 0;
+      const price = parseFloat(row['K: Price']) || 0;
+
+      // Condition 1: Applied ACOS < 9999 && Applied ACOS < Target ACOS && Latest Bid < Current Bid
+      const condition1 = appliedAcos < 9999 && appliedAcos < targetAcos && latestBid < currentBid;
+      
+      // Condition 2: Applied ACOS = 9999 && Ad Spend < (Target ACOS * Price) && Latest Bid < Current Bid
+      const condition2 = appliedAcos === 9999 && adSpend < (targetAcos * price) && latestBid < currentBid;
+      
+      return condition1 || condition2;
+    });
 
     // GRP # 1: Latest Bid Calculated by the System = effective_ceiling
-    const grp1 = data
+    const grp1 = globalFilteredData
       .filter(row => {
         const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
         const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
@@ -70,7 +88,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       }));
 
     // GRP # 2: NOT (Latest Bid Calculated by the System <= effective_ceiling && Δ <= 0 && M: TOS% >= 0.5)
-    const grp2Data = data.map(row => ({
+    const grp2Data = globalFilteredData.map(row => ({
       asin: row['ASIN'] || '',
       campaign: row['Campaign'] || '',
       kw: row['KW'] || row['Search Term'] || '',
@@ -87,7 +105,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     });
 
     // GRP # 3: NOT (Latest Bid Calculated by the System < effective_ceiling && Δ > 0 && M: TOS% < 0.5)
-    const grp3Data = data.map(row => ({
+    const grp3Data = globalFilteredData.map(row => ({
       asin: row['ASIN'] || '',
       campaign: row['Campaign'] || '',
       kw: row['KW'] || row['Search Term'] || '',
@@ -109,6 +127,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       grp3: grp3Violations,
       grp2AllGood: grp2Violations.length === 0,
       grp3AllGood: grp3Violations.length === 0,
+      filteredRows: globalFilteredData.length,
     };
   }, [data]);
 
@@ -588,9 +607,14 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
               </CardDescription>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            Total: {totalRows}
-          </Badge>
+          <div className="flex flex-col items-end gap-1">
+            <Badge variant="outline" className="text-xs">
+              Filtered: {analysisData.filteredRows} / {totalRows}
+            </Badge>
+            <div className="text-xs text-muted-foreground">
+              Global filter applied
+            </div>
+          </div>
         </div>
       </CardHeader>
       
