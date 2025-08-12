@@ -50,7 +50,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   });
   
   const analysisData = useMemo(() => {
-    if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [], filteredRows: 0 };
+    if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [], filteredRows: 0, globalFilteredData: [] };
 
     // Apply global widget filter first
     const globalFilteredData = data.filter(row => {
@@ -128,6 +128,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       grp2AllGood: grp2Violations.length === 0,
       grp3AllGood: grp3Violations.length === 0,
       filteredRows: globalFilteredData.length,
+      globalFilteredData: globalFilteredData,
     };
   }, [data]);
 
