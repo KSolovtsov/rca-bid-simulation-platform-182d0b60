@@ -597,7 +597,21 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/10 rounded-lg">
-              <Target className="h-5 w-5 text-emerald-600" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Target className="h-5 w-5 text-emerald-600 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-md">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Global Widget Filter:</p>
+                    <div className="text-xs space-y-1">
+                      <p><strong>Condition 1:</strong> Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS AND Latest Bid &lt; Current Bid</p>
+                      <p><strong>OR</strong></p>
+                      <p><strong>Condition 2:</strong> Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price) AND Latest Bid &lt; Current Bid</p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div>
               <CardTitle className="text-lg text-emerald-700">
