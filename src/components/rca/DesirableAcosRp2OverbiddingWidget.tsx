@@ -184,6 +184,18 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   };
 
   const renderGrp1Table = () => {
+    if (grp1Data.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">All Good!!</h3>
+            <p className="text-muted-foreground">All conditions are met for this group</p>
+          </div>
+        </div>
+      );
+    }
+
     const sortedData = sortData(grp1Data, 'grp1');
     
     return (
@@ -304,17 +316,24 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               </div>
             ))}
           </div>
-          {grp1Data.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No data found for GRP#1 criteria
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
   };
 
   const renderGrp2Table = () => {
+    if (grp2Data.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">All Good!!</h3>
+            <p className="text-muted-foreground">All conditions are met for this group</p>
+          </div>
+        </div>
+      );
+    }
+
     const sortedData = sortData(grp2Data, 'grp2');
     
     return (
@@ -446,17 +465,24 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               </div>
             ))}
           </div>
-          {grp2Data.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No data found for GRP#2 criteria
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
   };
 
   const renderGrp3Table = () => {
+    if (grp3Data.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">All Good!!</h3>
+            <p className="text-muted-foreground">All conditions are met for this group</p>
+          </div>
+        </div>
+      );
+    }
+
     const sortedData = sortData(grp3Data, 'grp3');
     
     return (
@@ -599,11 +625,6 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               </div>
             ))}
           </div>
-          {grp3Data.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No data found for GRP#3 criteria
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
