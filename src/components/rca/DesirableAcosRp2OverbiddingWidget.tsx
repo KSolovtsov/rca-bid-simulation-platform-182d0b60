@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +19,13 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { activeFileName } = useAppSettings();
+  
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<{
+    grp1?: { field: string; direction: 'asc' | 'desc' };
+    grp2?: { field: string; direction: 'asc' | 'desc' };
+    grp3?: { field: string; direction: 'asc' | 'desc' };
+  }>({});
   
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
@@ -140,173 +148,466 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     navigate(`/bid-simulation?${params.toString()}`);
   };
 
-  const renderGrp1Table = () => (
-    <ScrollArea className="h-full">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background">
-          <TableRow className="bg-muted/50">
-            <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">Campaign</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">KW</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[50px]">Match Type</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CVR</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Avg CVR RP2</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">TOS%</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {grp1Data.map((item, index) => (
-            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-              <TableCell className="font-mono text-xs py-0.5 w-[60px]">{item.asin}</TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5" title={item.searchTerm}>
-                <div className="flex items-center gap-1">
-                  <span>{item.searchTerm}</span>
-                  <Copy 
-                    className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
-                    onClick={() => copyToClipboard(item.searchTerm)}
-                  />
-                </div>
-              </TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.campaign}</TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.kw}</TableCell>
-              <TableCell className="py-0.5 w-[50px]">
-                <Badge 
-                  variant="outline" 
-                  className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                  onClick={() => handleMatchTypeClick(item)}
-                >
-                  {item.matchType}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.cvr * 100).toFixed(2)}%</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[60px]">{(item.avgCvrRp2 * 100).toFixed(2)}%</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.tosPercent * 100).toFixed(1)}%</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {grp1Data.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground text-sm">
-          No data found for GRP#1 criteria
-        </div>
-      )}
-    </ScrollArea>
-  );
+  const handleSort = (group: 'grp1' | 'grp2' | 'grp3', field: string) => {
+    const currentSort = sortConfig[group];
+    const direction = currentSort?.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc';
+    
+    setSortConfig(prev => ({
+      ...prev,
+      [group]: { field, direction }
+    }));
+  };
 
-  const renderGrp2Table = () => (
-    <ScrollArea className="h-full">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background">
-          <TableRow className="bg-muted/50">
-            <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">Campaign</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">KW</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[50px]">Match Type</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[70px]">Latest Bid</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CVR</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Avg CVR RP2</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">TOS%</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {grp2Data.map((item, index) => (
-            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-              <TableCell className="font-mono text-xs py-0.5 w-[60px]">{item.asin}</TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5" title={item.searchTerm}>
-                <div className="flex items-center gap-1">
-                  <span>{item.searchTerm}</span>
-                  <Copy 
-                    className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
-                    onClick={() => copyToClipboard(item.searchTerm)}
-                  />
-                </div>
-              </TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.campaign}</TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.kw}</TableCell>
-              <TableCell className="py-0.5 w-[50px]">
-                <Badge 
-                  variant="outline" 
-                  className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                  onClick={() => handleMatchTypeClick(item)}
-                >
-                  {item.matchType}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[70px]">{formatCurrency(item.latestBid)}</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.cvr * 100).toFixed(2)}%</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[60px]">{(item.avgCvrRp2 * 100).toFixed(2)}%</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.tosPercent * 100).toFixed(1)}%</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {grp2Data.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground text-sm">
-          No data found for GRP#2 criteria
-        </div>
-      )}
-    </ScrollArea>
-  );
+  const sortData = (data: any[], group: 'grp1' | 'grp2' | 'grp3') => {
+    const sort = sortConfig[group];
+    if (!sort) return data;
 
-  const renderGrp3Table = () => (
-    <ScrollArea className="h-full">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background">
-          <TableRow className="bg-muted/50">
-            <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">Campaign</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[80px]">KW</TableHead>
-            <TableHead className="font-semibold text-xs py-2 w-[50px]">Match Type</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[70px]">Latest Bid</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CVR</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Avg CVR RP2</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Ad Spend</TableHead>
-            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">Clicks</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {grp3Data.map((item, index) => (
-            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-              <TableCell className="font-mono text-xs py-0.5 w-[60px]">{item.asin}</TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5" title={item.searchTerm}>
-                <div className="flex items-center gap-1">
-                  <span>{item.searchTerm}</span>
-                  <Copy 
-                    className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
-                    onClick={() => copyToClipboard(item.searchTerm)}
-                  />
-                </div>
-              </TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.campaign}</TableCell>
-              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.kw}</TableCell>
-              <TableCell className="py-0.5 w-[50px]">
-                <Badge 
-                  variant="outline" 
-                  className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                  onClick={() => handleMatchTypeClick(item)}
-                >
-                  {item.matchType}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[70px]">{formatCurrency(item.latestBid)}</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.cvr * 100).toFixed(2)}%</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[60px]">{(item.avgCvrRp2 * 100).toFixed(2)}%</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[60px]">{formatCurrency(item.adSpend)}</TableCell>
-              <TableCell className="text-center text-xs py-0.5 w-[50px]">{item.clicks}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {grp3Data.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground text-sm">
-          No data found for GRP#3 criteria
+    return [...data].sort((a, b) => {
+      const aVal = a[sort.field];
+      const bVal = b[sort.field];
+      
+      // Special handling for numeric fields
+      if (sort.field === 'latestBid' || sort.field === 'cvr' || sort.field === 'avgCvrRp2' || 
+          sort.field === 'tosPercent' || sort.field === 'adSpend' || sort.field === 'clicks') {
+        const aNum = parseFloat(aVal) || 0;
+        const bNum = parseFloat(bVal) || 0;
+        return sort.direction === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      
+      // String comparison
+      const aStr = String(aVal || '').toLowerCase();
+      const bStr = String(bVal || '').toLowerCase();
+      if (aStr < bStr) return sort.direction === 'asc' ? -1 : 1;
+      if (aStr > bStr) return sort.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const renderGrp1Table = () => {
+    const sortedData = sortData(grp1Data, 'grp1');
+    
+    return (
+      <div className="h-full flex flex-col">
+        <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'asin')}
+              >
+                ASIN
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'searchTerm')}
+              >
+                Search Term
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'campaign')}
+              >
+                Campaign
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'kw')}
+              >
+                KW
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'matchType')}
+              >
+                Match
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[50px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'cvr')}
+              >
+                CVR
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'avgCvrRp2')}
+              >
+                Avg CVR RP2
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'tosPercent')}
+              >
+                TOS%
+              </Button>
+            </div>
+          </div>
         </div>
-      )}
-    </ScrollArea>
-  );
+        
+        <ScrollArea className="flex-1">
+          <div className="min-w-full">
+            {sortedData.map((item, index) => (
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate" title={item.searchTerm}>
+                  <div className="flex items-center gap-1">
+                    <span className="truncate">{item.searchTerm}</span>
+                    <Copy 
+                      className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer flex-shrink-0" 
+                      onClick={() => copyToClipboard(item.searchTerm)}
+                    />
+                  </div>
+                </div>
+                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30 truncate">{item.campaign}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate">{item.kw}</div>
+                <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
+                    {item.matchType}
+                  </Badge>
+                </div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+              </div>
+            ))}
+          </div>
+          {grp1Data.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No data found for GRP#1 criteria
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    );
+  };
+
+  const renderGrp2Table = () => {
+    const sortedData = sortData(grp2Data, 'grp2');
+    
+    return (
+      <div className="h-full flex flex-col">
+        <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'asin')}
+              >
+                ASIN
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'searchTerm')}
+              >
+                Search Term
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'campaign')}
+              >
+                Campaign
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'kw')}
+              >
+                KW
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'matchType')}
+              >
+                Match
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[65px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'latestBid')}
+              >
+                Latest Bid
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[50px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'cvr')}
+              >
+                CVR
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'avgCvrRp2')}
+              >
+                Avg CVR RP2
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'tosPercent')}
+              >
+                TOS%
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <ScrollArea className="flex-1">
+          <div className="min-w-full">
+            {sortedData.map((item, index) => (
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate" title={item.searchTerm}>
+                  <div className="flex items-center gap-1">
+                    <span className="truncate">{item.searchTerm}</span>
+                    <Copy 
+                      className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer flex-shrink-0" 
+                      onClick={() => copyToClipboard(item.searchTerm)}
+                    />
+                  </div>
+                </div>
+                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30 truncate">{item.campaign}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate">{item.kw}</div>
+                <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
+                    {item.matchType}
+                  </Badge>
+                </div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+              </div>
+            ))}
+          </div>
+          {grp2Data.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No data found for GRP#2 criteria
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    );
+  };
+
+  const renderGrp3Table = () => {
+    const sortedData = sortData(grp3Data, 'grp3');
+    
+    return (
+      <div className="h-full flex flex-col">
+        <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'asin')}
+              >
+                ASIN
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'searchTerm')}
+              >
+                Search Term
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'campaign')}
+              >
+                Campaign
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'kw')}
+              >
+                KW
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'matchType')}
+              >
+                Match
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[65px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'latestBid')}
+              >
+                Latest Bid
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[50px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'cvr')}
+              >
+                CVR
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'avgCvrRp2')}
+              >
+                Avg CVR RP2
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'adSpend')}
+              >
+                Ad Spend
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[50px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'clicks')}
+              >
+                Clicks
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <ScrollArea className="flex-1">
+          <div className="min-w-full">
+            {sortedData.map((item, index) => (
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate" title={item.searchTerm}>
+                  <div className="flex items-center gap-1">
+                    <span className="truncate">{item.searchTerm}</span>
+                    <Copy 
+                      className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer flex-shrink-0" 
+                      onClick={() => copyToClipboard(item.searchTerm)}
+                    />
+                  </div>
+                </div>
+                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30 truncate">{item.campaign}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate">{item.kw}</div>
+                <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
+                    {item.matchType}
+                  </Badge>
+                </div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[60px] border-r border-border/30">{formatCurrency(item.adSpend)}</div>
+                <div className="text-center text-[9px] px-1 py-0.5 w-[50px]">{item.clicks}</div>
+              </div>
+            ))}
+          </div>
+          {grp3Data.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No data found for GRP#3 criteria
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    );
+  };
 
   return (
     <Card className="shadow-card animate-slide-up h-[600px]">
