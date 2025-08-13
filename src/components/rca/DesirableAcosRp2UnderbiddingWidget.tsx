@@ -223,7 +223,15 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     });
   };
 
-  const renderCellWithCopy = (content: string, type: 'Campaign' | 'KW') => {
+  const handleMatchTypeClick = (item: any) => {
+    const params = new URLSearchParams();
+    params.set('kw', item.kw || item.searchTerm);
+    params.set('campaign', item.campaign);
+    params.set('matchType', item.matchType);
+    navigate(`/bid-simulation?${params.toString()}`);
+  };
+
+  const renderCellWithCopy = (content: string, type: 'Campaign' | 'KW' | 'Search Term') => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -371,12 +379,18 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
+                </div>
                 <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
-                  <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
                     {item.matchType}
                   </Badge>
                 </div>
@@ -509,12 +523,18 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
+                </div>
                 <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
-                  <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
                     {item.matchType}
                   </Badge>
                 </div>
@@ -645,12 +665,18 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
+                </div>
                 <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
-                  <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
                     {item.matchType}
                   </Badge>
                 </div>
@@ -801,12 +827,18 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
+                </div>
                 <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
-                  <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleMatchTypeClick(item)}
+                  >
                     {item.matchType}
                   </Badge>
                 </div>

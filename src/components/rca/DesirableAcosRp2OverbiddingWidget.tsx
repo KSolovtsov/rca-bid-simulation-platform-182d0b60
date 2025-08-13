@@ -3,13 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { TrendingUp, AlertTriangle } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Copy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface WidgetProps {
   data: any[];
 }
 
 const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return [];
 
@@ -41,6 +45,22 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard",
+      description: `"${text}" has been copied to your clipboard.`,
+    });
+  };
+
+  const handleMatchTypeClick = (item: any) => {
+    const params = new URLSearchParams();
+    params.set('kw', item.kw);
+    params.set('campaign', item.campaign);
+    params.set('matchType', item.matchType);
+    navigate(`/bid-simulation?${params.toString()}`);
+  };
+
   return (
     <Card className="shadow-card animate-slide-up h-[600px]">
       <CardHeader className="pb-3">
@@ -69,40 +89,50 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <Table>
             <TableHeader className="sticky top-0 bg-background">
               <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs">ASIN</TableHead>
-                <TableHead className="font-semibold text-xs">KW</TableHead>
-                <TableHead className="font-semibold text-xs">Match</TableHead>
-                <TableHead className="text-center font-semibold text-xs">ACOS RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs">CPC RP#1</TableHead>
-                <TableHead className="text-center font-semibold text-xs">CPC RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs">Orders RP#2</TableHead>
+                <TableHead className="font-semibold text-xs py-2">ASIN</TableHead>
+                <TableHead className="font-semibold text-xs py-2">Search Term</TableHead>
+                <TableHead className="font-semibold text-xs py-2">Match</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2">ACOS RP#2</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2">CPC RP#1</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2">CPC RP#2</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2">Orders RP#2</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {analysisData.map((item, index) => (
                 <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs">{item.asin}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-xs" title={item.kw}>
-                    {item.kw}
+                  <TableCell className="font-mono text-xs py-1">{item.asin}</TableCell>
+                  <TableCell className="max-w-[120px] truncate text-xs py-1" title={item.kw}>
+                    <div className="flex items-center gap-1">
+                      <span>{item.kw}</span>
+                      <Copy 
+                        className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
+                        onClick={() => copyToClipboard(item.kw)}
+                      />
+                    </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs px-1 py-0">
+                  <TableCell className="py-1">
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                      onClick={() => handleMatchTypeClick(item)}
+                    >
                       {item.matchType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center py-1">
                     <span className="text-emerald-600 font-medium text-xs">
                       {formatAcos(item.avgAcosRp2)}
                     </span>
                   </TableCell>
-                  <TableCell className="text-center text-xs">{formatCurrency(item.avgCpcRp1)}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center text-xs py-1">{formatCurrency(item.avgCpcRp1)}</TableCell>
+                  <TableCell className="text-center py-1">
                     <div className="flex items-center justify-center gap-1">
                       <TrendingUp className="h-3 w-3 text-red-500" />
                       <span className="text-red-600 text-xs">{formatCurrency(item.avgCpcRp2)}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center text-xs">{item.avgOrdersRp2.toFixed(1)}</TableCell>
+                  <TableCell className="text-center text-xs py-1">{item.avgOrdersRp2.toFixed(1)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
