@@ -346,7 +346,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 N: CVR {getSortIcon('grp1', 'nCvr')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[96px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[106px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -356,7 +356,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[77px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -366,7 +366,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[50px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
               <Button
                 variant="ghost"
                 size="sm"
@@ -404,9 +404,9 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </div>
                 <div className="text-[10px] px-1 py-2 w-[63px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
                 <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-2 w-[96px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
-                <div className="text-[10px] px-1 py-2 w-[77px] border-r border-border">{item.avgCvrRp1}</div>
-                <div className="text-[10px] px-1 py-2 w-[50px]">{item.avgCvrRp2}</div>
+                <div className="text-[10px] px-1 py-2 w-[106px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
+                <div className="text-[10px] px-1 py-2 w-[85px] border-r border-border">{item.avgCvrRp1}</div>
+                <div className="text-[10px] px-1 py-2 w-[40px]">{item.avgCvrRp2}</div>
               </div>
             ))}
           </div>
