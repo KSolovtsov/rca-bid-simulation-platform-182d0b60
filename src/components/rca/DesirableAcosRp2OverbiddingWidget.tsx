@@ -332,17 +332,51 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       
       <CardContent className="p-0 h-[calc(100%-120px)]">
         <Tabs defaultValue="grp1" className="h-full">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mb-2">
-            <TabsTrigger value="grp1" className="text-xs">
-              GRP#1 ({grp1Data.length})
-            </TabsTrigger>
-            <TabsTrigger value="grp2" className="text-xs">
-              GRP#2 ({grp2Data.length})
-            </TabsTrigger>
-            <TabsTrigger value="grp3" className="text-xs">
-              GRP#3 ({grp3Data.length})
-            </TabsTrigger>
-          </TabsList>
+          <TooltipProvider>
+            <TabsList className="grid w-full grid-cols-3 mx-0 mt-2 gap-0">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="grp1" className="text-[9px] px-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">GRP#1 ({grp1Data.length})</span>
+                    </div>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium mb-1">GRP # 1 Filter Logic:</p>
+                  <p className="text-xs">CVR ≤ Avg CVR RP2 AND TOS% &gt; 0.5</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="grp2" className="text-[9px] px-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">GRP#2 ({grp2Data.length})</span>
+                    </div>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium mb-1">GRP # 2 Filter Logic:</p>
+                  <p className="text-xs">CVR ≤ Avg CVR RP2 AND TOS% ≤ 0.5 AND Δ ≥ 0</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="grp3" className="text-[9px] px-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">GRP#3 ({grp3Data.length})</span>
+                    </div>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
+                  <p className="text-xs">Avg CVR RP2 Not blank AND CVR &gt; Avg CVR RP2 AND Clicks ≥ 5</p>
+                </TooltipContent>
+              </Tooltip>
+            </TabsList>
+          </TooltipProvider>
           
           <TabsContent value="grp1" className="h-[calc(100%-50px)] mt-0">
             {renderGrp1Table()}
