@@ -333,7 +333,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'adSpend')}
               >
-                J: Ad Spend {getSortIcon('grp1', 'adSpend')}
+                Spend {getSortIcon('grp1', 'adSpend')}
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
@@ -510,7 +510,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Effective {getSortIcon('grp2', 'effectiveCeiling')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[66px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -520,7 +520,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Adjusted {getSortIcon('grp2', 'adjustedBid')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[54px]">
               <Button
                 variant="ghost"
                 size="sm"
@@ -558,8 +558,8 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </div>
                 <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
                 <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
-                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-2 w-[60px]">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] px-1 py-2 w-[66px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-2 w-[54px]">{item.mTos.toFixed(1)}%</div>
               </div>
             ))}
           </div>
@@ -795,14 +795,14 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Latest Bid {getSortIcon('grp4', 'latestBid')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[92px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'minSuggestedBid')}
               >
-                Min. Suggested {getSortIcon('grp4', 'minSuggestedBid')}
+                Min. Suggested Bid {getSortIcon('grp4', 'minSuggestedBid')}
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -825,7 +825,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Adjusted {getSortIcon('grp4', 'adjustedBid')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[48px]">
               <Button
                 variant="ghost"
                 size="sm"
@@ -862,10 +862,10 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   </Badge>
                 </div>
                 <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
-                <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border">{formatCurrency(item.minSuggestedBid)}</div>
+                <div className="text-[10px] px-1 py-2 w-[92px] border-r border-border">{formatCurrency(item.minSuggestedBid)}</div>
                 <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
                 <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-2 w-[60px]">{formatAcos(item.mTos)}</div>
+                <div className="text-[10px] px-1 py-2 w-[48px]">{formatAcos(item.mTos)}</div>
               </div>
             ))}
           </div>
