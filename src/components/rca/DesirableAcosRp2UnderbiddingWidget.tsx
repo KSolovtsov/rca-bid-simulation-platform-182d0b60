@@ -382,17 +382,17 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <div className="space-y-0">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
+                <div className="font-mono text-[10px] px-1 py-2 w-[60px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-2 w-[80px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
+                <div className="text-[10px] py-2 w-[70px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-2 w-[70px] border-r border-border">
+                <div className="px-1 py-2 w-[50px] border-r border-border">
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -401,11 +401,11 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
-                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
-                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{item.avgCvrRp1}</div>
-                <div className="text-[10px] px-1 py-2 w-[70px]">{item.avgCvrRp2}</div>
+                <div className="text-[10px] px-1 py-2 w-[50px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
+                <div className="text-[10px] px-1 py-2 w-[40px] border-r border-border">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
+                <div className="text-[10px] px-1 py-2 w-[50px] border-r border-border">{item.avgCvrRp1}</div>
+                <div className="text-[10px] px-1 py-2 w-[50px]">{item.avgCvrRp2}</div>
               </div>
             ))}
           </div>

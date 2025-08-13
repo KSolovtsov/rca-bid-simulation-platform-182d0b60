@@ -96,20 +96,20 @@ const DesirableAcos1dUnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <Table>
             <TableHeader className="sticky top-0 bg-background">
               <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs py-2">ASIN</TableHead>
-                <TableHead className="font-semibold text-xs py-2">Search Term</TableHead>
-                <TableHead className="font-semibold text-xs py-2">Match</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2">ACOS_1d</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2">CPC RP#1</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2">CPC RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2">Orders_1d</TableHead>
+                <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
+                <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
+                <TableHead className="font-semibold text-xs py-2 w-[50px]">Match</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">ACOS_1d</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CPC RP#1</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">CPC RP#2</TableHead>
+                <TableHead className="text-center font-semibold text-xs py-2 w-[40px]">Orders_1d</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {analysisData.map((item, index) => (
                 <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs py-1">{item.asin}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-xs py-1" title={item.kw}>
+                  <TableCell className="font-mono text-xs py-1 w-[60px]">{item.asin}</TableCell>
+                  <TableCell className="max-w-[80px] truncate text-xs py-1" title={item.kw}>
                     <div className="flex items-center gap-1">
                       <span>{item.kw}</span>
                       <Copy 
@@ -118,7 +118,7 @@ const DesirableAcos1dUnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                       />
                     </div>
                   </TableCell>
-                  <TableCell className="py-1">
+                  <TableCell className="py-1 w-[50px]">
                     <Badge 
                       variant="outline" 
                       className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -127,19 +127,19 @@ const DesirableAcos1dUnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                       {item.matchType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-center py-1">
+                  <TableCell className="text-center py-1 w-[50px]">
                     <span className="text-cyan-600 font-medium text-xs">
                       {formatAcos(item.avgAcos1d)}
                     </span>
                   </TableCell>
-                  <TableCell className="text-center text-xs py-1">{formatCurrency(item.avgCpcRp1)}</TableCell>
-                  <TableCell className="text-center py-1">
+                  <TableCell className="text-center text-xs py-1 w-[50px]">{formatCurrency(item.avgCpcRp1)}</TableCell>
+                  <TableCell className="text-center py-1 w-[60px]">
                     <div className="flex items-center justify-center gap-1">
                       <TrendingDown className="h-3 w-3 text-orange-500" />
                       <span className="text-orange-600 text-xs">{formatCurrency(item.avgCpcRp2)}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center text-xs py-1">{item.avgOrders1d.toFixed(1)}</TableCell>
+                  <TableCell className="text-center text-xs py-1 w-[40px]">{item.avgOrders1d.toFixed(1)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
