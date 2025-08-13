@@ -55,9 +55,16 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
 
   const handleMatchTypeClick = (item: any) => {
     const params = new URLSearchParams();
-    params.set('kw', item.kw);
-    params.set('campaign', item.campaign);
-    params.set('matchType', item.matchType);
+    params.set('source', 'rca_analysis');
+    params.set('filter_kw', 'KW');
+    params.set('value_kw', item.kw);
+    params.set('operator_kw', 'equals');
+    params.set('filter_campaign', 'Campaign');
+    params.set('value_campaign', item.campaign);
+    params.set('operator_campaign', 'equals');
+    params.set('filter_match', 'Match Type');
+    params.set('value_match', item.matchType);
+    params.set('operator_match', 'equals');
     navigate(`/bid-simulation?${params.toString()}`);
   };
 
