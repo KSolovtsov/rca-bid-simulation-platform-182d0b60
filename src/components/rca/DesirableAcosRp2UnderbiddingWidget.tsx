@@ -76,12 +76,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
         return effectiveCeiling === 0.02;
       })
-      .map(row => ({
+     .map(row => ({
         asin: row['ASIN'] || '',
         campaign: row['Campaign'] || '',
         searchTerm: row['Search Term'] || '',
         kw: row['KW'] || '',
         matchType: row['Match Type'] || '',
+        adSpend: row['J: Ad Spend'] || '',
         nCvr: row['N: CVR'] || '',
         cvrDateRange: row['CVR Date Range'] || '',
         avgCvrRp1: row['Avg CVR Reporting Period # 1'] || '',
@@ -227,17 +228,27 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   KW {getSortIcon('grp1', 'kw')}
                 </Button>
               </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'matchType')}
-                >
-                  Match {getSortIcon('grp1', 'matchType')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
+               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
+                   onClick={() => handleSort('grp1', 'matchType')}
+                 >
+                   Match {getSortIcon('grp1', 'matchType')}
+                 </Button>
+               </TableHead>
+               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
+                   onClick={() => handleSort('grp1', 'adSpend')}
+                 >
+                   J: Ad Spend {getSortIcon('grp1', 'adSpend')}
+                 </Button>
+               </TableHead>
+               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -294,12 +305,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <TableCell className="text-[10px] px-1 py-1 w-[90px] max-w-[90px] truncate" title={item.kw}>
                     {item.kw}
                   </TableCell>
-                  <TableCell className="px-1 py-1 w-[70px]">
-                    <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
-                      {item.matchType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[60px]">{item.nCvr}</TableCell>
+                   <TableCell className="px-1 py-1 w-[70px]">
+                     <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
+                       {item.matchType}
+                     </Badge>
+                   </TableCell>
+                   <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.adSpend}</TableCell>
+                   <TableCell className="text-[10px] px-1 py-1 w-[60px]">{item.nCvr}</TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[80px] max-w-[80px] truncate" title={item.cvrDateRange}>{item.cvrDateRange}</TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.avgCvrRp1}</TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.avgCvrRp2}</TableCell>
