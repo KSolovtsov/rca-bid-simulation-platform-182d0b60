@@ -276,7 +276,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[56px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -286,7 +286,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 ASIN {getSortIcon('grp1', 'asin')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -296,7 +296,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Campaign {getSortIcon('grp1', 'campaign')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -306,7 +306,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Search Term {getSortIcon('grp1', 'searchTerm')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -316,7 +316,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 KW {getSortIcon('grp1', 'kw')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[49px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -326,7 +326,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Match {getSortIcon('grp1', 'matchType')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[49px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -336,7 +336,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 J: Ad Spend {getSortIcon('grp1', 'adSpend')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[42px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -346,7 +346,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 N: CVR {getSortIcon('grp1', 'nCvr')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[56px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -356,7 +356,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[49px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -366,7 +366,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[49px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px]">
               <Button
                 variant="ghost"
                 size="sm"
@@ -383,17 +383,17 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <div className="space-y-0">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-2 w-[42px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] py-2 w-[56px] border-r border-border truncate" title={item.campaign}>
+                <div className="font-mono text-[10px] px-1 py-2 w-[60px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-2 w-[80px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[49px] border-r border-border truncate" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] py-2 w-[49px] border-r border-border truncate" title={item.kw}>
+                <div className="text-[10px] py-2 w-[70px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-2 w-[35px] border-r border-border">
+                <div className="px-1 py-2 w-[50px] border-r border-border">
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -402,11 +402,11 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[35px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
-                <div className="text-[10px] px-1 py-2 w-[28px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-2 w-[42px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
-                <div className="text-[10px] px-1 py-2 w-[35px] border-r border-border">{item.avgCvrRp1}</div>
-                <div className="text-[10px] px-1 py-2 w-[35px]">{item.avgCvrRp2}</div>
+                <div className="text-[10px] px-1 py-2 w-[50px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
+                <div className="text-[10px] px-1 py-2 w-[40px] border-r border-border">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
+                <div className="text-[10px] px-1 py-2 w-[50px] border-r border-border">{item.avgCvrRp1}</div>
+                <div className="text-[10px] px-1 py-2 w-[50px]">{item.avgCvrRp2}</div>
               </div>
             ))}
           </div>
@@ -537,17 +537,17 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <div className="space-y-0">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-2 w-[56px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] py-2 w-[70px] border-r border-border truncate" title={item.campaign}>
+                <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[63px] border-r border-border truncate" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] py-2 w-[63px] border-r border-border truncate" title={item.kw}>
+                <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-2 w-[49px] border-r border-border">
+                <div className="px-1 py-2 w-[70px] border-r border-border">
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -556,10 +556,10 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[56px] border-r border-border">{formatCurrency(item.latestBid)}</div>
-                <div className="text-[10px] px-1 py-2 w-[49px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
-                <div className="text-[10px] px-1 py-2 w-[42px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-2 w-[42px]">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px]">{item.mTos.toFixed(1)}%</div>
               </div>
             ))}
           </div>
