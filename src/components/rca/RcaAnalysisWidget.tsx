@@ -12,9 +12,7 @@ import UnderbiddingWidget from './UnderbiddingWidget';
 import PortalBidAnalysisWidget from './PortalBidAnalysisWidget';
 import AgencyBidAnalysisWidget from './AgencyBidAnalysisWidget';
 import DesirableAcosRp2UnderbiddingWidget from './DesirableAcosRp2UnderbiddingWidget';
-import DesirableAcos1dUnderbiddingWidget from './DesirableAcos1dUnderbiddingWidget';
 import DesirableAcosRp2OverbiddingWidget from './DesirableAcosRp2OverbiddingWidget';
-import DesirableAcos1dOverbiddingWidget from './DesirableAcos1dOverbiddingWidget';
 
 interface RcaAnalysisData {
   asin: string;
@@ -429,9 +427,7 @@ const RcaAnalysisWidget = () => {
         <TabsContent value="misc-filters" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DesirableAcosRp2UnderbiddingWidget data={fileData.data} />
-            <DesirableAcos1dUnderbiddingWidget data={fileData.data} />
             <DesirableAcosRp2OverbiddingWidget data={fileData.data} />
-            <DesirableAcos1dOverbiddingWidget data={fileData.data} />
           </div>
         </TabsContent>
       </Tabs>
