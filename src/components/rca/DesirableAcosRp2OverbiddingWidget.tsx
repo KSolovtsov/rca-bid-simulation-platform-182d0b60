@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, AlertTriangle, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -14,33 +15,101 @@ interface WidgetProps {
 const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const analysisData = useMemo(() => {
+  
+  // Apply global Desire ACOS filter
+  const baseFilteredData = useMemo(() => {
     if (!data || !Array.isArray(data)) return [];
-
-    return data
+    
+    return data.filter(row => {
+      const appliedAcos = parseFloat(row['Applied ACOS']) || 0;
+      const targetAcos = parseFloat(row['Target ACOS']) || 0;
+      const adSpend = parseFloat(row['Ad Spend']) || 0;
+      const price = parseFloat(row['Price']) || 0;
+      
+      // Desire ACOS filter
+      if (appliedAcos < 9999 && appliedAcos < targetAcos) {
+        return true;
+      } else if (appliedAcos === 9999 && adSpend < (targetAcos * price)) {
+        return true;
+      }
+      return false;
+    });
+  }, [data]);
+  
+  // GRP#1 Analysis
+  const grp1Data = useMemo(() => {
+    return baseFilteredData
       .filter(row => {
-        const acosRp2 = parseFloat(row['Avg ACOS Reporting Period # 2']) || 0;
-        const ordersRp2 = parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0;
-        const cpcRp1 = parseFloat(row['Avg CPC Reporting Period # 1']) || 0;
-        const cpcRp2 = parseFloat(row['Avg CPC Reporting Period # 2']) || 0;
+        const cvr = parseFloat(row['CVR']) || 0;
+        const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
+        const tosPercent = parseFloat(row['TOS%']) || 0;
         
-        // Filter for desirable ACOS in RP#2 but overbidding indicators
-        return acosRp2 > 0 && acosRp2 < 30 && ordersRp2 > 0 && cpcRp2 > cpcRp1;
+        return cvr <= avgCvrRp2 && tosPercent > 0.5;
       })
       .map(row => ({
         asin: row['ASIN'] || '',
+        searchTerm: row['Search Term'] || '',
         campaign: row['Campaign'] || '',
-        kw: row['KW'] || row['Search Term'] || '',
+        kw: row['KW'] || '',
         matchType: row['Match Type'] || '',
-        avgAcosRp2: parseFloat(row['Avg ACOS Reporting Period # 2']) || 0,
-        avgCpcRp1: parseFloat(row['Avg CPC Reporting Period # 1']) || 0,
-        avgCpcRp2: parseFloat(row['Avg CPC Reporting Period # 2']) || 0,
-        avgOrdersRp2: parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0,
-        bidIncrease: ((parseFloat(row['Avg CPC Reporting Period # 2']) || 0) - (parseFloat(row['Avg CPC Reporting Period # 1']) || 0)),
+        cvr: parseFloat(row['CVR']) || 0,
+        avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
+        tosPercent: parseFloat(row['TOS%']) || 0,
       }))
-      .sort((a, b) => b.bidIncrease - a.bidIncrease)
       .slice(0, 50);
-  }, [data]);
+  }, [baseFilteredData]);
+  
+  // GRP#2 Analysis
+  const grp2Data = useMemo(() => {
+    return baseFilteredData
+      .filter(row => {
+        const cvr = parseFloat(row['CVR']) || 0;
+        const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
+        const tosPercent = parseFloat(row['TOS%']) || 0;
+        const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
+        const previousBid = parseFloat(row['Previous Bid Calculated by the System']) || 0;
+        const bidDelta = latestBid - previousBid;
+        
+        return cvr <= avgCvrRp2 && tosPercent <= 0.5 && bidDelta >= 0;
+      })
+      .map(row => ({
+        asin: row['ASIN'] || '',
+        searchTerm: row['Search Term'] || '',
+        campaign: row['Campaign'] || '',
+        kw: row['KW'] || '',
+        matchType: row['Match Type'] || '',
+        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+        cvr: parseFloat(row['CVR']) || 0,
+        avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
+        tosPercent: parseFloat(row['TOS%']) || 0,
+      }))
+      .slice(0, 50);
+  }, [baseFilteredData]);
+  
+  // GRP#3 Analysis
+  const grp3Data = useMemo(() => {
+    return baseFilteredData
+      .filter(row => {
+        const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
+        const cvr = parseFloat(row['CVR']) || 0;
+        const clicks = parseFloat(row['Clicks']) || 0;
+        
+        return avgCvrRp2 > 0 && cvr > avgCvrRp2 && clicks >= 5;
+      })
+      .map(row => ({
+        asin: row['ASIN'] || '',
+        searchTerm: row['Search Term'] || '',
+        campaign: row['Campaign'] || '',
+        kw: row['KW'] || '',
+        matchType: row['Match Type'] || '',
+        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+        cvr: parseFloat(row['CVR']) || 0,
+        avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
+        adSpend: parseFloat(row['Ad Spend']) || 0,
+        clicks: parseFloat(row['Clicks']) || 0,
+      }))
+      .slice(0, 50);
+  }, [baseFilteredData]);
 
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
@@ -68,6 +137,174 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     navigate(`/bid-simulation?${params.toString()}`);
   };
 
+  const renderGrp1Table = () => (
+    <ScrollArea className="h-full">
+      <Table>
+        <TableHeader className="sticky top-0 bg-background">
+          <TableRow className="bg-muted/50">
+            <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">Campaign</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">KW</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[50px]">Match Type</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CVR</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Avg CVR RP2</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">TOS%</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {grp1Data.map((item, index) => (
+            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+              <TableCell className="font-mono text-xs py-0.5 w-[60px]">{item.asin}</TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5" title={item.searchTerm}>
+                <div className="flex items-center gap-1">
+                  <span>{item.searchTerm}</span>
+                  <Copy 
+                    className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
+                    onClick={() => copyToClipboard(item.searchTerm)}
+                  />
+                </div>
+              </TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.campaign}</TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.kw}</TableCell>
+              <TableCell className="py-0.5 w-[50px]">
+                <Badge 
+                  variant="outline" 
+                  className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={() => handleMatchTypeClick(item)}
+                >
+                  {item.matchType}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.cvr * 100).toFixed(2)}%</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[60px]">{(item.avgCvrRp2 * 100).toFixed(2)}%</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.tosPercent * 100).toFixed(1)}%</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {grp1Data.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground text-sm">
+          No data found for GRP#1 criteria
+        </div>
+      )}
+    </ScrollArea>
+  );
+
+  const renderGrp2Table = () => (
+    <ScrollArea className="h-full">
+      <Table>
+        <TableHeader className="sticky top-0 bg-background">
+          <TableRow className="bg-muted/50">
+            <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">Campaign</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">KW</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[50px]">Match Type</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[70px]">Latest Bid</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CVR</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Avg CVR RP2</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">TOS%</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {grp2Data.map((item, index) => (
+            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+              <TableCell className="font-mono text-xs py-0.5 w-[60px]">{item.asin}</TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5" title={item.searchTerm}>
+                <div className="flex items-center gap-1">
+                  <span>{item.searchTerm}</span>
+                  <Copy 
+                    className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
+                    onClick={() => copyToClipboard(item.searchTerm)}
+                  />
+                </div>
+              </TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.campaign}</TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.kw}</TableCell>
+              <TableCell className="py-0.5 w-[50px]">
+                <Badge 
+                  variant="outline" 
+                  className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={() => handleMatchTypeClick(item)}
+                >
+                  {item.matchType}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[70px]">{formatCurrency(item.latestBid)}</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.cvr * 100).toFixed(2)}%</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[60px]">{(item.avgCvrRp2 * 100).toFixed(2)}%</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.tosPercent * 100).toFixed(1)}%</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {grp2Data.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground text-sm">
+          No data found for GRP#2 criteria
+        </div>
+      )}
+    </ScrollArea>
+  );
+
+  const renderGrp3Table = () => (
+    <ScrollArea className="h-full">
+      <Table>
+        <TableHeader className="sticky top-0 bg-background">
+          <TableRow className="bg-muted/50">
+            <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">Campaign</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[80px]">KW</TableHead>
+            <TableHead className="font-semibold text-xs py-2 w-[50px]">Match Type</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[70px]">Latest Bid</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CVR</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Avg CVR RP2</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">Ad Spend</TableHead>
+            <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">Clicks</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {grp3Data.map((item, index) => (
+            <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+              <TableCell className="font-mono text-xs py-0.5 w-[60px]">{item.asin}</TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5" title={item.searchTerm}>
+                <div className="flex items-center gap-1">
+                  <span>{item.searchTerm}</span>
+                  <Copy 
+                    className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
+                    onClick={() => copyToClipboard(item.searchTerm)}
+                  />
+                </div>
+              </TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.campaign}</TableCell>
+              <TableCell className="max-w-[80px] truncate text-xs py-0.5">{item.kw}</TableCell>
+              <TableCell className="py-0.5 w-[50px]">
+                <Badge 
+                  variant="outline" 
+                  className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={() => handleMatchTypeClick(item)}
+                >
+                  {item.matchType}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[70px]">{formatCurrency(item.latestBid)}</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[50px]">{(item.cvr * 100).toFixed(2)}%</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[60px]">{(item.avgCvrRp2 * 100).toFixed(2)}%</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[60px]">{formatCurrency(item.adSpend)}</TableCell>
+              <TableCell className="text-center text-xs py-0.5 w-[50px]">{item.clicks}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {grp3Data.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground text-sm">
+          No data found for GRP#3 criteria
+        </div>
+      )}
+    </ScrollArea>
+  );
+
   return (
     <Card className="shadow-card animate-slide-up h-[600px]">
       <CardHeader className="pb-3">
@@ -82,72 +319,46 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               </CardTitle>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            {analysisData.length} keywords
-          </Badge>
+          <div className="flex gap-2">
+            <Badge variant="outline" className="text-xs">
+              GRP#1: {grp1Data.length}
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              GRP#2: {grp2Data.length}
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              GRP#3: {grp3Data.length}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       
       <CardContent className="p-0 h-[calc(100%-120px)]">
-        <ScrollArea className="h-full">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background">
-              <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-xs py-2 w-[60px]">ASIN</TableHead>
-                <TableHead className="font-semibold text-xs py-2 w-[80px]">Search Term</TableHead>
-                <TableHead className="font-semibold text-xs py-2 w-[50px]">Match</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">ACOS RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2 w-[50px]">CPC RP#1</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2 w-[60px]">CPC RP#2</TableHead>
-                <TableHead className="text-center font-semibold text-xs py-2 w-[40px]">Orders RP#2</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {analysisData.map((item, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-mono text-xs py-1 w-[60px]">{item.asin}</TableCell>
-                  <TableCell className="max-w-[80px] truncate text-xs py-1" title={item.kw}>
-                    <div className="flex items-center gap-1">
-                      <span>{item.kw}</span>
-                      <Copy 
-                        className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer" 
-                        onClick={() => copyToClipboard(item.kw)}
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-1 w-[50px]">
-                    <Badge 
-                      variant="outline" 
-                      className="text-xs px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                      onClick={() => handleMatchTypeClick(item)}
-                    >
-                      {item.matchType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center py-1 w-[50px]">
-                    <span className="text-emerald-600 font-medium text-xs">
-                      {formatAcos(item.avgAcosRp2)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-center text-xs py-1 w-[50px]">{formatCurrency(item.avgCpcRp1)}</TableCell>
-                  <TableCell className="text-center py-1 w-[60px]">
-                    <div className="flex items-center justify-center gap-1">
-                      <TrendingUp className="h-3 w-3 text-red-500" />
-                      <span className="text-red-600 text-xs">{formatCurrency(item.avgCpcRp2)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-xs py-1 w-[40px]">{item.avgOrdersRp2.toFixed(1)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <Tabs defaultValue="grp1" className="h-full">
+          <TabsList className="grid w-full grid-cols-3 mx-4 mb-2">
+            <TabsTrigger value="grp1" className="text-xs">
+              GRP#1 ({grp1Data.length})
+            </TabsTrigger>
+            <TabsTrigger value="grp2" className="text-xs">
+              GRP#2 ({grp2Data.length})
+            </TabsTrigger>
+            <TabsTrigger value="grp3" className="text-xs">
+              GRP#3 ({grp3Data.length})
+            </TabsTrigger>
+          </TabsList>
           
-          {analysisData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No keywords found with desirable ACOS in RP#2 that show overbidding patterns
-            </div>
-          )}
-        </ScrollArea>
+          <TabsContent value="grp1" className="h-[calc(100%-50px)] mt-0">
+            {renderGrp1Table()}
+          </TabsContent>
+          
+          <TabsContent value="grp2" className="h-[calc(100%-50px)] mt-0">
+            {renderGrp2Table()}
+          </TabsContent>
+          
+          <TabsContent value="grp3" className="h-[calc(100%-50px)] mt-0">
+            {renderGrp3Table()}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
