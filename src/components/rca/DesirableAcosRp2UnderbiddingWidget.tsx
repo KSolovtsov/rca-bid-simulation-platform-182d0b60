@@ -4,12 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
+import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Copy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
+import { toast } from 'sonner';
 
 interface WidgetProps {
   data: any[];
@@ -204,6 +206,32 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       : <ArrowDown className="h-3 w-3" />;
   };
 
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success(`${type} copied to clipboard`);
+    }).catch(() => {
+      toast.error('Failed to copy to clipboard');
+    });
+  };
+
+  const renderCellWithCopy = (content: string, type: 'Campaign' | 'KW') => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors">
+            {content}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy {type}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   const renderGrp1Table = (groupData: any[]) => {
     if (groupData.length === 0) {
       return (
@@ -331,9 +359,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
                 <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-2 w-[100px] border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
                 <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.kw}>{item.kw}</div>
+                <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
                   <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                     {item.matchType}
@@ -465,9 +497,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
                 <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-2 w-[100px] border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
                 <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.kw}>{item.kw}</div>
+                <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
                   <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                     {item.matchType}
@@ -597,9 +633,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
                 <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-2 w-[100px] border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
                 <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.kw}>{item.kw}</div>
+                <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
                   <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                     {item.matchType}
@@ -749,9 +789,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
                 <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-2 w-[100px] border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] py-2 w-[100px] border-r border-border truncate" title={item.campaign}>
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
                 <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
-                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.kw}>{item.kw}</div>
+                <div className="text-[10px] py-2 w-[90px] border-r border-border truncate" title={item.kw}>
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-2 w-[70px] border-r border-border">
                   <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
                     {item.matchType}
@@ -827,39 +871,6 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <TabsTrigger value="grp1" className="text-[9px] px-0.5">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#1 ({analysisData.grp1.length} - {getPercentage(analysisData.grp1.length)}%)</span>
-                      {analysisData.grp1.length > 0 && (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate('/bid-simulation', { 
-                              state: { 
-                                filteredData: analysisData.globalFilteredData.filter(row => {
-                                  const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  return effectiveCeiling === 0.02;
-                                }).map(row => ({
-                                  'ASIN': row['ASIN'] || '',
-                                  'Campaign': row['Campaign'] || '',
-                                  'KW': row['KW'] || row['Search Term'] || '',
-                                  'Match Type': row['Match Type'] || '',
-                                  'Sync Status': row['Sync Status'] || '',
-                                  'Latest Bid Calculated by the System': row['Latest Bid Calculated by the System'] || '',
-                                  'effective_ceiling': row['effective_ceiling'] || '',
-                                  'I: Applied ACOS': row['I: Applied ACOS'] || '',
-                                  'G: Target ACOS': row['G: Target ACOS'] || '',
-                                  'Current Bid As displayed on Amazon Seller Central': row['Current Bid As displayed on Amazon Seller Central'] || '',
-                                  'J: Ad Spend': row['J: Ad Spend'] || '',
-                                  'K: Price': row['K: Price'] || ''
-                                }))
-                              }
-                            });
-                          }}
-                        >
-                          Details
-                        </Button>
-                      )}
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -874,46 +885,6 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <TabsTrigger value="grp2" className="text-[9px] px-0.5">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#2 ({analysisData.grp2.length} - {getPercentage(analysisData.grp2.length)}%)</span>
-                      {analysisData.grp2.length > 0 && (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate('/bid-simulation', { 
-                              state: { 
-                                filteredData: analysisData.globalFilteredData.filter(row => {
-                                  const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
-                                  const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  const bidDelta = (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0);
-                                  const tosPercent = parseFloat(row['M: TOS%']) || 0;
-                                  
-                                  // Latest Bid <= effective_ceiling && Δ < 0 && TOS% <= 0.5
-                                  return latestBid <= effectiveCeiling && bidDelta < 0 && tosPercent <= 0.5;
-                                }).map(row => ({
-                                  'ASIN': row['ASIN'] || '',
-                                  'Campaign': row['Campaign'] || '',
-                                  'KW': row['KW'] || row['Search Term'] || '',
-                                  'Match Type': row['Match Type'] || '',
-                                  'Sync Status': row['Sync Status'] || '',
-                                  'Latest Bid Calculated by the System': row['Latest Bid Calculated by the System'] || '',
-                                  'effective_ceiling': row['effective_ceiling'] || '',
-                                  'M: TOS%': row['M: TOS%'] || '',
-                                  'I: Applied ACOS': row['I: Applied ACOS'] || '',
-                                  'G: Target ACOS': row['G: Target ACOS'] || '',
-                                  'Current Bid As displayed on Amazon Seller Central': row['Current Bid As displayed on Amazon Seller Central'] || '',
-                                  'J: Ad Spend': row['J: Ad Spend'] || '',
-                                  'K: Price': row['K: Price'] || '',
-                                  'Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)': row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)'] || ''
-                                }))
-                              }
-                            });
-                          }}
-                        >
-                          Details
-                        </Button>
-                      )}
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -928,46 +899,6 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <TabsTrigger value="grp3" className="text-[9px] px-0.5">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#3 ({analysisData.grp3.length} - {getPercentage(analysisData.grp3.length)}%)</span>
-                      {analysisData.grp3.length > 0 && (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="h-3 px-1 ml-0.5 text-[8px] bg-blue-500 text-white hover:bg-blue-600"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate('/bid-simulation', { 
-                              state: { 
-                                filteredData: analysisData.globalFilteredData.filter(row => {
-                                  const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
-                                  const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  const bidDelta = (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0);
-                                  const tosPercent = parseFloat(row['M: TOS%']) || 0;
-                                  
-                                  // Latest Bid > effective_ceiling && Δ < 0 && TOS% > 0.5
-                                  return latestBid > effectiveCeiling && bidDelta < 0 && tosPercent > 0.5;
-                                }).map(row => ({
-                                  'ASIN': row['ASIN'] || '',
-                                  'Campaign': row['Campaign'] || '',
-                                  'KW': row['KW'] || row['Search Term'] || '',
-                                  'Match Type': row['Match Type'] || '',
-                                  'Sync Status': row['Sync Status'] || '',
-                                  'Latest Bid Calculated by the System': row['Latest Bid Calculated by the System'] || '',
-                                  'effective_ceiling': row['effective_ceiling'] || '',
-                                  'M: TOS%': row['M: TOS%'] || '',
-                                  'I: Applied ACOS': row['I: Applied ACOS'] || '',
-                                  'G: Target ACOS': row['G: Target ACOS'] || '',
-                                  'Current Bid As displayed on Amazon Seller Central': row['Current Bid As displayed on Amazon Seller Central'] || '',
-                                  'J: Ad Spend': row['J: Ad Spend'] || '',
-                                  'K: Price': row['K: Price'] || '',
-                                  'Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)': row['Δ (Latest Bid Calculated by the System - Previous Bid Calculated by the System)'] || ''
-                                }))
-                              }
-                            });
-                          }}
-                        >
-                          Details
-                        </Button>
-                      )}
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
