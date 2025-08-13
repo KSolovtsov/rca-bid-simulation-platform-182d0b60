@@ -70,21 +70,22 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       return condition1 || condition2;
     });
 
-    // GRP # 1: Latest Bid Calculated by the System = effective_ceiling
+    // GRP # 1: effective_ceiling = 0.02
     const grp1 = globalFilteredData
       .filter(row => {
-        const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
         const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-        return latestBid === effectiveCeiling;
+        return effectiveCeiling === 0.02;
       })
       .map(row => ({
         asin: row['ASIN'] || '',
         campaign: row['Campaign'] || '',
-        kw: row['KW'] || row['Search Term'] || '',
+        searchTerm: row['Search Term'] || '',
+        kw: row['KW'] || '',
         matchType: row['Match Type'] || '',
-        syncStatus: row['Sync Status'] || '',
         nCvr: row['N: CVR'] || '',
         cvrDateRange: row['CVR Date Range'] || '',
+        avgCvrRp1: row['Avg CVR Reporting Period # 1'] || '',
+        avgCvrRp2: row['Avg CVR Reporting Period # 2'] || '',
       }));
 
     // GRP # 2: Latest Bid >= effective_ceiling && Δ >= 0 && TOS% <= 0.5
@@ -211,6 +212,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   variant="ghost"
                   size="sm"
                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
+                  onClick={() => handleSort('grp1', 'searchTerm')}
+                >
+                  Search Term {getSortIcon('grp1', 'searchTerm')}
+                </Button>
+              </TableHead>
+              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[90px]">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                   onClick={() => handleSort('grp1', 'kw')}
                 >
                   KW {getSortIcon('grp1', 'kw')}
@@ -226,16 +237,6 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Match {getSortIcon('grp1', 'matchType')}
                 </Button>
               </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'syncStatus')}
-                >
-                  Sync {getSortIcon('grp1', 'syncStatus')}
-                </Button>
-              </TableHead>
               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
                 <Button
                   variant="ghost"
@@ -243,7 +244,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                   onClick={() => handleSort('grp1', 'nCvr')}
                 >
-                  CVR {getSortIcon('grp1', 'nCvr')}
+                  N: CVR {getSortIcon('grp1', 'nCvr')}
                 </Button>
               </TableHead>
               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
@@ -253,7 +254,27 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                   onClick={() => handleSort('grp1', 'cvrDateRange')}
                 >
-                  Date Range {getSortIcon('grp1', 'cvrDateRange')}
+                  CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+                </Button>
+              </TableHead>
+              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
+                  onClick={() => handleSort('grp1', 'avgCvrRp1')}
+                >
+                  Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
+                </Button>
+              </TableHead>
+              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
+                  onClick={() => handleSort('grp1', 'avgCvrRp2')}
+                >
+                  Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
                 </Button>
               </TableHead>
             </TableRow>
@@ -267,6 +288,9 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TableRow key={index} className="hover:bg-muted/30 transition-colors h-8">
                   <TableCell className="font-mono text-[10px] px-1 py-1 w-[80px]">{item.asin}</TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[100px] max-w-[100px] truncate" title={item.campaign}>{item.campaign}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 w-[90px] max-w-[90px] truncate" title={item.searchTerm}>
+                    {item.searchTerm}
+                  </TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[90px] max-w-[90px] truncate" title={item.kw}>
                     {item.kw}
                   </TableCell>
@@ -275,9 +299,10 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                       {item.matchType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.syncStatus}</TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[60px]">{item.nCvr}</TableCell>
                   <TableCell className="text-[10px] px-1 py-1 w-[80px] max-w-[80px] truncate" title={item.cvrDateRange}>{item.cvrDateRange}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.avgCvrRp1}</TableCell>
+                  <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.avgCvrRp2}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -652,9 +677,8 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                             navigate('/bid-simulation', { 
                               state: { 
                                 filteredData: analysisData.globalFilteredData.filter(row => {
-                                  const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
                                   const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-                                  return latestBid === effectiveCeiling;
+                                  return effectiveCeiling === 0.02;
                                 }).map(row => ({
                                   'ASIN': row['ASIN'] || '',
                                   'Campaign': row['Campaign'] || '',
@@ -681,7 +705,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 1 Filter Logic:</p>
-                  <p className="text-xs">Latest Bid Calculated by the System = effective_ceiling</p>
+                  <p className="text-xs">effective_ceiling = 0.02</p>
                 </TooltipContent>
               </Tooltip>
               
