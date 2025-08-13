@@ -102,6 +102,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       matchType: row['Match Type'] || '',
       latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
       effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+      adjustedBid: parseFloat(row['adjusted_bid']) || 0,
       bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
       mTos: parseFloat(row['M: TOS%']) || 0,
     }));
@@ -509,6 +510,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Effective {getSortIcon('grp2', 'effectiveCeiling')}
               </Button>
             </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'adjustedBid')}
+              >
+                Adjusted {getSortIcon('grp2', 'adjustedBid')}
+              </Button>
+            </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[60px]">
               <Button
                 variant="ghost"
@@ -547,7 +558,8 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </div>
                 <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
                 <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
-                <div className="text-[10px] px-1 py-2 w-[60px]">{formatAcos(item.mTos)}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px]">{item.mTos.toFixed(1)}%</div>
               </div>
             ))}
           </div>
