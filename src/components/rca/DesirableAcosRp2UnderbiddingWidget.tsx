@@ -107,7 +107,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     }));
     
     const grp2Violations = grp2Data.filter(item => {
-      return item.latestBid <= item.effectiveCeiling && item.bidDelta < 0 && item.mTos <= 0.5;
+      return item.latestBid <= item.effectiveCeiling && item.bidDelta < 0 && item.mTos <= 50;
     });
 
     // GRP # 3: Latest Bid < effective_ceiling && Δ > 0 && TOS% > 0.5
@@ -124,7 +124,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     }));
     
     const grp3Violations = grp3Data.filter(item => {
-      return item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos > 0.5;
+      return item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos > 50;
     });
 
     // GRP # 4: effective_ceiling > 0.02 && (Min. Suggested Bid - Latest Bid) > 0.5 && Δ <= 0 && TOS% <= 0.5
@@ -144,7 +144,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     
     const grp4Violations = grp4Data.filter(item => {
       const minSuggestedBidDelta = item.minSuggestedBid - item.latestBid;
-      return item.effectiveCeiling > 0.02 && minSuggestedBidDelta > 0.5 && item.bidDelta <= 0 && item.mTos <= 0.5;
+      return item.effectiveCeiling > 0.02 && minSuggestedBidDelta > 0.5 && item.bidDelta <= 0 && item.mTos <= 50;
     });
     
     return {
@@ -890,7 +890,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 2 Filter Logic:</p>
-                  <p className="text-xs">Latest Bid ≤ effective_ceiling AND Δ &lt; 0 AND TOS% ≤ 0.5</p>
+                  <p className="text-xs">Latest Bid ≤ effective_ceiling AND Δ &lt; 0 AND TOS% ≤ 50</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -904,7 +904,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
-                  <p className="text-xs">Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND TOS% &gt; 0.5</p>
+                  <p className="text-xs">Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND TOS% &gt; 50</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -918,7 +918,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 4 Filter Logic:</p>
-                  <p className="text-xs">effective_ceiling &gt; 0.02 AND (Min. Suggested Bid - Latest Bid) &gt; 0.5 AND Δ ≤ 0 AND TOS% ≤ 0.5</p>
+                  <p className="text-xs">effective_ceiling &gt; 0.02 AND (Min. Suggested Bid - Latest Bid) &gt; 0.5 AND Δ ≤ 0 AND TOS% ≤ 50</p>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
