@@ -283,7 +283,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'asin')}
               >
-                ASIN {getSortIcon('grp1', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
@@ -293,7 +293,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'campaign')}
               >
-                Campaign {getSortIcon('grp1', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -303,7 +303,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp1', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -313,7 +313,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'kw')}
               >
-                KW {getSortIcon('grp1', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
@@ -323,7 +323,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'matchType')}
               >
-                Match {getSortIcon('grp1', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
@@ -333,7 +333,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'adSpend')}
               >
-                Spend {getSortIcon('grp1', 'adSpend')}
+                Spend
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
@@ -343,7 +343,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'nCvr')}
               >
-                N: CVR {getSortIcon('grp1', 'nCvr')}
+                N: CVR
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[106px] border-r border-border">
@@ -353,7 +353,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'cvrDateRange')}
               >
-                CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+                CVR Date Range
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
@@ -363,7 +363,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'avgCvrRp1')}
               >
-                Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
+                Avg CVR RP1
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
@@ -373,7 +373,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'avgCvrRp2')}
               >
-                Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
+                Avg CVR RP2
               </Button>
             </div>
           </div>
@@ -447,7 +447,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'asin')}
               >
-                ASIN {getSortIcon('grp2', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
@@ -457,7 +457,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'campaign')}
               >
-                Campaign {getSortIcon('grp2', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -467,7 +467,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp2', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -477,7 +477,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'kw')}
               >
-                KW {getSortIcon('grp2', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -487,7 +487,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'matchType')}
               >
-                Match {getSortIcon('grp2', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
@@ -497,7 +497,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp2', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -507,7 +507,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'effectiveCeiling')}
               >
-                Effective {getSortIcon('grp2', 'effectiveCeiling')}
+                Effective
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[66px] border-r border-border">
@@ -517,7 +517,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'adjustedBid')}
               >
-                Adjusted {getSortIcon('grp2', 'adjustedBid')}
+                Adjusted
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[54px]">
@@ -527,7 +527,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'mTos')}
               >
-                TOS% {getSortIcon('grp2', 'mTos')}
+                TOS%
               </Button>
             </div>
           </div>
@@ -600,7 +600,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'asin')}
               >
-                ASIN {getSortIcon('grp3', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
@@ -610,7 +610,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'campaign')}
               >
-                Campaign {getSortIcon('grp3', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -620,7 +620,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp3', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -630,7 +630,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'kw')}
               >
-                KW {getSortIcon('grp3', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -640,7 +640,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'matchType')}
               >
-                Match {getSortIcon('grp3', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
@@ -650,7 +650,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp3', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -660,7 +660,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'effectiveCeiling')}
               >
-                Effective {getSortIcon('grp3', 'effectiveCeiling')}
+                Effective
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[60px]">
@@ -670,7 +670,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'mTos')}
               >
-                TOS% {getSortIcon('grp3', 'mTos')}
+                TOS%
               </Button>
             </div>
           </div>
@@ -742,7 +742,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'asin')}
               >
-                ASIN {getSortIcon('grp4', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
@@ -752,7 +752,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'campaign')}
               >
-                Campaign {getSortIcon('grp4', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -762,7 +762,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp4', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
@@ -772,7 +772,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'kw')}
               >
-                KW {getSortIcon('grp4', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -782,7 +782,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'matchType')}
               >
-                Match {getSortIcon('grp4', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
@@ -792,7 +792,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp4', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[92px] border-r border-border">
@@ -802,7 +802,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'minSuggestedBid')}
               >
-                Min. Suggested Bid {getSortIcon('grp4', 'minSuggestedBid')}
+                Min. Suggested Bid
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -812,7 +812,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'effectiveCeiling')}
               >
-                Effective {getSortIcon('grp4', 'effectiveCeiling')}
+                Effective
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
@@ -822,7 +822,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'adjustedBid')}
               >
-                Adjusted {getSortIcon('grp4', 'adjustedBid')}
+                Adjusted
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[48px]">
@@ -832,7 +832,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'mTos')}
               >
-                TOS% {getSortIcon('grp4', 'mTos')}
+                TOS%
               </Button>
             </div>
           </div>
