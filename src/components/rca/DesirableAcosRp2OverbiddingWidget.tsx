@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, AlertTriangle, Copy } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TrendingUp, AlertTriangle, Copy, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAppSettings } from '@/hooks/use-app-settings';
@@ -326,7 +327,26 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="secondary" className="text-xs cursor-help">
+                    <Info className="h-3 w-3 mr-1" />
+                    Toolkit
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm p-3">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Global Filter - Desire ACOS:</h4>
+                    <div className="text-sm space-y-1">
+                      <p>• IF Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS</p>
+                      <p>• OR IF Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price)</p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Badge variant="outline" className="text-xs">
               GRP#1: {grp1Data.length}
             </Badge>
