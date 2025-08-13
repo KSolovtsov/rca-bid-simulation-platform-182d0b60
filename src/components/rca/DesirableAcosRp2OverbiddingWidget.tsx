@@ -55,7 +55,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
         const tosPercent = parseFloat(row['TOS%']) || 0;
         
-        return cvr <= avgCvrRp2 && tosPercent > 0.5;
+        return cvr <= avgCvrRp2 && tosPercent > 50;
       })
       .map(row => ({
         asin: row['ASIN'] || '',
