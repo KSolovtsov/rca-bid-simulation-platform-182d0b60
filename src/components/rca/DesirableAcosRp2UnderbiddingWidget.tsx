@@ -188,6 +188,15 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       const aVal = a[sort.field];
       const bVal = b[sort.field];
       
+      // Special handling for numeric fields that might be stored as strings
+      if (sort.field === 'adSpend' || sort.field === 'latestBid' || sort.field === 'effectiveCeiling' || 
+          sort.field === 'minSuggestedBid' || sort.field === 'adjustedBid' || sort.field === 'mTos' || 
+          sort.field === 'bidDelta') {
+        const aNum = parseFloat(aVal) || 0;
+        const bNum = parseFloat(bVal) || 0;
+        return sort.direction === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      
       if (typeof aVal === 'string' && typeof bVal === 'string') {
         return sort.direction === 'asc' 
           ? aVal.localeCompare(bVal)
