@@ -327,36 +327,6 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               )}
             </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge variant="secondary" className="text-xs cursor-help">
-                    <Info className="h-3 w-3 mr-1" />
-                    Toolkit
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-sm p-3">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Global Filter - Desire ACOS:</h4>
-                    <div className="text-sm space-y-1">
-                      <p>• IF Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS</p>
-                      <p>• OR IF Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price)</p>
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <Badge variant="outline" className="text-xs">
-              GRP#1: {grp1Data.length}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              GRP#2: {grp2Data.length}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              GRP#3: {grp3Data.length}
-            </Badge>
-          </div>
         </div>
       </CardHeader>
       
