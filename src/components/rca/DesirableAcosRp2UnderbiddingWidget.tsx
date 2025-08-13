@@ -61,11 +61,11 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       const adSpend = parseFloat(row['J: Ad Spend']) || 0;
       const price = parseFloat(row['K: Price']) || 0;
 
-      // Condition 1: Applied ACOS < 9999 && Applied ACOS < Target ACOS && Latest Bid < Current Bid
-      const condition1 = appliedAcos < 9999 && appliedAcos < targetAcos && latestBid < currentBid;
+      // Condition 1: Applied ACOS < 9999 && Applied ACOS < Target ACOS
+      const condition1 = appliedAcos < 9999 && appliedAcos < targetAcos;
       
-      // Condition 2: Applied ACOS = 9999 && Ad Spend < (Target ACOS * Price) && Latest Bid < Current Bid
-      const condition2 = appliedAcos === 9999 && adSpend < (targetAcos * price) && latestBid < currentBid;
+      // Condition 2: Applied ACOS = 9999 && Ad Spend < (Target ACOS * Price)
+      const condition2 = appliedAcos === 9999 && adSpend < (targetAcos * price);
       
       return condition1 || condition2;
     });
@@ -605,9 +605,9 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Global Widget Filter:</p>
                     <div className="text-xs space-y-1">
-                      <p><strong>Condition 1:</strong> Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS AND Latest Bid &lt; Current Bid</p>
+                      <p><strong>Condition 1:</strong> Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS</p>
                       <p><strong>OR</strong></p>
-                      <p><strong>Condition 2:</strong> Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price) AND Latest Bid &lt; Current Bid</p>
+                      <p><strong>Condition 2:</strong> Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price)</p>
                     </div>
                   </div>
                 </TooltipContent>
