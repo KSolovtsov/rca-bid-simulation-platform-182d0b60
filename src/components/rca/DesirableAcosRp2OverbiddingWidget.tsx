@@ -80,9 +80,6 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               <CardTitle className="text-lg text-amber-700">
                 KWs with desirable ACOS in RP # 2, why are we overbidding?
               </CardTitle>
-              <CardDescription className="text-sm">
-                Keywords performing well but potentially overpaying for traffic
-              </CardDescription>
             </div>
           </div>
           <Badge variant="outline" className="text-xs">
