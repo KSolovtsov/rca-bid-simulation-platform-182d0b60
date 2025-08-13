@@ -371,7 +371,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{item.adSpend}</div>
+                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
                 <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{item.nCvr}</div>
                 <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
                 <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{item.avgCvrRp1}</div>
