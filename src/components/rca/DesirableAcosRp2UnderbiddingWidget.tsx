@@ -204,6 +204,18 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   };
 
   const renderGrp1Table = (groupData: any[]) => {
+    if (groupData.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="text-6xl mb-4">✅</div>
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">All Good!!</h3>
+            <p className="text-muted-foreground">All conditions are met for this group</p>
+          </div>
+        </div>
+      );
+    }
+
     const sortedData = sortData(groupData, 'grp1');
     
     return (
