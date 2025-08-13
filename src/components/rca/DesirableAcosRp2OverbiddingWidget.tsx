@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, AlertTriangle, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAppSettings } from '@/hooks/use-app-settings';
 
 interface WidgetProps {
   data: any[];
@@ -15,6 +16,7 @@ interface WidgetProps {
 const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { activeFileName } = useAppSettings();
   
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
@@ -317,6 +319,11 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               <CardTitle className="text-lg text-amber-700">
                 KWs with desirable ACOS in RP # 2, why are we overbidding?
               </CardTitle>
+              {activeFileName && (
+                <CardDescription className="text-sm text-muted-foreground mt-1">
+                  Active file: {activeFileName.replace('.csv', '')}
+                </CardDescription>
+              )}
             </div>
           </div>
           <div className="flex gap-2">
