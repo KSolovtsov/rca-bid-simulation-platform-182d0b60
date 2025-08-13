@@ -185,140 +185,132 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     
     return (
       <div className="h-full flex flex-col">
-        <Table>
-          <TableHeader className="bg-background border-b shadow-sm">
-            <TableRow className="bg-muted/50">
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'asin')}
-                >
-                  ASIN {getSortIcon('grp1', 'asin')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[100px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'campaign')}
-                >
-                  Campaign {getSortIcon('grp1', 'campaign')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[90px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'searchTerm')}
-                >
-                  Search Term {getSortIcon('grp1', 'searchTerm')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[90px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'kw')}
-                >
-                  KW {getSortIcon('grp1', 'kw')}
-                </Button>
-              </TableHead>
-               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
-                 <Button
-                   variant="ghost"
-                   size="sm"
-                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                   onClick={() => handleSort('grp1', 'matchType')}
-                 >
-                   Match {getSortIcon('grp1', 'matchType')}
-                 </Button>
-               </TableHead>
-               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
-                 <Button
-                   variant="ghost"
-                   size="sm"
-                   className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                   onClick={() => handleSort('grp1', 'adSpend')}
-                 >
-                   J: Ad Spend {getSortIcon('grp1', 'adSpend')}
-                 </Button>
-               </TableHead>
-               <TableHead className="font-semibold text-[10px] px-1 py-1 w-[60px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'nCvr')}
-                >
-                  N: CVR {getSortIcon('grp1', 'nCvr')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[80px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'cvrDateRange')}
-                >
-                  CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'avgCvrRp1')}
-                >
-                  Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
-                </Button>
-              </TableHead>
-              <TableHead className="font-semibold text-[10px] px-1 py-1 w-[70px]">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
-                  onClick={() => handleSort('grp1', 'avgCvrRp2')}
-                >
-                  Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
-                </Button>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-        </Table>
+        <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'asin')}
+              >
+                ASIN {getSortIcon('grp1', 'asin')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'campaign')}
+              >
+                Campaign {getSortIcon('grp1', 'campaign')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'searchTerm')}
+              >
+                Search Term {getSortIcon('grp1', 'searchTerm')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'kw')}
+              >
+                KW {getSortIcon('grp1', 'kw')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'matchType')}
+              >
+                Match {getSortIcon('grp1', 'matchType')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'adSpend')}
+              >
+                J: Ad Spend {getSortIcon('grp1', 'adSpend')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'nCvr')}
+              >
+                N: CVR {getSortIcon('grp1', 'nCvr')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'cvrDateRange')}
+              >
+                CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'avgCvrRp1')}
+              >
+                Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'avgCvrRp2')}
+              >
+                Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
+              </Button>
+            </div>
+          </div>
+        </div>
         
         <ScrollArea className="flex-1">
-          <Table>
-            <TableBody>
-              {sortedData.map((item, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors h-8">
-                  <TableCell className="font-mono text-[10px] px-1 py-1 w-[80px]">{item.asin}</TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[100px] max-w-[100px] truncate" title={item.campaign}>{item.campaign}</TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[90px] max-w-[90px] truncate" title={item.searchTerm}>
-                    {item.searchTerm}
-                  </TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[90px] max-w-[90px] truncate" title={item.kw}>
-                    {item.kw}
-                  </TableCell>
-                   <TableCell className="px-1 py-1 w-[70px]">
-                     <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
-                       {item.matchType}
-                     </Badge>
-                   </TableCell>
-                   <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.adSpend}</TableCell>
-                   <TableCell className="text-[10px] px-1 py-1 w-[60px]">{item.nCvr}</TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[80px] max-w-[80px] truncate" title={item.cvrDateRange}>{item.cvrDateRange}</TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.avgCvrRp1}</TableCell>
-                  <TableCell className="text-[10px] px-1 py-1 w-[70px]">{item.avgCvrRp2}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="space-y-0">
+            {sortedData.map((item, index) => (
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
+                <div className="font-mono text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] px-1 py-2 w-[100px] border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-2 w-[90px] border-r border-border truncate" title={item.kw}>{item.kw}</div>
+                <div className="px-1 py-2 w-[70px] border-r border-border">
+                  <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
+                    {item.matchType}
+                  </Badge>
+                </div>
+                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{item.adSpend}</div>
+                <div className="text-[10px] px-1 py-2 w-[60px] border-r border-border">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-2 w-[80px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
+                <div className="text-[10px] px-1 py-2 w-[70px] border-r border-border">{item.avgCvrRp1}</div>
+                <div className="text-[10px] px-1 py-2 w-[70px]">{item.avgCvrRp2}</div>
+              </div>
+            ))}
+          </div>
           
           {sortedData.length === 0 && (
             <div className="text-center py-8 text-muted-foreground text-sm">
