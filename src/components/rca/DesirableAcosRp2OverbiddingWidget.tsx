@@ -107,9 +107,17 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   
   // GRP#3 Analysis (Simplified: CVR > Avg CVR RP2 AND Clicks >= 5)
   const grp3Data = useMemo(() => {
-    console.log('🔍 GRP#3 Debug - baseFilteredData length:', baseFilteredData.length);
+    console.log('🔍 GRP#3 Debug - Starting analysis...');
+    console.log('📊 BaseFilteredData length:', baseFilteredData.length);
     
-    const filtered = baseFilteredData.filter(row => {
+    if (baseFilteredData.length > 0) {
+      console.log('📋 Sample row columns:', Object.keys(baseFilteredData[0]));
+      console.log('📋 Sample row values:', baseFilteredData[0]);
+    }
+    
+    let matchCount = 0;
+    
+    const filtered = baseFilteredData.filter((row, index) => {
       const cvr = parseFloat(row['N: CVR']) || 0;
       const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
       const clicks = parseFloat(row['L: Clicks']) || 0;
@@ -119,12 +127,16 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       
       const passes = cvrGreaterThanAvg && clicksAtLeast5;
       
-      if (passes) {
-        console.log('✅ GRP#3 Match found:', {
+      // Log first 5 rows for debugging
+      if (index < 5) {
+        console.log(`🔍 Row ${index}:`, {
           asin: row['ASIN'],
           kw: row['KW'],
+          'N: CVR': row['N: CVR'],
           cvr,
+          'Avg CVR Reporting Period # 2': row['Avg CVR Reporting Period # 2'],
           avgCvrRp2,
+          'L: Clicks': row['L: Clicks'],
           clicks,
           cvrGreaterThanAvg,
           clicksAtLeast5,
@@ -132,10 +144,27 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         });
       }
       
+      if (passes) {
+        matchCount++;
+        console.log(`✅ GRP#3 Match #${matchCount}:`, {
+          asin: row['ASIN'],
+          kw: row['KW'],
+          cvr,
+          avgCvrRp2,
+          clicks,
+          cvrGreaterThanAvg,
+          clicksAtLeast5
+        });
+      }
+      
       return passes;
     });
 
-    console.log('🎯 GRP#3 Debug - filtered results:', filtered.length);
+    console.log('🎯 GRP#3 final results:', {
+      totalProcessed: baseFilteredData.length,
+      totalMatches: filtered.length,
+      matchCount
+    });
 
     return filtered
       .map(row => ({
@@ -725,7 +754,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
-                  <p className="text-xs">Avg CVR RP2 Not blank AND CVR &gt; Avg CVR RP2 AND Clicks ≥ 5</p>
+                  <p className="text-xs">CVR &gt; Avg CVR RP2 AND Clicks ≥ 5</p>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
