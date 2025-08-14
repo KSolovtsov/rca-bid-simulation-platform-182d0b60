@@ -353,7 +353,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'cvrDateRange')}
               >
-                CVR Date Range
+                CVR Waterfall
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
