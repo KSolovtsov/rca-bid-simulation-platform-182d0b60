@@ -44,10 +44,10 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     let passedCount = 0;
     
     const filtered = data.filter((row, index) => {
-      const appliedAcos = parseFloat(row['Applied ACOS']) || 0;
-      const targetAcos = parseFloat(row['Target ACOS']) || 0;
-      const adSpend = parseFloat(row['Ad Spend']) || 0;
-      const price = parseFloat(row['Price']) || 0;
+      const appliedAcos = parseFloat(row['I: Applied ACOS']) || 0;
+      const targetAcos = parseFloat(row['G: Target ACOS']) || 0;
+      const adSpend = parseFloat(row['J: Ad Spend']) || 0;
+      const price = parseFloat(row['K: Price']) || 0;
       
       // Desire ACOS filter logic
       let passes = false;
@@ -60,13 +60,13 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       // Log first 5 rows for debugging
       if (index < 5) {
         console.log(`🔍 BaseFilter Row ${index}:`, {
-          'Applied ACOS': row['Applied ACOS'],
+          'I: Applied ACOS': row['I: Applied ACOS'],
           appliedAcos,
-          'Target ACOS': row['Target ACOS'], 
+          'G: Target ACOS': row['G: Target ACOS'], 
           targetAcos,
-          'Ad Spend': row['Ad Spend'],
+          'J: Ad Spend': row['J: Ad Spend'],
           adSpend,
-          'Price': row['Price'],
+          'K: Price': row['K: Price'],
           price,
           condition1: appliedAcos < 9999 && appliedAcos < targetAcos,
           condition2: appliedAcos === 9999 && adSpend < (targetAcos * price),
