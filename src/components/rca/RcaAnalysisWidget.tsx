@@ -237,7 +237,7 @@ const RcaAnalysisWidget = () => {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="rca-bid-analysis" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bids RCA</TabsTrigger>
           <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Performance Overview</TabsTrigger>
-          <TabsTrigger value="misc-filters" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Misc filters</TabsTrigger>
+          <TabsTrigger value="misc-filters" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bids RCA v.2</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-6">
