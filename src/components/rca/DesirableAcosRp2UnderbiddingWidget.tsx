@@ -110,7 +110,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     }));
     
     const grp2Violations = grp2Data.filter(item => {
-      return item.latestBid <= item.effectiveCeiling && item.bidDelta < 0 && item.mTos <= 50;
+      return item.latestBid <= item.effectiveCeiling && item.bidDelta < 0 && item.mTos <= 50 && item.effectiveCeiling > 0.02;
     });
 
     // GRP # 3: Latest Bid < effective_ceiling && Δ > 0 && TOS% > 0.5
