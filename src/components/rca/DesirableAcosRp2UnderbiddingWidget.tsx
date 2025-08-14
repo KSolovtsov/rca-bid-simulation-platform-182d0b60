@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Copy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -275,108 +276,137 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'asin')}
-              >
-                ASIN
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'campaign')}
-              >
-                Campaign
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'searchTerm')}
-              >
-                Search Term
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'kw')}
-              >
-                KW
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'matchType')}
-              >
-                Match
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'adSpend')}
-              >
-                Spend
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'nCvr')}
-              >
-                N: CVR
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[106px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'cvrDateRange')}
-              >
-                CVR Date Range
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'avgCvrRp1')}
-              >
-                Avg CVR RP1
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp1', 'avgCvrRp2')}
-              >
-                Avg CVR RP2
-              </Button>
-            </div>
-          </div>
+          <ResizablePanelGroup direction="horizontal" className="bg-muted/50">
+            <ResizablePanel defaultSize={11} minSize={8}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'asin')}
+                >
+                  ASIN
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={13} minSize={10}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'campaign')}
+                >
+                  Campaign
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={12} minSize={8}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'searchTerm')}
+                >
+                  Search Term
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={12} minSize={8}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'kw')}
+                >
+                  KW
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={8} minSize={6}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'matchType')}
+                >
+                  Match
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={8} minSize={6}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'adSpend')}
+                >
+                  Spend
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={8} minSize={6}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'nCvr')}
+                >
+                  N: CVR
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={14} minSize={10}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'cvrDateRange')}
+                >
+                  CVR Date Range
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={11} minSize={8}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'avgCvrRp1')}
+                >
+                  Avg CVR RP1
+                </Button>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={11} minSize={8}>
+              <div className="h-full flex items-center px-1 py-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp1', 'avgCvrRp2')}
+                >
+                  Avg CVR RP2
+                </Button>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
         
         <ScrollArea className="flex-1">
