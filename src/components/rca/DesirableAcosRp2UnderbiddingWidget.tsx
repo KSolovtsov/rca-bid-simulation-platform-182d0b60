@@ -442,111 +442,111 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[80px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'asin')}
               >
                 ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[100px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'campaign')}
               >
                 Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[90px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'searchTerm')}
               >
                 Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[90px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'kw')}
               >
                 KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[70px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'matchType')}
               >
                 Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[80px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'latestBid')}
               >
                 Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[70px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'effectiveCeiling')}
               >
                 Effective
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[66px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[66px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'adjustedBid')}
               >
                 Adjusted
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[54px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[54px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'mTos')}
               >
                 TOS%
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+            <div className="font-semibold text-[10px] py-2 w-[60px] border-r border-border flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'nCvr')}
               >
                 CVR
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[106px]">
+            <div className="font-semibold text-[10px] py-2 w-[106px] flex items-center justify-start pl-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent"
                 onClick={() => handleSort('grp2', 'cvrWaterfall')}
               >
                 CVR Waterfall
@@ -559,17 +559,17 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <div className="space-y-0">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
+                <div className="font-mono text-[10px] py-0.5 w-[80px] border-r border-border truncate pl-2" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate pl-2" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate pl-2" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
+                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate pl-2" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[70px] border-r border-border">
+                <div className="py-0.5 w-[70px] border-r border-border pl-2">
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -578,12 +578,12 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[66px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[54px] border-r border-border">{item.mTos.toFixed(1)}%</div>
-                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[106px] truncate" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
+                <div className="text-[10px] py-0.5 w-[80px] border-r border-border pl-2">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] py-0.5 w-[70px] border-r border-border pl-2">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] py-0.5 w-[66px] border-r border-border pl-2">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] py-0.5 w-[54px] border-r border-border pl-2">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] py-0.5 w-[60px] border-r border-border pl-2">{item.nCvr}</div>
+                <div className="text-[10px] py-0.5 w-[106px] truncate pl-2" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
               </div>
             ))}
           </div>
