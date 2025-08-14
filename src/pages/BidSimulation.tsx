@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Target, Filter, X, Columns, ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
+import { ArrowLeft, Target, Filter, X, Columns, ChevronUp, ChevronDown, Undo2, Copy } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,14 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
+import { useToast } from '@/hooks/use-toast';
 import { format, parseISO, isValid } from 'date-fns';
 
 const BidSimulation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   
   const handleBack = () => {
     console.log('Back button clicked');
@@ -945,6 +948,39 @@ const BidSimulation = () => {
     return String(value || '');
   };
 
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied to clipboard",
+        description: `${type} copied successfully`,
+      });
+    }).catch(() => {
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
+      });
+    });
+  };
+
+  const renderCellWithCopy = (content: string, type: 'Campaign' | 'KW') => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors">
+            {content}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy {type}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-secondary/20">
       {/* Fixed Header */}
@@ -1292,13 +1328,16 @@ const BidSimulation = () => {
                               
                               const formattedValue = formatCellValue(cellValue, header, row);
                               
-                              return (
-                                <div key={cellIndex} className="p-2 border-r last:border-r-0 flex items-center">
-                                  <div className="truncate text-xs w-full" title={formattedValue}>
-                                    {formattedValue}
-                                  </div>
-                                </div>
-                              );
+                               return (
+                                 <div key={cellIndex} className="p-2 border-r last:border-r-0 flex items-center">
+                                   <div className="truncate text-xs w-full" title={formattedValue}>
+                                     {(header === 'KW' || header === 'Campaign') ? 
+                                       renderCellWithCopy(formattedValue, header as 'Campaign' | 'KW') : 
+                                       formattedValue
+                                     }
+                                   </div>
+                                 </div>
+                               );
                             })}
                           </div>
                         ))}
