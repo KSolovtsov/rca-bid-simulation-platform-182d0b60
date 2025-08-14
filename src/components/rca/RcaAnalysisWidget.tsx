@@ -48,12 +48,10 @@ const RcaAnalysisWidget = () => {
   // Load file data when activeFileId changes
   useEffect(() => {
     const loadFile = async () => {
-      console.log('Loading file with activeFileId:', activeFileId);
       setLoading(true);
       setHasAttemptedLoad(true);
       
       if (!activeFileId) {
-        console.log('No activeFileId found');
         setFileData(null);
         setLoading(false);
         return;
@@ -61,7 +59,6 @@ const RcaAnalysisWidget = () => {
       
       try {
         const file = await getFile(activeFileId);
-        console.log('File loaded successfully:', file?.name);
         setFileData(file);
       } catch (error) {
         console.error('Error loading file:', error);

@@ -38,15 +38,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
     if (!data || !Array.isArray(data)) {
-      console.log('DesirableAcosRp2Overbidding - No data or not array:', data?.length || 0);
       return [];
-    }
-    
-    console.log('🔍 DesirableAcosRp2Overbidding - Input data length:', data.length);
-    
-    if (data.length > 0) {
-      console.log('📋 Available columns:', Object.keys(data[0]));
-      console.log('📋 Sample row:', data[0]);
     }
     
     let passedCount = 0;
@@ -65,34 +57,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         passes = true;
       }
       
-      // Log first 5 rows for debugging
-      if (index < 5) {
-        console.log(`🔍 BaseFilter Row ${index}:`, {
-          'I: Applied ACOS': row['I: Applied ACOS'],
-          appliedAcos,
-          'G: Target ACOS': row['G: Target ACOS'], 
-          targetAcos,
-          'J: Ad Spend': row['J: Ad Spend'],
-          adSpend,
-          'K: Price': row['K: Price'],
-          price,
-          condition1: appliedAcos < 9999 && appliedAcos < targetAcos,
-          condition2: appliedAcos === 9999 && adSpend < (targetAcos * price),
-          passes
-        });
-      }
-      
-      if (passes) {
-        passedCount++;
-      }
-      
       return passes;
-    });
-    
-    console.log('🎯 BaseFilter results:', {
-      totalInput: data.length,
-      totalPassed: filtered.length,
-      passedCount
     });
     
     return filtered;
@@ -150,13 +115,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   
   // GRP#3 Analysis (Simplified: CVR > Avg CVR RP2 AND Clicks >= 5)
   const grp3Data = useMemo(() => {
-    console.log('🔍 GRP#3 Debug - Starting analysis...');
-    console.log('📊 BaseFilteredData length:', baseFilteredData.length);
-    
-    if (baseFilteredData.length > 0) {
-      console.log('📋 Sample row columns:', Object.keys(baseFilteredData[0]));
-      console.log('📋 Sample row values:', baseFilteredData[0]);
-    }
+    // Debug logging removed
     
     let matchCount = 0;
     
@@ -189,25 +148,13 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       
       if (passes) {
         matchCount++;
-        console.log(`✅ GRP#3 Match #${matchCount}:`, {
-          asin: row['ASIN'],
-          kw: row['KW'],
-          cvr,
-          avgCvrRp2,
-          clicks,
-          cvrGreaterThanAvg,
-          clicksAtLeast5
-        });
+      // Debug logging removed
       }
       
       return passes;
     });
 
-    console.log('🎯 GRP#3 final results:', {
-      totalProcessed: baseFilteredData.length,
-      totalMatches: filtered.length,
-      matchCount
-    });
+    // Debug logging removed
 
     return filtered
       .map(row => ({

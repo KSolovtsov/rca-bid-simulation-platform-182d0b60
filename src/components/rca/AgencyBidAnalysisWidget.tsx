@@ -13,24 +13,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
   const navigate = useNavigate();
   // Debug: Log the data structure and available columns
   React.useEffect(() => {
-    if (data && data.length > 0) {
-      console.log('=== AGENCY WIDGET DEBUG ===');
-      console.log('Available columns:', Object.keys(data[0]));
-      console.log('Total records:', data.length);
-      console.log('Sample row data:', data[0]);
-      
-      // Check specific columns that we need
-      const sampleRow = data[0];
-      console.log('Key column values:');
-      console.log('- Sync Status:', sampleRow['Sync Status'], typeof sampleRow['Sync Status']);
-      console.log('- Applied ACOS:', sampleRow['Applied ACOS'], typeof sampleRow['Applied ACOS']);
-      console.log('- Target ACOS:', sampleRow['Target ACOS'], typeof sampleRow['Target ACOS']);
-      console.log('- Current Bid As displayed on Amazon Seller Central:', sampleRow['Current Bid As displayed on Amazon Seller Central']);
-      console.log('- Ad Spend:', sampleRow['Ad Spend']);
-      console.log('- TOS%:', sampleRow['TOS%']);
-      console.log('- Min. Suggested Bid:', sampleRow['Min. Suggested Bid']);
-      console.log('=== END AGENCY DEBUG ===');
-    }
+    // Debug logging removed to reduce console noise
   }, [data]);
 
   const getOverbiddingDescription = (index: number) => {
@@ -141,15 +124,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
     const minSuggestedBid = toNumber(row['O: Min. Suggested Bid']);
     const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
-    console.log('Agency Underbidding #1 check:', {
-      syncStatus,
-      appliedACOS,
-      adSpend,
-      tosPercent,
-      minSuggestedBid,
-      currentBid,
-      passes: syncStatus && appliedACOS === 9999 && adSpend === 0 && tosPercent <= 0 && minSuggestedBid > currentBid
-    });
+    // Debug logging removed
     
     return syncStatus &&
            appliedACOS === 9999 &&
@@ -165,13 +140,7 @@ const AgencyBidAnalysisWidget = ({ data }: AgencyBidAnalysisWidgetProps) => {
     const targetACOS = toNumber(row['G: Target ACOS']);
     const currentBid = toNumber(row['Current Bid As displayed on Amazon Seller Central']);
     
-    console.log('Agency Overbidding #1 check:', {
-      syncStatus,
-      appliedACOS,
-      targetACOS,
-      currentBid,
-      passes: syncStatus && appliedACOS < 9999 && appliedACOS < targetACOS && currentBid > 0.2
-    });
+    // Debug logging removed
     
     return syncStatus &&
            appliedACOS < 9999 &&
