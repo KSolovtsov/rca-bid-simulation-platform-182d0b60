@@ -88,7 +88,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         matchType: row['Match Type'] || '',
         adSpend: row['J: Ad Spend'] || '',
         nCvr: row['N: CVR'] || '',
-        cvrDateRange: row['CVR Date Range'] || '',
+        cvrDateRange: row['CVR Waterfall Level'] || '',
         avgCvrRp1: row['Avg CVR Reporting Period # 1'] || '',
         avgCvrRp2: row['Avg CVR Reporting Period # 2'] || '',
       }));
