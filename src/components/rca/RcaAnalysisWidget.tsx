@@ -18,6 +18,7 @@ interface RcaAnalysisData {
   asin: string;
   campaign: string;
   kw: string;
+  searchTerm: string;
   matchType: string;
   avgDailyOrdersPeriod1: number;
   avgDailyOrdersPeriod2: number;
@@ -80,7 +81,8 @@ const RcaAnalysisWidget = () => {
     return fileData.data.map((row: any) => ({
       asin: row['ASIN'] || '',
       campaign: row['Campaign'] || '',
-      kw: row['KW'] || row['Search Term'] || '',
+      kw: row['KW'] || '',
+      searchTerm: row['Search Term'] || '',
       matchType: row['Match Type'] || '',
       avgDailyOrdersPeriod1: parseFloat(row['Avg Daily Orders Reporting Period # 1']) || 0,
       avgDailyOrdersPeriod2: parseFloat(row['Avg Daily Orders Reporting Period # 2']) || 0,
@@ -308,6 +310,15 @@ const RcaAnalysisWidget = () => {
                       </TableHead>
                       <TableHead 
                         className="font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
+                        onClick={() => handleSort('searchTerm')}
+                      >
+                        <div className="flex items-center justify-between">
+                          Search Term
+                          {getSortIcon('searchTerm')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="font-semibold cursor-pointer hover:bg-muted/70 transition-colors select-none"
                         onClick={() => handleSort('matchType')}
                       >
                         <div className="flex items-center justify-between">
@@ -382,6 +393,7 @@ const RcaAnalysisWidget = () => {
                         <TableCell className="font-mono text-sm">{item.asin}</TableCell>
                         <TableCell className="max-w-[150px] truncate">{item.campaign}</TableCell>
                         <TableCell className="max-w-[120px] truncate">{item.kw}</TableCell>
+                        <TableCell className="max-w-[120px] truncate">{item.searchTerm}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-xs">
                             {item.matchType}
