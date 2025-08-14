@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Copy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -53,6 +52,11 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     grp3: null,
     grp4: null,
   });
+
+  // Column resizing state
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizingColumn, setResizingColumn] = useState<string | null>(null);
   
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [], grp4: [], filteredRows: 0, globalFilteredData: [] };
@@ -217,6 +221,65 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       : <ArrowDown className="h-3 w-3" />;
   };
 
+  // Get column width with fallback to default
+  const getColumnWidth = (columnKey: string, group: string) => {
+    const key = `${group}_${columnKey}`;
+    if (columnWidths[key]) {
+      return columnWidths[key];
+    }
+    
+    // Default widths based on content
+    const defaultWidths: Record<string, number> = {
+      asin: 80,
+      campaign: 100,
+      searchTerm: 90,
+      kw: 90,
+      matchType: 63,
+      adSpend: 63,
+      nCvr: 60,
+      cvrDateRange: 106,
+      avgCvrRp1: 85,
+      avgCvrRp2: 85,
+      latestBid: 80,
+      effectiveCeiling: 90,
+      adjustedBid: 80,
+      bidDelta: 70,
+      mTos: 60,
+      minSuggestedBid: 100
+    };
+    
+    return defaultWidths[columnKey] || 80;
+  };
+
+  // Handle column resize
+  const handleMouseDown = (e: React.MouseEvent, columnKey: string, group: string) => {
+    e.preventDefault();
+    setIsResizing(true);
+    const resizeKey = `${group}_${columnKey}`;
+    setResizingColumn(resizeKey);
+    
+    const startX = e.clientX;
+    const startWidth = getColumnWidth(columnKey, group);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = Math.max(50, startWidth + (e.clientX - startX));
+      setColumnWidths(prev => ({
+        ...prev,
+        [resizeKey]: newWidth
+      }));
+    };
+    
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      setResizingColumn(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text).then(() => {
       toast.success(`${type} copied to clipboard`);
@@ -276,9 +339,9 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <ResizablePanelGroup direction="horizontal" className="bg-muted/50">
-            <ResizablePanel defaultSize={11} minSize={8}>
-              <div className="h-full flex items-center px-1 py-2">
+          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
+            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -288,10 +351,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   ASIN
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={13} minSize={10}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_asin' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -301,10 +370,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Campaign
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={12} minSize={8}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_campaign' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -314,10 +389,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Search Term
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={12} minSize={8}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_searchTerm' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -327,10 +408,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   KW
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={8} minSize={6}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_kw' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -340,10 +427,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Match
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={8} minSize={6}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_matchType' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('adSpend', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -353,10 +446,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Spend
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={8} minSize={6}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_adSpend' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'adSpend', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('nCvr', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -366,10 +465,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   N: CVR
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={14} minSize={10}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_nCvr' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'nCvr', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('cvrDateRange', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -379,10 +484,16 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   CVR Date Range
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={11} minSize={8}>
-              <div className="h-full flex items-center px-1 py-2">
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_cvrDateRange' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'cvrDateRange', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('avgCvrRp1', 'grp1')}px` }}>
+              <div className="h-full flex items-center px-1 py-2 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -392,9 +503,15 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Avg CVR RP1
                 </Button>
               </div>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={11} minSize={8}>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp1_avgCvrRp1' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'avgCvrRp1', 'grp1')}
+                style={{ userSelect: 'none' }}
+              />
+            </div>
+            <div className="relative" style={{ width: `${getColumnWidth('avgCvrRp2', 'grp1')}px` }}>
               <div className="h-full flex items-center px-1 py-2">
                 <Button
                   variant="ghost"
@@ -405,25 +522,46 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                   Avg CVR RP2
                 </Button>
               </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            </div>
+          </div>
         </div>
         
         <ScrollArea className="flex-1">
           <div className="space-y-0">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
+                <div 
+                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border truncate" 
+                  style={{ width: `${getColumnWidth('asin', 'grp1')}px` }}
+                  title={item.asin}
+                >
+                  {item.asin}
+                </div>
+                <div 
+                  className="text-[10px] py-0.5 border-r border-border truncate" 
+                  style={{ width: `${getColumnWidth('campaign', 'grp1')}px` }}
+                  title={item.campaign}
+                >
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
+                  style={{ width: `${getColumnWidth('searchTerm', 'grp1')}px` }}
+                  title={item.searchTerm}
+                >
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
+                <div 
+                  className="text-[10px] py-0.5 border-r border-border truncate" 
+                  style={{ width: `${getColumnWidth('kw', 'grp1')}px` }}
+                  title={item.kw}
+                >
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[63px] border-r border-border">
+                <div 
+                  className="px-1 py-0.5 border-r border-border" 
+                  style={{ width: `${getColumnWidth('matchType', 'grp1')}px` }}
+                >
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -432,11 +570,37 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[63px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[106px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[85px] border-r border-border">{item.avgCvrRp1}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[40px]">{item.avgCvrRp2}</div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border" 
+                  style={{ width: `${getColumnWidth('adSpend', 'grp1')}px` }}
+                >
+                  {formatCurrency(parseFloat(item.adSpend) || 0)}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border" 
+                  style={{ width: `${getColumnWidth('nCvr', 'grp1')}px` }}
+                >
+                  {item.nCvr}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
+                  style={{ width: `${getColumnWidth('cvrDateRange', 'grp1')}px` }}
+                  title={item.cvrDateRange}
+                >
+                  {item.cvrDateRange}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border" 
+                  style={{ width: `${getColumnWidth('avgCvrRp1', 'grp1')}px` }}
+                >
+                  {item.avgCvrRp1}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5" 
+                  style={{ width: `${getColumnWidth('avgCvrRp2', 'grp1')}px` }}
+                >
+                  {item.avgCvrRp2}
+                </div>
               </div>
             ))}
           </div>
