@@ -323,7 +323,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -333,7 +333,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -343,7 +343,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -353,7 +353,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -363,7 +363,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -373,7 +373,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[50px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -383,7 +383,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 CVR
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -393,7 +393,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Avg CVR RP2
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[40px]">
               <Button
                 variant="ghost"
                 size="sm"
@@ -459,7 +459,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -469,7 +469,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -479,7 +479,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -489,7 +489,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -499,7 +499,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -509,7 +509,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[65px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -519,7 +519,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[50px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -529,7 +529,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 CVR
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -539,7 +539,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Avg CVR RP2
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[40px]">
               <Button
                 variant="ghost"
                 size="sm"
@@ -606,7 +606,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -616,7 +616,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -626,7 +626,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -636,7 +636,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -646,7 +646,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -656,7 +656,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[65px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -666,7 +666,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[50px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -676,7 +676,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 CVR
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -686,7 +686,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Avg CVR RP2
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -696,7 +696,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Ad Spend
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[50px]">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[50px]">
               <Button
                 variant="ghost"
                 size="sm"
