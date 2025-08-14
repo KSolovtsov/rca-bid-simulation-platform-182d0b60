@@ -105,32 +105,29 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       .slice(0, 50);
   }, [baseFilteredData]);
   
-  // GRP#3 Analysis
+  // GRP#3 Analysis (Simplified: CVR > Avg CVR RP2 AND Clicks >= 5)
   const grp3Data = useMemo(() => {
-    console.log('GRP#3 Debug - baseFilteredData length:', baseFilteredData.length);
+    console.log('🔍 GRP#3 Debug - baseFilteredData length:', baseFilteredData.length);
     
     const filtered = baseFilteredData.filter(row => {
-      const avgCvrRp2Raw = row['Avg CVR Reporting Period # 2'];
       const cvr = parseFloat(row['N: CVR']) || 0;
-      const clicks = parseFloat(row['Clicks']) || 0;
+      const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
+      const clicks = parseFloat(row['L: Clicks']) || 0;
       
-      // Check if avgCvrRp2 is not blank (not null, undefined, empty string, or "N/A")
-      const isAvgCvrRp2NotBlank = avgCvrRp2Raw !== null && 
-                                  avgCvrRp2Raw !== undefined && 
-                                  avgCvrRp2Raw !== '' && 
-                                  avgCvrRp2Raw !== 'N/A';
-      const avgCvrRp2 = parseFloat(avgCvrRp2Raw) || 0;
+      const cvrGreaterThanAvg = cvr > avgCvrRp2;
+      const clicksAtLeast5 = clicks >= 5;
       
-      const passes = isAvgCvrRp2NotBlank && cvr > avgCvrRp2 && clicks >= 5;
+      const passes = cvrGreaterThanAvg && clicksAtLeast5;
       
-      if (row['ASIN'] && passes) {
-        console.log('GRP#3 Match found:', {
+      if (passes) {
+        console.log('✅ GRP#3 Match found:', {
           asin: row['ASIN'],
-          avgCvrRp2Raw,
-          avgCvrRp2,
+          kw: row['KW'],
           cvr,
+          avgCvrRp2,
           clicks,
-          isAvgCvrRp2NotBlank,
+          cvrGreaterThanAvg,
+          clicksAtLeast5,
           passes
         });
       }
@@ -138,7 +135,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       return passes;
     });
 
-    console.log('GRP#3 Debug - filtered results:', filtered.length);
+    console.log('🎯 GRP#3 Debug - filtered results:', filtered.length);
 
     return filtered
       .map(row => ({
@@ -150,8 +147,8 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
         cvr: parseFloat(row['N: CVR']) || 0,
         avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
-        adSpend: parseFloat(row['Ad Spend']) || 0,
-        clicks: parseFloat(row['Clicks']) || 0,
+        adSpend: parseFloat(row['J: Ad Spend']) || 0,
+        clicks: parseFloat(row['L: Clicks']) || 0,
       }))
       .slice(0, 50);
   }, [baseFilteredData]);
