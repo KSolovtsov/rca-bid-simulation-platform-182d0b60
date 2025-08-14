@@ -928,7 +928,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             <TabsList className="grid w-full grid-cols-4 mx-0 mt-2 gap-0">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp1" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp1" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#1 ({analysisData.grp1.length} - {getPercentage(analysisData.grp1.length)}%)</span>
                     </div>
@@ -942,7 +942,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp2" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp2" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#2 ({analysisData.grp2.length} - {getPercentage(analysisData.grp2.length)}%)</span>
                     </div>
@@ -956,7 +956,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp3" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp3" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#3 ({analysisData.grp3.length} - {getPercentage(analysisData.grp3.length)}%)</span>
                     </div>
@@ -970,7 +970,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp4" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp4" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#4 ({analysisData.grp4.length} - {getPercentage(analysisData.grp4.length)}%)</span>
                     </div>

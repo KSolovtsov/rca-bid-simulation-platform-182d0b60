@@ -771,7 +771,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
             <TabsList className="grid w-full grid-cols-3 mx-0 mt-2 gap-0">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp1" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp1" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#1 ({grp1Data.length})</span>
                     </div>
@@ -785,7 +785,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp2" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp2" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#2 ({grp2Data.length})</span>
                     </div>
@@ -799,7 +799,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="grp3" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
+                  <TabsTrigger value="grp3" className="text-[9px] px-0.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
                       <span className="truncate">GRP#3 ({grp3Data.length})</span>
                     </div>
