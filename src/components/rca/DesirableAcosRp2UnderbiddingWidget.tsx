@@ -559,17 +559,11 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
           <div className="space-y-0">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
-                  {renderCellWithCopy(item.campaign, 'Campaign')}
-                </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
-                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
-                </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
-                  {renderCellWithCopy(item.kw, 'KW')}
-                </div>
-                <div className="px-1 py-0.5 w-[70px] border-r border-border">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate flex items-center" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border truncate flex items-center" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate flex items-center" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate flex items-center" title={item.kw}>{item.kw}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border flex items-center">
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -578,12 +572,12 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[66px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[54px] border-r border-border">{item.mTos.toFixed(1)}%</div>
-                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[106px] truncate" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border flex items-center">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border flex items-center">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[66px] border-r border-border flex items-center">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[54px] border-r border-border flex items-center">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border flex items-center">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[106px] truncate flex items-center" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
               </div>
             ))}
           </div>
