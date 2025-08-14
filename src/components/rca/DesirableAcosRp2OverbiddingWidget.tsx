@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { TrendingUp, AlertTriangle, Copy, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -220,12 +221,37 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied to clipboard",
-      description: `"${text}" has been copied to your clipboard.`,
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Copied to clipboard",
+        description: `${type} copied successfully`,
+      });
+    }).catch(() => {
+      toast({
+        title: "Error", 
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
+      });
     });
+  };
+
+  const renderCellWithCopy = (content: string, type: 'Search Term' | 'Campaign' | 'KW') => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors truncate">
+            {content}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy {type}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
 
   const handleMatchTypeClick = (item: any) => {
@@ -385,17 +411,15 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
                 <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate" title={item.searchTerm}>
-                  <div className="flex items-center gap-1">
-                    <span className="truncate">{item.searchTerm}</span>
-                    <Copy 
-                      className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer flex-shrink-0" 
-                      onClick={() => copyToClipboard(item.searchTerm)}
-                    />
-                  </div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30 truncate">{item.campaign}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate">{item.kw}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
@@ -533,17 +557,15 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
                 <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate" title={item.searchTerm}>
-                  <div className="flex items-center gap-1">
-                    <span className="truncate">{item.searchTerm}</span>
-                    <Copy 
-                      className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer flex-shrink-0" 
-                      onClick={() => copyToClipboard(item.searchTerm)}
-                    />
-                  </div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30 truncate">{item.campaign}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate">{item.kw}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
@@ -692,17 +714,15 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
                 <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate" title={item.searchTerm}>
-                  <div className="flex items-center gap-1">
-                    <span className="truncate">{item.searchTerm}</span>
-                    <Copy 
-                      className="h-3 w-3 text-muted-foreground hover:text-foreground cursor-pointer flex-shrink-0" 
-                      onClick={() => copyToClipboard(item.searchTerm)}
-                    />
-                  </div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                  {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30 truncate">{item.campaign}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30 truncate">{item.kw}</div>
+                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                  {renderCellWithCopy(item.campaign, 'Campaign')}
+                </div>
+                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                  {renderCellWithCopy(item.kw, 'KW')}
+                </div>
                 <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
