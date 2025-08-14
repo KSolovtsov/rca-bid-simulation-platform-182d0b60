@@ -127,6 +127,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         matchType: row['Match Type'] || '',
         latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
         cvr: parseFloat(row['N: CVR']) || 0,
+        cvrWaterfallLevel: row['CVR Waterfall Level'] || '-',
         avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
         tosPercent: parseFloat(row['TOS%']) || 0,
       }))
@@ -516,6 +517,16 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 CVR
               </Button>
             </div>
+            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'cvrWaterfallLevel')}
+              >
+                CVR W-f
+              </Button>
+            </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
               <Button
                 variant="ghost"
@@ -564,6 +575,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 </div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{item.cvrWaterfallLevel || '-'}</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
               </div>
