@@ -410,14 +410,14 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <div className="min-w-full">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
@@ -429,9 +429,9 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
               </div>
             ))}
           </div>
@@ -556,14 +556,14 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <div className="min-w-full">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
@@ -575,10 +575,10 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
               </div>
             ))}
           </div>
@@ -713,14 +713,14 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <div className="min-w-full">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[9px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[9px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
@@ -732,11 +732,11 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[60px] border-r border-border/30">{formatCurrency(item.adSpend)}</div>
-                <div className="text-center text-[9px] px-1 py-0.5 w-[50px]">{item.clicks}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{formatCurrency(item.adSpend)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[50px]">{item.clicks}</div>
               </div>
             ))}
           </div>
