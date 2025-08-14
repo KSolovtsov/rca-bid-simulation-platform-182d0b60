@@ -101,11 +101,18 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const grp3Data = useMemo(() => {
     return baseFilteredData
       .filter(row => {
-        const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
+        const avgCvrRp2Raw = row['Avg CVR Reporting Period # 2'];
         const cvr = parseFloat(row['CVR']) || 0;
         const clicks = parseFloat(row['Clicks']) || 0;
         
-        return avgCvrRp2 > 0 && cvr > avgCvrRp2 && clicks >= 5;
+        // Check if avgCvrRp2 is not blank (not null, undefined, empty string, or "N/A")
+        const isAvgCvrRp2NotBlank = avgCvrRp2Raw !== null && 
+                                    avgCvrRp2Raw !== undefined && 
+                                    avgCvrRp2Raw !== '' && 
+                                    avgCvrRp2Raw !== 'N/A';
+        const avgCvrRp2 = parseFloat(avgCvrRp2Raw) || 0;
+        
+        return isAvgCvrRp2NotBlank && cvr > avgCvrRp2 && clicks >= 5;
       })
       .map(row => ({
         asin: row['ASIN'] || '',
