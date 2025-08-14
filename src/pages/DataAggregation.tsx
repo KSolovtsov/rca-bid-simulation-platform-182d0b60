@@ -128,18 +128,18 @@ const DataAggregation = () => {
     const groups = {
       // Positive ranges
       '0-0.25': 0,
-      '0.25-0.5': 0,
-      '0.5-1.0': 0,
-      '1.0-1.5': 0,
-      '1.5-2.0': 0,
-      '>2.0': 0,
+      '0.26-0.5': 0,
+      '0.51-1.0': 0,
+      '1.01-1.5': 0,
+      '1.51-2.0': 0,
+      '>2.1': 0,
       // Negative ranges
       '0 to -0.25': 0,
-      '-0.25 to -0.5': 0,
-      '-0.5 to -1.0': 0,
-      '-1.0 to -1.5': 0,
-      '-1.5 to -2.0': 0,
-      '<-2.0': 0
+      '-0.26 to -0.5': 0,
+      '-0.51 to -1.0': 0,
+      '-1.01 to -1.5': 0,
+      '-1.51 to -2.0': 0,
+      '<-2.1': 0
     };
 
     activeFile.data.forEach((row) => {
@@ -155,30 +155,30 @@ const DataAggregation = () => {
         const numValue = parseFloat(String(deltaValue));
         
         if (!isNaN(numValue)) {
-          if (numValue >= 0 && numValue < 0.25) {
+          if (numValue >= 0 && numValue <= 0.25) {
             groups['0-0.25']++;
-          } else if (numValue >= 0.25 && numValue < 0.5) {
-            groups['0.25-0.5']++;
-          } else if (numValue >= 0.5 && numValue < 1.0) {
-            groups['0.5-1.0']++;
-          } else if (numValue >= 1.0 && numValue < 1.5) {
-            groups['1.0-1.5']++;
-          } else if (numValue >= 1.5 && numValue <= 2.0) {
-            groups['1.5-2.0']++;
-          } else if (numValue > 2.0) {
-            groups['>2.0']++;
-          } else if (numValue < 0 && numValue > -0.25) {
+          } else if (numValue >= 0.26 && numValue <= 0.5) {
+            groups['0.26-0.5']++;
+          } else if (numValue >= 0.51 && numValue <= 1.0) {
+            groups['0.51-1.0']++;
+          } else if (numValue >= 1.01 && numValue <= 1.5) {
+            groups['1.01-1.5']++;
+          } else if (numValue >= 1.51 && numValue <= 2.0) {
+            groups['1.51-2.0']++;
+          } else if (numValue > 2.1) {
+            groups['>2.1']++;
+          } else if (numValue < 0 && numValue >= -0.25) {
             groups['0 to -0.25']++;
-          } else if (numValue <= -0.25 && numValue > -0.5) {
-            groups['-0.25 to -0.5']++;
-          } else if (numValue <= -0.5 && numValue > -1.0) {
-            groups['-0.5 to -1.0']++;
-          } else if (numValue <= -1.0 && numValue > -1.5) {
-            groups['-1.0 to -1.5']++;
-          } else if (numValue <= -1.5 && numValue >= -2.0) {
-            groups['-1.5 to -2.0']++;
-          } else if (numValue < -2.0) {
-            groups['<-2.0']++;
+          } else if (numValue <= -0.26 && numValue >= -0.5) {
+            groups['-0.26 to -0.5']++;
+          } else if (numValue <= -0.51 && numValue >= -1.0) {
+            groups['-0.51 to -1.0']++;
+          } else if (numValue <= -1.01 && numValue >= -1.5) {
+            groups['-1.01 to -1.5']++;
+          } else if (numValue <= -1.51 && numValue >= -2.0) {
+            groups['-1.51 to -2.0']++;
+          } else if (numValue < -2.1) {
+            groups['<-2.1']++;
           }
         }
       }
