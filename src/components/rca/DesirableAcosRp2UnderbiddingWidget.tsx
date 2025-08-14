@@ -33,7 +33,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             setActiveFileName(file.name);
           }
         } catch (error) {
-          console.error('Error fetching active file:', error);
+          // Error fetching active file
         }
       }
     };

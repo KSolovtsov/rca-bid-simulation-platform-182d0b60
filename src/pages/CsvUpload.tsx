@@ -28,14 +28,10 @@ const CsvUpload = () => {
   const { toast } = useToast();
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("File select triggered");
     const file = event.target.files?.[0];
     if (!file) {
-      console.log("No file selected");
       return;
     }
-
-    console.log("File selected:", file.name);
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
       toast({
@@ -47,13 +43,10 @@ const CsvUpload = () => {
     }
 
     setSelectedFile(file);
-    console.log("File set to state:", file.name);
   }, [toast]);
 
   const handleSaveFile = useCallback(() => {
-    console.log("Save file triggered, selectedFile:", selectedFile?.name);
     if (!selectedFile) {
-      console.log("No file to save");
       return;
     }
 

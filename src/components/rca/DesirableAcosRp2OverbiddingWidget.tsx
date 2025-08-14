@@ -31,15 +31,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
     if (!data || !Array.isArray(data)) {
-      console.log('DesirableAcosRp2Overbidding - No data or not array:', data?.length || 0);
       return [];
-    }
-    
-    console.log('🔍 DesirableAcosRp2Overbidding - Input data length:', data.length);
-    
-    if (data.length > 0) {
-      console.log('📋 Available columns:', Object.keys(data[0]));
-      console.log('📋 Sample row:', data[0]);
     }
     
     let passedCount = 0;
@@ -143,13 +135,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   
   // GRP#3 Analysis (Simplified: CVR > Avg CVR RP2 AND Clicks >= 5)
   const grp3Data = useMemo(() => {
-    console.log('🔍 GRP#3 Debug - Starting analysis...');
-    console.log('📊 BaseFilteredData length:', baseFilteredData.length);
-    
-    if (baseFilteredData.length > 0) {
-      console.log('📋 Sample row columns:', Object.keys(baseFilteredData[0]));
-      console.log('📋 Sample row values:', baseFilteredData[0]);
-    }
+    // Debug logging removed for performance
     
     let matchCount = 0;
     
