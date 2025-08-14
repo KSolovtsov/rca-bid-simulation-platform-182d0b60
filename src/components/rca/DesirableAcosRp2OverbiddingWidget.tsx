@@ -102,7 +102,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     return baseFilteredData
       .filter(row => {
         const avgCvrRp2Raw = row['Avg CVR Reporting Period # 2'];
-        const cvr = parseFloat(row['CVR']) || 0;
+        const cvr = parseFloat(row['N: CVR']) || 0;
         const clicks = parseFloat(row['Clicks']) || 0;
         
         // Check if avgCvrRp2 is not blank (not null, undefined, empty string, or "N/A")
@@ -121,7 +121,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         kw: row['KW'] || '',
         matchType: row['Match Type'] || '',
         latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-        cvr: parseFloat(row['CVR']) || 0,
+        cvr: parseFloat(row['N: CVR']) || 0,
         avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
         adSpend: parseFloat(row['Ad Spend']) || 0,
         clicks: parseFloat(row['Clicks']) || 0,
