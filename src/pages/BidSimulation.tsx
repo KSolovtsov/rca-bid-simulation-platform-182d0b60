@@ -20,8 +20,7 @@ const BidSimulation = () => {
   const location = useLocation();
   const { toast } = useToast();
   
-    // Navigation logic without debug logs
-    
+  const handleBack = () => {
     // Проверяем, есть ли история для возврата
     if (window.history.length > 1) {
       navigate(-1);
