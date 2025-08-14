@@ -99,21 +99,40 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   
   // GRP#3 Analysis
   const grp3Data = useMemo(() => {
-    return baseFilteredData
-      .filter(row => {
-        const avgCvrRp2Raw = row['Avg CVR Reporting Period # 2'];
-        const cvr = parseFloat(row['N: CVR']) || 0;
-        const clicks = parseFloat(row['Clicks']) || 0;
-        
-        // Check if avgCvrRp2 is not blank (not null, undefined, empty string, or "N/A")
-        const isAvgCvrRp2NotBlank = avgCvrRp2Raw !== null && 
-                                    avgCvrRp2Raw !== undefined && 
-                                    avgCvrRp2Raw !== '' && 
-                                    avgCvrRp2Raw !== 'N/A';
-        const avgCvrRp2 = parseFloat(avgCvrRp2Raw) || 0;
-        
-        return isAvgCvrRp2NotBlank && cvr > avgCvrRp2 && clicks >= 5;
-      })
+    console.log('GRP#3 Debug - baseFilteredData length:', baseFilteredData.length);
+    
+    const filtered = baseFilteredData.filter(row => {
+      const avgCvrRp2Raw = row['Avg CVR Reporting Period # 2'];
+      const cvr = parseFloat(row['N: CVR']) || 0;
+      const clicks = parseFloat(row['Clicks']) || 0;
+      
+      // Check if avgCvrRp2 is not blank (not null, undefined, empty string, or "N/A")
+      const isAvgCvrRp2NotBlank = avgCvrRp2Raw !== null && 
+                                  avgCvrRp2Raw !== undefined && 
+                                  avgCvrRp2Raw !== '' && 
+                                  avgCvrRp2Raw !== 'N/A';
+      const avgCvrRp2 = parseFloat(avgCvrRp2Raw) || 0;
+      
+      const passes = isAvgCvrRp2NotBlank && cvr > avgCvrRp2 && clicks >= 5;
+      
+      if (row['ASIN'] && passes) {
+        console.log('GRP#3 Match found:', {
+          asin: row['ASIN'],
+          avgCvrRp2Raw,
+          avgCvrRp2,
+          cvr,
+          clicks,
+          isAvgCvrRp2NotBlank,
+          passes
+        });
+      }
+      
+      return passes;
+    });
+
+    console.log('GRP#3 Debug - filtered results:', filtered.length);
+
+    return filtered
       .map(row => ({
         asin: row['ASIN'] || '',
         searchTerm: row['Search Term'] || '',
