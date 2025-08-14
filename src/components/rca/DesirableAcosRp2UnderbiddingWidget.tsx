@@ -560,13 +560,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
                 <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
                 <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
                 <div className="px-1 py-0.5 w-[70px] border-r border-border">
