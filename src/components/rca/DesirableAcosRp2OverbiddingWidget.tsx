@@ -29,9 +29,14 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
-    if (!data || !Array.isArray(data)) return [];
+    if (!data || !Array.isArray(data)) {
+      console.log('DesirableAcosRp2Overbidding - No data or not array:', data?.length || 0);
+      return [];
+    }
     
-    return data.filter(row => {
+    console.log('DesirableAcosRp2Overbidding - Input data length:', data.length);
+    
+    const filtered = data.filter(row => {
       const appliedAcos = parseFloat(row['Applied ACOS']) || 0;
       const targetAcos = parseFloat(row['Target ACOS']) || 0;
       const adSpend = parseFloat(row['Ad Spend']) || 0;
@@ -45,13 +50,16 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       }
       return false;
     });
+    
+    console.log('DesirableAcosRp2Overbidding - Filtered data length:', filtered.length);
+    return filtered;
   }, [data]);
   
   // GRP#1 Analysis
   const grp1Data = useMemo(() => {
     return baseFilteredData
       .filter(row => {
-        const cvr = parseFloat(row['CVR']) || 0;
+        const cvr = parseFloat(row['N: CVR']) || 0;
         const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
         const tosPercent = parseFloat(row['TOS%']) || 0;
         
@@ -63,7 +71,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         campaign: row['Campaign'] || '',
         kw: row['KW'] || '',
         matchType: row['Match Type'] || '',
-        cvr: parseFloat(row['CVR']) || 0,
+        cvr: parseFloat(row['N: CVR']) || 0,
         avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
         tosPercent: parseFloat(row['TOS%']) || 0,
       }))
@@ -74,7 +82,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const grp2Data = useMemo(() => {
     return baseFilteredData
       .filter(row => {
-        const cvr = parseFloat(row['CVR']) || 0;
+        const cvr = parseFloat(row['N: CVR']) || 0;
         const avgCvrRp2 = parseFloat(row['Avg CVR Reporting Period # 2']) || 0;
         const tosPercent = parseFloat(row['TOS%']) || 0;
         const latestBid = parseFloat(row['Latest Bid Calculated by the System']) || 0;
@@ -90,7 +98,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         kw: row['KW'] || '',
         matchType: row['Match Type'] || '',
         latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-        cvr: parseFloat(row['CVR']) || 0,
+        cvr: parseFloat(row['N: CVR']) || 0,
         avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
         tosPercent: parseFloat(row['TOS%']) || 0,
       }))
