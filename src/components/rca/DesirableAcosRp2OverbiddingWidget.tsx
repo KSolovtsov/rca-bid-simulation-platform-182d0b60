@@ -815,15 +815,15 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
             </TabsList>
           </TooltipProvider>
           
-          <TabsContent value="grp1" className="h-[calc(100%-50px)] mt-0">
+          <TabsContent value="grp1" className="h-[calc(100%-50px)] mt-4">
             {renderGrp1Table()}
           </TabsContent>
           
-          <TabsContent value="grp2" className="h-[calc(100%-50px)] mt-0">
+          <TabsContent value="grp2" className="h-[calc(100%-50px)] mt-4">
             {renderGrp2Table()}
           </TabsContent>
           
-          <TabsContent value="grp3" className="h-[calc(100%-50px)] mt-0">
+          <TabsContent value="grp3" className="h-[calc(100%-50px)] mt-4">
             {renderGrp3Table()}
           </TabsContent>
         </Tabs>
