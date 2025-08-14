@@ -105,6 +105,8 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       adjustedBid: parseFloat(row['adjusted_bid']) || 0,
       bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
       mTos: parseFloat(row['M: TOS%']) || 0,
+      nCvr: row['N: CVR'] || '',
+      cvrWaterfall: row['CVR Waterfall Level'] || '',
     }));
     
     const grp2Violations = grp2Data.filter(item => {
@@ -520,7 +522,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Adjusted
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[54px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[54px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -528,6 +530,26 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 onClick={() => handleSort('grp2', 'mTos')}
               >
                 TOS%
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'nCvr')}
+              >
+                CVR
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[106px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'cvrWaterfall')}
+              >
+                CVR Waterfall
               </Button>
             </div>
           </div>
@@ -559,7 +581,9 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
                 <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
                 <div className="text-[10px] px-1 py-0.5 w-[66px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[54px]">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] px-1 py-0.5 w-[54px] border-r border-border">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[106px] truncate" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
               </div>
             ))}
           </div>
