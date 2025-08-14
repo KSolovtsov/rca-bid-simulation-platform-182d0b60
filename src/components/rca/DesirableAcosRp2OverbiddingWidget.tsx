@@ -34,24 +34,59 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       return [];
     }
     
-    console.log('DesirableAcosRp2Overbidding - Input data length:', data.length);
+    console.log('🔍 DesirableAcosRp2Overbidding - Input data length:', data.length);
     
-    const filtered = data.filter(row => {
+    if (data.length > 0) {
+      console.log('📋 Available columns:', Object.keys(data[0]));
+      console.log('📋 Sample row:', data[0]);
+    }
+    
+    let passedCount = 0;
+    
+    const filtered = data.filter((row, index) => {
       const appliedAcos = parseFloat(row['Applied ACOS']) || 0;
       const targetAcos = parseFloat(row['Target ACOS']) || 0;
       const adSpend = parseFloat(row['Ad Spend']) || 0;
       const price = parseFloat(row['Price']) || 0;
       
-      // Desire ACOS filter
+      // Desire ACOS filter logic
+      let passes = false;
       if (appliedAcos < 9999 && appliedAcos < targetAcos) {
-        return true;
+        passes = true;
       } else if (appliedAcos === 9999 && adSpend < (targetAcos * price)) {
-        return true;
+        passes = true;
       }
-      return false;
+      
+      // Log first 5 rows for debugging
+      if (index < 5) {
+        console.log(`🔍 BaseFilter Row ${index}:`, {
+          'Applied ACOS': row['Applied ACOS'],
+          appliedAcos,
+          'Target ACOS': row['Target ACOS'], 
+          targetAcos,
+          'Ad Spend': row['Ad Spend'],
+          adSpend,
+          'Price': row['Price'],
+          price,
+          condition1: appliedAcos < 9999 && appliedAcos < targetAcos,
+          condition2: appliedAcos === 9999 && adSpend < (targetAcos * price),
+          passes
+        });
+      }
+      
+      if (passes) {
+        passedCount++;
+      }
+      
+      return passes;
     });
     
-    console.log('DesirableAcosRp2Overbidding - Filtered data length:', filtered.length);
+    console.log('🎯 BaseFilter results:', {
+      totalInput: data.length,
+      totalPassed: filtered.length,
+      passedCount
+    });
+    
     return filtered;
   }, [data]);
   
