@@ -536,17 +536,35 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <div className="min-w-full">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                <div 
+                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border/30 truncate"
+                  style={{ width: `${getColumnWidth('asin', 'grp1')}px` }}
+                >
+                  {item.asin}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30" 
+                  style={{ width: `${getColumnWidth('searchTerm', 'grp1')}px` }}
+                  title={item.searchTerm}
+                >
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('campaign', 'grp1')}px` }}
+                >
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('kw', 'grp1')}px` }}
+                >
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
+                <div 
+                  className="px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('matchType', 'grp1')}px` }}
+                >
                   <Badge 
                     variant="outline" 
                     className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -555,9 +573,24 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('cvr', 'grp1')}px` }}
+                >
+                  {(item.cvr * 100).toFixed(2)}%
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('avgCvrRp2', 'grp1')}px` }}
+                >
+                  {(item.avgCvrRp2 * 100).toFixed(2)}%
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5"
+                  style={{ width: `${getColumnWidth('tosPercent', 'grp1')}px` }}
+                >
+                  {(item.tosPercent * 100).toFixed(1)}%
+                </div>
               </div>
             ))}
           </div>
@@ -584,96 +617,170 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'asin')}
-              >
-                ASIN
-              </Button>
+          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
+            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'asin')}
+                >
+                  ASIN
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_asin' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'searchTerm')}
-              >
-                Search Term
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'searchTerm')}
+                >
+                  Search Term
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_searchTerm' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'campaign')}
-              >
-                Campaign
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'campaign')}
+                >
+                  Campaign
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_campaign' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'kw')}
-              >
-                KW
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'kw')}
+                >
+                  KW
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_kw' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'matchType')}
-              >
-                Match
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'matchType')}
+                >
+                  Match
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_matchType' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'latestBid')}
-              >
-                Latest Bid
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('latestBid', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'latestBid')}
+                >
+                  Latest Bid
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_latestBid' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'latestBid', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'cvr')}
-              >
-                CVR
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('cvr', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'cvr')}
+                >
+                  CVR
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_cvr' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'cvr', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'avgCvrRp2')}
-              >
-                Avg CVR RP2
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('avgCvrRp2', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'avgCvrRp2')}
+                >
+                  Avg CVR RP2
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp2_avgCvrRp2' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'avgCvrRp2', 'grp2')}
+                style={{ userSelect: 'none' }}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[40px]">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'tosPercent')}
-              >
-                TOS%
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('tosPercent', 'grp2')}px` }}>
+              <div className="h-full flex items-center px-1 py-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp2', 'tosPercent')}
+                >
+                  TOS%
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -682,17 +789,35 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
           <div className="min-w-full">
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                <div 
+                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border/30 truncate"
+                  style={{ width: `${getColumnWidth('asin', 'grp2')}px` }}
+                >
+                  {item.asin}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('searchTerm', 'grp2')}px` }}
+                  title={item.searchTerm}
+                >
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('campaign', 'grp2')}px` }}
+                >
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('kw', 'grp2')}px` }}
+                >
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
+                <div 
+                  className="px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('matchType', 'grp2')}px` }}
+                >
                   <Badge 
                     variant="outline" 
                     className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -701,10 +826,30 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('latestBid', 'grp2')}px` }}
+                >
+                  {formatCurrency(item.latestBid)}
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('cvr', 'grp2')}px` }}
+                >
+                  {(item.cvr * 100).toFixed(2)}%
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('avgCvrRp2', 'grp2')}px` }}
+                >
+                  {(item.avgCvrRp2 * 100).toFixed(2)}%
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5"
+                  style={{ width: `${getColumnWidth('tosPercent', 'grp2')}px` }}
+                >
+                  {(item.tosPercent * 100).toFixed(1)}%
+                </div>
               </div>
             ))}
           </div>
