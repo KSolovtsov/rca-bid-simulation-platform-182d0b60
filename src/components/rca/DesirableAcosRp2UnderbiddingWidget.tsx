@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Copy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
@@ -52,13 +52,6 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     grp3: null,
     grp4: null,
   });
-
-  // Column resizing state
-  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
-  const [isResizing, setIsResizing] = useState(false);
-  const [resizingColumn, setResizingColumn] = useState<string | null>(null);
-  const [startX, setStartX] = useState(0);
-  const [startWidths, setStartWidths] = useState<{ current: number; next: number }>({ current: 0, next: 0 });
   
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [], grp4: [], filteredRows: 0, globalFilteredData: [] };
@@ -98,84 +91,126 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         cvrDateRange: row['CVR Date Range'] || '',
         avgCvrRp1: row['Avg CVR Reporting Period # 1'] || '',
         avgCvrRp2: row['Avg CVR Reporting Period # 2'] || '',
-      }));
+      }))
+      .slice(0, 50);
 
-    // GRP # 2: Latest Bid <= effective_ceiling && Δ < 0 && TOS% <= 0.5
-    const grp2Data = globalFilteredData.map(row => ({
-      asin: row['ASIN'] || '',
-      campaign: row['Campaign'] || '',
-      searchTerm: row['Search Term'] || '',
-      kw: row['KW'] || '',
-      matchType: row['Match Type'] || '',
-      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
-      adjustedBid: parseFloat(row['adjusted_bid']) || 0,
-      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
-      mTos: parseFloat(row['M: TOS%']) || 0,
-    }));
-    
-    const grp2Violations = grp2Data.filter(item => {
-      return item.latestBid <= item.effectiveCeiling && item.bidDelta < 0 && item.mTos <= 50;
-    });
+    // GRP # 2: effective_ceiling = 0.03
+    const grp2 = globalFilteredData
+      .filter(row => {
+        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+        return effectiveCeiling === 0.03;
+      })
+      .map(row => ({
+        asin: row['ASIN'] || '',
+        campaign: row['Campaign'] || '',
+        searchTerm: row['Search Term'] || '',
+        kw: row['KW'] || '',
+        matchType: row['Match Type'] || '',
+        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+        effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+        adjustedBid: parseFloat(row['Adjusted Bid']) || 0,
+        bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Current Bid As displayed on Amazon Seller Central']) || 0),
+      }))
+      .slice(0, 50);
 
-    // GRP # 3: Latest Bid < effective_ceiling && Δ > 0 && TOS% > 0.5
-    const grp3Data = globalFilteredData.map(row => ({
-      asin: row['ASIN'] || '',
-      campaign: row['Campaign'] || '',
-      searchTerm: row['Search Term'] || '',
-      kw: row['KW'] || '',
-      matchType: row['Match Type'] || '',
-      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
-      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
-      mTos: parseFloat(row['M: TOS%']) || 0,
-    }));
-    
-    const grp3Violations = grp3Data.filter(item => {
-      return item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos > 50;
-    });
+    // GRP # 3: effective_ceiling = 0.04
+    const grp3 = globalFilteredData
+      .filter(row => {
+        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+        return effectiveCeiling === 0.04;
+      })
+      .map(row => ({
+        asin: row['ASIN'] || '',
+        campaign: row['Campaign'] || '',
+        searchTerm: row['Search Term'] || '',
+        kw: row['KW'] || '',
+        matchType: row['Match Type'] || '',
+        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+        effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+        adjustedBid: parseFloat(row['Adjusted Bid']) || 0,
+      }))
+      .slice(0, 50);
 
-    // GRP # 4: effective_ceiling > 0.02 && (Min. Suggested Bid - Latest Bid) > 0.5 && Δ <= 0 && TOS% <= 0.5
-    const grp4Data = globalFilteredData.map(row => ({
-      asin: row['ASIN'] || '',
-      campaign: row['Campaign'] || '',
-      searchTerm: row['Search Term'] || '',
-      kw: row['KW'] || '',
-      matchType: row['Match Type'] || '',
-      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-      minSuggestedBid: parseFloat(row['O: Min. Suggested Bid']) || 0,
-      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
-      adjustedBid: parseFloat(row['adjusted_bid']) || 0,
-      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
-      mTos: parseFloat(row['M: TOS%']) || 0,
-    }));
-    
-    const grp4Violations = grp4Data.filter(item => {
-      const minSuggestedBidDelta = item.minSuggestedBid - item.latestBid;
-      return item.effectiveCeiling > 0.02 && minSuggestedBidDelta > 0.5 && item.bidDelta <= 0 && item.mTos <= 50;
-    });
-    
+    // GRP # 4: effective_ceiling > 0.04
+    const grp4 = globalFilteredData
+      .filter(row => {
+        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
+        return effectiveCeiling > 0.04;
+      })
+      .map(row => ({
+        asin: row['ASIN'] || '',
+        campaign: row['Campaign'] || '',
+        searchTerm: row['Search Term'] || '',
+        kw: row['KW'] || '',
+        matchType: row['Match Type'] || '',
+        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+        mTos: row['M: TOS%'] || '',
+        minSuggestedBid: parseFloat(row['O: Min. Suggested Bid']) || 0,
+        bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Current Bid As displayed on Amazon Seller Central']) || 0),
+      }))
+      .slice(0, 50);
+
     return {
       grp1,
-      grp2: grp2Violations,
-      grp3: grp3Violations,
-      grp4: grp4Violations,
-      grp2AllGood: grp2Violations.length === 0,
-      grp3AllGood: grp3Violations.length === 0,
-      grp4AllGood: grp4Violations.length === 0,
+      grp2,
+      grp3,
+      grp4,
       filteredRows: globalFilteredData.length,
-      globalFilteredData: globalFilteredData,
+      globalFilteredData
     };
   }, [data]);
 
+  const { grp1, grp2, grp3, grp4 } = analysisData;
+
+  const getSortIcon = (group: 'grp1' | 'grp2' | 'grp3' | 'grp4', field: string) => {
+    const sort = sortConfig[group];
+    if (sort?.field !== field) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
+    return sort.direction === 'asc' 
+      ? <ArrowUp className="h-3 w-3" />
+      : <ArrowDown className="h-3 w-3" />;
+  };
+
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
-  const formatAcos = (value: number) => `${value.toFixed(1)}%`;
-  
-  const totalRows = data ? data.length : 0;
-  
-  // Calculate percentages
-  const getPercentage = (count: number) => {
-    return totalRows > 0 ? ((count / totalRows) * 100).toFixed(1) : '0.0';
+
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success(`${type} copied to clipboard`);
+    }).catch(() => {
+      toast.error('Failed to copy to clipboard');
+    });
+  };
+
+  const renderCellWithCopy = (content: string, type: 'Search Term' | 'Campaign' | 'KW') => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors truncate">
+            {content}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy {type}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
+  const handleMatchTypeClick = (item: any) => {
+    const params = new URLSearchParams();
+    params.set('source', 'rca_analysis');
+    params.set('filter_kw', 'KW');
+    params.set('value_kw', item.kw);
+    params.set('operator_kw', 'equals');
+    params.set('filter_campaign', 'Campaign');
+    params.set('value_campaign', item.campaign);
+    params.set('operator_campaign', 'equals');
+    params.set('filter_match', 'Match Type');
+    params.set('value_match', item.matchType);
+    params.set('operator_match', 'equals');
+    navigate(`/bid-simulation?${params.toString()}`);
   };
 
   const handleSort = (group: 'grp1' | 'grp2' | 'grp3' | 'grp4', field: string) => {
@@ -196,158 +231,25 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       const aVal = a[sort.field];
       const bVal = b[sort.field];
       
-      // Special handling for numeric fields that might be stored as strings
-      if (sort.field === 'adSpend' || sort.field === 'latestBid' || sort.field === 'effectiveCeiling' || 
-          sort.field === 'minSuggestedBid' || sort.field === 'adjustedBid' || sort.field === 'mTos' || 
-          sort.field === 'bidDelta') {
+      // Special handling for numeric fields
+      if (sort.field === 'latestBid' || sort.field === 'effectiveCeiling' || sort.field === 'adjustedBid' || 
+          sort.field === 'bidDelta' || sort.field === 'minSuggestedBid') {
         const aNum = parseFloat(aVal) || 0;
         const bNum = parseFloat(bVal) || 0;
         return sort.direction === 'asc' ? aNum - bNum : bNum - aNum;
       }
       
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sort.direction === 'asc' 
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-      
-      return sort.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      // String comparison
+      const aStr = String(aVal || '').toLowerCase();
+      const bStr = String(bVal || '').toLowerCase();
+      if (aStr < bStr) return sort.direction === 'asc' ? -1 : 1;
+      if (aStr > bStr) return sort.direction === 'asc' ? 1 : -1;
+      return 0;
     });
   };
 
-  const getSortIcon = (group: 'grp1' | 'grp2' | 'grp3' | 'grp4', field: string) => {
-    const sort = sortConfig[group];
-    if (sort?.field !== field) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    return sort.direction === 'asc' 
-      ? <ArrowUp className="h-3 w-3" />
-      : <ArrowDown className="h-3 w-3" />;
-  };
-
-  // Get column width with fallback to default
-  const getColumnWidth = (columnKey: string, group: string) => {
-    const key = `${group}_${columnKey}`;
-    if (columnWidths[key]) {
-      return columnWidths[key];
-    }
-    
-    // Default widths based on content
-    const defaultWidths: Record<string, number> = {
-      asin: 80,
-      campaign: 100,
-      searchTerm: 90,
-      kw: 90,
-      matchType: 63,
-      adSpend: 63,
-      nCvr: 60,
-      cvrDateRange: 106,
-      avgCvrRp1: 85,
-      avgCvrRp2: 85,
-      latestBid: 80,
-      effectiveCeiling: 90,
-      adjustedBid: 80,
-      bidDelta: 70,
-      mTos: 60,
-      minSuggestedBid: 100
-    };
-    
-    return defaultWidths[columnKey] || 80;
-  };
-
-  // Get column order for each group to find adjacent column
-  const getColumnOrder = (group: string) => {
-    const orders = {
-      grp1: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'adSpend', 'nCvr', 'cvrDateRange', 'avgCvrRp1', 'avgCvrRp2'],
-      grp2: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'latestBid', 'effectiveCeiling', 'adjustedBid', 'bidDelta'],
-      grp3: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'latestBid', 'effectiveCeiling', 'adjustedBid'],
-      grp4: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'latestBid', 'mTos', 'minSuggestedBid', 'bidDelta']
-    };
-    return orders[group] || [];
-  };
-
-  // Handle column resize
-  const handleMouseDown = (e: React.MouseEvent, columnKey: string, group: string) => {
-    e.preventDefault();
-    setIsResizing(true);
-    const resizeKey = `${group}_${columnKey}`;
-    setResizingColumn(resizeKey);
-    
-    const columns = getColumnOrder(group);
-    const currentIndex = columns.indexOf(columnKey);
-    const nextColumn = currentIndex < columns.length - 1 ? columns[currentIndex + 1] : null;
-    
-    if (!nextColumn) return; // Last column cannot be resized
-    
-    setStartX(e.clientX);
-    const currentWidth = getColumnWidth(columnKey, group);
-    const nextWidth = getColumnWidth(nextColumn, group);
-    setStartWidths({ current: currentWidth, next: nextWidth });
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - startX;
-      const newCurrentWidth = Math.max(50, startWidths.current + deltaX);
-      const newNextWidth = Math.max(50, startWidths.next - deltaX);
-      
-      setColumnWidths(prev => ({
-        ...prev,
-        [`${group}_${columnKey}`]: newCurrentWidth,
-        [`${group}_${nextColumn}`]: newNextWidth
-      }));
-    };
-    
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      setResizingColumn(null);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const copyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      toast.success(`${type} copied to clipboard`);
-    }).catch(() => {
-      toast.error('Failed to copy to clipboard');
-    });
-  };
-
-  const handleMatchTypeClick = (item: any) => {
-    const params = new URLSearchParams();
-    params.set('source', 'rca_analysis');
-    params.set('filter_kw', 'KW');
-    params.set('value_kw', item.kw || item.searchTerm);
-    params.set('operator_kw', 'equals');
-    params.set('filter_campaign', 'Campaign');
-    params.set('value_campaign', item.campaign);
-    params.set('operator_campaign', 'equals');
-    params.set('filter_match', 'Match Type');
-    params.set('value_match', item.matchType);
-    params.set('operator_match', 'equals');
-    navigate(`/bid-simulation?${params.toString()}`);
-  };
-
-  const renderCellWithCopy = (content: string, type: 'Campaign' | 'KW' | 'Search Term') => {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors">
-            {content}
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copy {type}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
-
-  const renderGrp1Table = (groupData: any[]) => {
-    if (groupData.length === 0) {
+  const renderGrp1Table = () => {
+    if (grp1.length === 0) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -359,289 +261,153 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(groupData, 'grp1');
+    const sortedData = sortData(grp1, 'grp1');
     
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
-            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'asin')}
-                >
-                  ASIN
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_asin' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'asin')}
+              >
+                ASIN {getSortIcon('grp1', 'asin')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'campaign')}
-                >
-                  Campaign
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_campaign' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'campaign')}
+              >
+                Campaign {getSortIcon('grp1', 'campaign')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'searchTerm')}
-                >
-                  Search Term
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_searchTerm' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'searchTerm')}
+              >
+                Search Term {getSortIcon('grp1', 'searchTerm')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'kw')}
-                >
-                  KW
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_kw' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'kw')}
+              >
+                KW {getSortIcon('grp1', 'kw')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'matchType')}
-                >
-                  Match
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_matchType' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'matchType')}
+              >
+                Match {getSortIcon('grp1', 'matchType')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('adSpend', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'adSpend')}
-                >
-                  Spend
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_adSpend' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'adSpend', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'adSpend')}
+              >
+                Ad Spend {getSortIcon('grp1', 'adSpend')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('nCvr', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'nCvr')}
-                >
-                  N: CVR
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_nCvr' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'nCvr', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'nCvr')}
+              >
+                N CVR {getSortIcon('grp1', 'nCvr')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('cvrDateRange', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'cvrDateRange')}
-                >
-                  CVR Date Range
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_cvrDateRange' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'cvrDateRange', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'cvrDateRange')}
+              >
+                CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('avgCvrRp1', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'avgCvrRp1')}
-                >
-                  Avg CVR RP1
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp1_avgCvrRp1' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'avgCvrRp1', 'grp1')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'avgCvrRp1')}
+              >
+                Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('avgCvrRp2', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp1', 'avgCvrRp2')}
-                >
-                  Avg CVR RP2
-                </Button>
-              </div>
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp1', 'avgCvrRp2')}
+              >
+                Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
+              </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-0">
+          <div className="min-w-full">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div 
-                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('asin', 'grp1')}px` }}
-                  title={item.asin}
-                >
-                  {item.asin}
-                </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('campaign', 'grp1')}px` }}
-                  title={item.campaign}
-                >
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('searchTerm', 'grp1')}px` }}
-                  title={item.searchTerm}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('kw', 'grp1')}px` }}
-                  title={item.kw}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div 
-                  className="px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('matchType', 'grp1')}px` }}
-                >
+                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
-                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('adSpend', 'grp1')}px` }}
-                >
-                  {formatCurrency(parseFloat(item.adSpend) || 0)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('nCvr', 'grp1')}px` }}
-                >
-                  {item.nCvr}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('cvrDateRange', 'grp1')}px` }}
-                  title={item.cvrDateRange}
-                >
-                  {item.cvrDateRange}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('avgCvrRp1', 'grp1')}px` }}
-                >
-                  {item.avgCvrRp1}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5" 
-                  style={{ width: `${getColumnWidth('avgCvrRp2', 'grp1')}px` }}
-                >
-                  {item.avgCvrRp2}
-                </div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{item.adSpend}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{item.nCvr}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">{item.cvrDateRange}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{item.avgCvrRp1}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px]">{item.avgCvrRp2}</div>
               </div>
             ))}
           </div>
-          
-          {sortedData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No keywords found in this group
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
   };
 
-  const renderGrp2Table = (groupData: any[]) => {
-    if (analysisData.grp2AllGood) {
+  const renderGrp2Table = () => {
+    if (grp2.length === 0) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -653,263 +419,142 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(groupData, 'grp2');
-
+    const sortedData = sortData(grp2, 'grp2');
+    
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
-            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'asin')}
-                >
-                  ASIN
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_asin' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'asin')}
+              >
+                ASIN {getSortIcon('grp2', 'asin')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'campaign')}
-                >
-                  Campaign
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_campaign' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'campaign')}
+              >
+                Campaign {getSortIcon('grp2', 'campaign')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'searchTerm')}
-                >
-                  Search Term
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_searchTerm' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'searchTerm')}
+              >
+                Search Term {getSortIcon('grp2', 'searchTerm')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'kw')}
-                >
-                  KW
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_kw' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'kw')}
+              >
+                KW {getSortIcon('grp2', 'kw')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'matchType')}
-                >
-                  Match
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_matchType' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'matchType')}
+              >
+                Match {getSortIcon('grp2', 'matchType')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('latestBid', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'latestBid')}
-                >
-                  Latest Bid
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_latestBid' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'latestBid', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'latestBid')}
+              >
+                Latest Bid {getSortIcon('grp2', 'latestBid')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('effectiveCeiling', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'effectiveCeiling')}
-                >
-                  Effective
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_effectiveCeiling' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'effectiveCeiling', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'effectiveCeiling')}
+              >
+                Effective Ceiling {getSortIcon('grp2', 'effectiveCeiling')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('adjustedBid', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'adjustedBid')}
-                >
-                  Adjusted
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp2_adjustedBid' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'adjustedBid', 'grp2')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'adjustedBid')}
+              >
+                Adjusted Bid {getSortIcon('grp2', 'adjustedBid')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('mTos', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp2', 'mTos')}
-                >
-                  TOS%
-                </Button>
-              </div>
+            <div className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp2', 'bidDelta')}
+              >
+                Bid Δ {getSortIcon('grp2', 'bidDelta')}
+              </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-0">
+          <div className="min-w-full">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div 
-                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('asin', 'grp2')}px` }}
-                  title={item.asin}
-                >
-                  {item.asin}
-                </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('campaign', 'grp2')}px` }}
-                  title={item.campaign}
-                >
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('searchTerm', 'grp2')}px` }}
-                  title={item.searchTerm}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('kw', 'grp2')}px` }}
-                  title={item.kw}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div 
-                  className="px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('matchType', 'grp2')}px` }}
-                >
+                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
-                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('latestBid', 'grp2')}px` }}
-                >
-                  {formatCurrency(item.latestBid)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('effectiveCeiling', 'grp2')}px` }}
-                >
-                  {formatCurrency(item.effectiveCeiling)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('adjustedBid', 'grp2')}px` }}
-                >
-                  {formatCurrency(item.adjustedBid)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5" 
-                  style={{ width: `${getColumnWidth('mTos', 'grp2')}px` }}
-                >
-                  {item.mTos.toFixed(1)}%
-                </div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">{item.effectiveCeiling.toFixed(2)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[70px]">{formatCurrency(item.bidDelta)}</div>
               </div>
             ))}
           </div>
-          
-          {sortedData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No keywords found in this group
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
   };
 
-  const renderGrp3Table = (groupData: any[]) => {
-    if (analysisData.grp3AllGood) {
+  const renderGrp3Table = () => {
+    if (grp3.length === 0) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -921,238 +566,131 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(groupData, 'grp3');
-
+    const sortedData = sortData(grp3, 'grp3');
+    
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
-            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'asin')}
-                >
-                  ASIN
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_asin' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'asin')}
+              >
+                ASIN {getSortIcon('grp3', 'asin')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'campaign')}
-                >
-                  Campaign
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_campaign' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'campaign')}
+              >
+                Campaign {getSortIcon('grp3', 'campaign')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'searchTerm')}
-                >
-                  Search Term
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_searchTerm' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'searchTerm')}
+              >
+                Search Term {getSortIcon('grp3', 'searchTerm')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'kw')}
-                >
-                  KW
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_kw' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'kw')}
+              >
+                KW {getSortIcon('grp3', 'kw')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'matchType')}
-                >
-                  Match
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_matchType' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'matchType')}
+              >
+                Match {getSortIcon('grp3', 'matchType')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('latestBid', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'latestBid')}
-                >
-                  Latest Bid
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_latestBid' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'latestBid', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'latestBid')}
+              >
+                Latest Bid {getSortIcon('grp3', 'latestBid')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('effectiveCeiling', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'effectiveCeiling')}
-                >
-                  Effective
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp3_effectiveCeiling' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'effectiveCeiling', 'grp3')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'effectiveCeiling')}
+              >
+                Effective Ceiling {getSortIcon('grp3', 'effectiveCeiling')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('mTos', 'grp3')}px` }}>
-              <div className="h-full flex items-center px-1 py-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp3', 'mTos')}
-                >
-                  TOS%
-                </Button>
-              </div>
+            <div className="font-semibold text-[10px] px-1 py-1 w-[85px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'adjustedBid')}
+              >
+                Adjusted Bid {getSortIcon('grp3', 'adjustedBid')}
+              </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-0">
+          <div className="min-w-full">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div 
-                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('asin', 'grp3')}px` }}
-                  title={item.asin}
-                >
-                  {item.asin}
-                </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('campaign', 'grp3')}px` }}
-                  title={item.campaign}
-                >
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('searchTerm', 'grp3')}px` }}
-                  title={item.searchTerm}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('kw', 'grp3')}px` }}
-                  title={item.kw}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div 
-                  className="px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('matchType', 'grp3')}px` }}
-                >
+                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
-                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('latestBid', 'grp3')}px` }}
-                >
-                  {formatCurrency(item.latestBid)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('effectiveCeiling', 'grp3')}px` }}
-                >
-                  {formatCurrency(item.effectiveCeiling)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5" 
-                  style={{ width: `${getColumnWidth('mTos', 'grp3')}px` }}
-                >
-                  {formatAcos(item.mTos)}
-                </div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">{item.effectiveCeiling.toFixed(2)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[85px]">{formatCurrency(item.adjustedBid)}</div>
               </div>
             ))}
           </div>
-          
-          {sortedData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No keywords found in this group
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
   };
 
-  const renderGrp4Table = (groupData: any[]) => {
-    if (analysisData.grp4AllGood) {
+  const renderGrp4Table = () => {
+    if (grp4.length === 0) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -1164,281 +702,135 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(groupData, 'grp4');
-
+    const sortedData = sortData(grp4, 'grp4');
+    
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
-            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'asin')}
-                >
-                  ASIN
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_asin' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+          <div className="flex bg-muted/50">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'asin')}
+              >
+                ASIN {getSortIcon('grp4', 'asin')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'campaign')}
-                >
-                  Campaign
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_campaign' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'campaign')}
+              >
+                Campaign {getSortIcon('grp4', 'campaign')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'searchTerm')}
-                >
-                  Search Term
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_searchTerm' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'searchTerm')}
+              >
+                Search Term {getSortIcon('grp4', 'searchTerm')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'kw')}
-                >
-                  KW
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_kw' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'kw')}
+              >
+                KW {getSortIcon('grp4', 'kw')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'matchType')}
-                >
-                  Match
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_matchType' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'matchType')}
+              >
+                Match {getSortIcon('grp4', 'matchType')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('latestBid', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'latestBid')}
-                >
-                  Latest Bid
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_latestBid' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'latestBid', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'latestBid')}
+              >
+                Latest Bid {getSortIcon('grp4', 'latestBid')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('minSuggestedBid', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'minSuggestedBid')}
-                >
-                  Min. Suggested Bid
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_minSuggestedBid' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'minSuggestedBid', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'mTos')}
+              >
+                M TOS {getSortIcon('grp4', 'mTos')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('effectiveCeiling', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'effectiveCeiling')}
-                >
-                  Effective
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_effectiveCeiling' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'effectiveCeiling', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
+            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'minSuggestedBid')}
+              >
+                Min Suggested Bid {getSortIcon('grp4', 'minSuggestedBid')}
+              </Button>
             </div>
-            <div className="relative" style={{ width: `${getColumnWidth('adjustedBid', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2 border-r border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'adjustedBid')}
-                >
-                  Adjusted
-                </Button>
-              </div>
-              <div
-                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
-                  resizingColumn === 'grp4_adjustedBid' ? 'bg-primary' : ''
-                }`}
-                onMouseDown={(e) => handleMouseDown(e, 'adjustedBid', 'grp4')}
-                style={{ userSelect: 'none' }}
-              />
-            </div>
-            <div className="relative" style={{ width: `${getColumnWidth('mTos', 'grp4')}px` }}>
-              <div className="h-full flex items-center px-1 py-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                  onClick={() => handleSort('grp4', 'mTos')}
-                >
-                  TOS%
-                </Button>
-              </div>
+            <div className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'bidDelta')}
+              >
+                Bid Δ {getSortIcon('grp4', 'bidDelta')}
+              </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-0">
+          <div className="min-w-full">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div 
-                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('asin', 'grp4')}px` }}
-                  title={item.asin}
-                >
-                  {item.asin}
-                </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('campaign', 'grp4')}px` }}
-                  title={item.campaign}
-                >
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('searchTerm', 'grp4')}px` }}
-                  title={item.searchTerm}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div 
-                  className="text-[10px] py-0.5 border-r border-border truncate" 
-                  style={{ width: `${getColumnWidth('kw', 'grp4')}px` }}
-                  title={item.kw}
-                >
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div 
-                  className="px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('matchType', 'grp4')}px` }}
-                >
+                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
                   <Badge 
                     variant="outline" 
-                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('latestBid', 'grp4')}px` }}
-                >
-                  {formatCurrency(item.latestBid)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('minSuggestedBid', 'grp4')}px` }}
-                >
-                  {formatCurrency(item.minSuggestedBid)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('effectiveCeiling', 'grp4')}px` }}
-                >
-                  {formatCurrency(item.effectiveCeiling)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5 border-r border-border" 
-                  style={{ width: `${getColumnWidth('adjustedBid', 'grp4')}px` }}
-                >
-                  {formatCurrency(item.adjustedBid)}
-                </div>
-                <div 
-                  className="text-[10px] px-1 py-0.5" 
-                  style={{ width: `${getColumnWidth('mTos', 'grp4')}px` }}
-                >
-                  {formatAcos(item.mTos)}
-                </div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{item.mTos}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">{formatCurrency(item.minSuggestedBid)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[70px]">{formatCurrency(item.bidDelta)}</div>
               </div>
             ))}
           </div>
-          
-          {sortedData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No keywords found in this group
-            </div>
-          )}
         </ScrollArea>
       </div>
     );
@@ -1450,37 +842,17 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/10 rounded-lg">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Target className="h-5 w-5 text-emerald-600 cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-md">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Global Widget Filter:</p>
-                    <div className="text-xs space-y-1">
-                      <p><strong>Condition 1:</strong> Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS</p>
-                      <p><strong>OR</strong></p>
-                      <p><strong>Condition 2:</strong> Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price)</p>
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
+              <TrendingDown className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
               <CardTitle className="text-lg text-emerald-700">
                 KWs with desirable ACOS in RP # 2, why are we underbidding?
               </CardTitle>
-              <CardDescription className="text-sm">
-                Active file: {activeFileName.replace('.csv', '')}
-              </CardDescription>
-            </div>
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            <Badge variant="outline" className="text-xs">
-              Filtered: {analysisData.filteredRows} / {totalRows}
-            </Badge>
-            <div className="text-xs text-muted-foreground">
-              Global filter applied
+              {activeFileName && (
+                <CardDescription className="text-sm text-muted-foreground mt-1">
+                  Active file: {activeFileName.replace('.csv', '')}
+                </CardDescription>
+              )}
             </div>
           </div>
         </div>
@@ -1494,7 +866,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp1" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#1 ({analysisData.grp1.length} - {getPercentage(analysisData.grp1.length)}%)</span>
+                      <span className="truncate">GRP#1 ({grp1.length})</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -1508,13 +880,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp2" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#2 ({analysisData.grp2.length} - {getPercentage(analysisData.grp2.length)}%)</span>
+                      <span className="truncate">GRP#2 ({grp2.length})</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 2 Filter Logic:</p>
-                  <p className="text-xs">Latest Bid ≤ effective_ceiling AND Δ &lt; 0 AND TOS% ≤ 50</p>
+                  <p className="text-xs">effective_ceiling = 0.03</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -1522,13 +894,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp3" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#3 ({analysisData.grp3.length} - {getPercentage(analysisData.grp3.length)}%)</span>
+                      <span className="truncate">GRP#3 ({grp3.length})</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
-                  <p className="text-xs">Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND TOS% &gt; 50</p>
+                  <p className="text-xs">effective_ceiling = 0.04</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -1536,32 +908,32 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp4" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#4 ({analysisData.grp4.length} - {getPercentage(analysisData.grp4.length)}%)</span>
+                      <span className="truncate">GRP#4 ({grp4.length})</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 4 Filter Logic:</p>
-                  <p className="text-xs">effective_ceiling &gt; 0.02 AND (Min. Suggested Bid - Latest Bid) &gt; 0.5 AND Δ ≤ 0 AND TOS% ≤ 50</p>
+                  <p className="text-xs">effective_ceiling &gt; 0.04</p>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
           </TooltipProvider>
           
-          <TabsContent value="grp1" className="mt-4 h-[calc(100%-56px)]">
-            {renderGrp1Table(analysisData.grp1)}
+          <TabsContent value="grp1" className="h-[calc(100%-50px)] mt-4">
+            {renderGrp1Table()}
           </TabsContent>
           
-          <TabsContent value="grp2" className="mt-4 h-[calc(100%-56px)]">
-            {renderGrp2Table(analysisData.grp2)}
+          <TabsContent value="grp2" className="h-[calc(100%-50px)] mt-4">
+            {renderGrp2Table()}
           </TabsContent>
           
-          <TabsContent value="grp3" className="mt-4 h-[calc(100%-56px)]">
-            {renderGrp3Table(analysisData.grp3)}
+          <TabsContent value="grp3" className="h-[calc(100%-50px)] mt-4">
+            {renderGrp3Table()}
           </TabsContent>
-
-          <TabsContent value="grp4" className="mt-4 h-[calc(100%-56px)]">
-            {renderGrp4Table(analysisData.grp4)}
+          
+          <TabsContent value="grp4" className="h-[calc(100%-50px)] mt-4">
+            {renderGrp4Table()}
           </TabsContent>
         </Tabs>
       </CardContent>
