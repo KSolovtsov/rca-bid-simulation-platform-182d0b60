@@ -32,6 +32,8 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [isResizing, setIsResizing] = useState(false);
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
+  const [startX, setStartX] = useState(0);
+  const [startWidths, setStartWidths] = useState<{ current: number; next: number }>({ current: 0, next: 0 });
   
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
@@ -250,6 +252,16 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     return defaultWidths[columnKey] || 80;
   };
 
+  // Get column order for each group to find adjacent column
+  const getColumnOrder = (group: string) => {
+    const orders = {
+      grp1: ['asin', 'searchTerm', 'campaign', 'kw', 'matchType', 'cvr', 'avgCvrRp2', 'tosPercent'],
+      grp2: ['asin', 'searchTerm', 'campaign', 'kw', 'matchType', 'latestBid', 'cvr', 'avgCvrRp2', 'tosPercent'],
+      grp3: ['asin', 'searchTerm', 'campaign', 'kw', 'matchType', 'latestBid', 'cvr', 'avgCvrRp2', 'adSpend', 'cvrWaterfallLevel', 'clicks']
+    };
+    return orders[group] || [];
+  };
+
   // Handle column resize
   const handleMouseDown = (e: React.MouseEvent, columnKey: string, group: string) => {
     e.preventDefault();
@@ -257,14 +269,26 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     const resizeKey = `${group}_${columnKey}`;
     setResizingColumn(resizeKey);
     
-    const startX = e.clientX;
-    const startWidth = getColumnWidth(columnKey, group);
+    const columns = getColumnOrder(group);
+    const currentIndex = columns.indexOf(columnKey);
+    const nextColumn = currentIndex < columns.length - 1 ? columns[currentIndex + 1] : null;
+    
+    if (!nextColumn) return; // Last column cannot be resized
+    
+    setStartX(e.clientX);
+    const currentWidth = getColumnWidth(columnKey, group);
+    const nextWidth = getColumnWidth(nextColumn, group);
+    setStartWidths({ current: currentWidth, next: nextWidth });
     
     const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.max(50, startWidth + (e.clientX - startX));
+      const deltaX = e.clientX - startX;
+      const newCurrentWidth = Math.max(50, startWidths.current + deltaX);
+      const newNextWidth = Math.max(50, startWidths.next - deltaX);
+      
       setColumnWidths(prev => ({
         ...prev,
-        [resizeKey]: newWidth
+        [`${group}_${columnKey}`]: newCurrentWidth,
+        [`${group}_${nextColumn}`]: newNextWidth
       }));
     };
     
@@ -518,7 +542,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               />
             </div>
             <div className="relative" style={{ width: `${getColumnWidth('tosPercent', 'grp1')}px` }}>
-              <div className="h-full flex items-center px-1 py-1">
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -771,7 +795,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
               />
             </div>
             <div className="relative" style={{ width: `${getColumnWidth('tosPercent', 'grp2')}px` }}>
-              <div className="h-full flex items-center px-1 py-1">
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -876,135 +900,235 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'asin')}
-              >
-                ASIN
-              </Button>
+          <div className="flex bg-muted/50" style={{ minWidth: 'fit-content' }}>
+            <div className="relative" style={{ width: `${getColumnWidth('asin', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'asin')}
+                >
+                  ASIN
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_asin' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'asin', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'searchTerm')}
-              >
-                Search Term
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('searchTerm', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'searchTerm')}
+                >
+                  Search Term
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_searchTerm' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'searchTerm', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'campaign')}
-              >
-                Campaign
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('campaign', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'campaign')}
+                >
+                  Campaign
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_campaign' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'campaign', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'kw')}
-              >
-                KW
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('kw', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'kw')}
+                >
+                  KW
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_kw' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'kw', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'matchType')}
-              >
-                Match
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('matchType', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'matchType')}
+                >
+                  Match
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_matchType' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'matchType', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'latestBid')}
-              >
-                Latest Bid
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('latestBid', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'latestBid')}
+                >
+                  Latest Bid
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_latestBid' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'latestBid', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'cvr')}
-              >
-                CVR
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('cvr', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'cvr')}
+                >
+                  CVR
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_cvr' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'cvr', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'avgCvrRp2')}
-              >
-                Avg CVR RP2
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('avgCvrRp2', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'avgCvrRp2')}
+                >
+                  Avg CVR RP2
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_avgCvrRp2' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'avgCvrRp2', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'adSpend')}
-              >
-                Ad Spend
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('adSpend', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'adSpend')}
+                >
+                  Ad Spend
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_adSpend' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'adSpend', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'cvrWaterfallLevel')}
-              >
-                CVR Waterfall
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('cvrWaterfallLevel', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'cvrWaterfallLevel')}
+                >
+                  CVR Waterfall
+                </Button>
+              </div>
+              <div
+                className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/50 transition-colors ${
+                  resizingColumn === 'grp3_cvrWaterfallLevel' ? 'bg-primary' : ''
+                }`}
+                onMouseDown={(e) => handleMouseDown(e, 'cvrWaterfallLevel', 'grp3')}
+              />
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[50px]">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'clicks')}
-              >
-                Clicks
-              </Button>
+            <div className="relative" style={{ width: `${getColumnWidth('clicks', 'grp3')}px` }}>
+              <div className="h-full flex items-center px-1 py-1 border-r border-border">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                  onClick={() => handleSort('grp3', 'clicks')}
+                >
+                  Clicks
+                </Button>
+              </div>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="min-w-full">
+          <div style={{ minWidth: 'fit-content' }}>
             {sortedData.map((item, index) => (
               <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30" title={item.searchTerm}>
+                <div 
+                  className="font-mono text-[10px] px-1 py-0.5 border-r border-border/30 truncate"
+                  style={{ width: `${getColumnWidth('asin', 'grp3')}px` }}
+                >
+                  {item.asin}
+                </div>
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('searchTerm', 'grp3')}px` }}
+                  title={item.searchTerm}
+                >
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('campaign', 'grp3')}px` }}
+                >
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div 
+                  className="text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('kw', 'grp3')}px` }}
+                >
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[63px] border-r border-border/30">
+                <div 
+                  className="px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('matchType', 'grp3')}px` }}
+                >
                   <Badge 
                     variant="outline" 
                     className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -1013,12 +1137,42 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{formatCurrency(item.adSpend)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{item.cvrWaterfallLevel || '-'}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[50px]">{item.clicks}</div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('latestBid', 'grp3')}px` }}
+                >
+                  {formatCurrency(item.latestBid)}
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('cvr', 'grp3')}px` }}
+                >
+                  {(item.cvr * 100).toFixed(2)}%
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('avgCvrRp2', 'grp3')}px` }}
+                >
+                  {(item.avgCvrRp2 * 100).toFixed(2)}%
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('adSpend', 'grp3')}px` }}
+                >
+                  {formatCurrency(item.adSpend)}
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5 border-r border-border/30"
+                  style={{ width: `${getColumnWidth('cvrWaterfallLevel', 'grp3')}px` }}
+                >
+                  {item.cvrWaterfallLevel || '-'}
+                </div>
+                <div 
+                  className="text-center text-[10px] px-1 py-0.5"
+                  style={{ width: `${getColumnWidth('clicks', 'grp3')}px` }}
+                >
+                  {item.clicks}
+                </div>
               </div>
             ))}
           </div>

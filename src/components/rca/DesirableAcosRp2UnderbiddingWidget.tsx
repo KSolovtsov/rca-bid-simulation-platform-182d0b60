@@ -57,6 +57,8 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [isResizing, setIsResizing] = useState(false);
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
+  const [startX, setStartX] = useState(0);
+  const [startWidths, setStartWidths] = useState<{ current: number; next: number }>({ current: 0, next: 0 });
   
   const analysisData = useMemo(() => {
     if (!data || !Array.isArray(data)) return { grp1: [], grp2: [], grp3: [], grp4: [], filteredRows: 0, globalFilteredData: [] };
@@ -251,6 +253,17 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     return defaultWidths[columnKey] || 80;
   };
 
+  // Get column order for each group to find adjacent column
+  const getColumnOrder = (group: string) => {
+    const orders = {
+      grp1: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'adSpend', 'nCvr', 'cvrDateRange', 'avgCvrRp1', 'avgCvrRp2'],
+      grp2: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'latestBid', 'effectiveCeiling', 'adjustedBid', 'bidDelta'],
+      grp3: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'latestBid', 'effectiveCeiling', 'adjustedBid'],
+      grp4: ['asin', 'campaign', 'searchTerm', 'kw', 'matchType', 'latestBid', 'mTos', 'minSuggestedBid', 'bidDelta']
+    };
+    return orders[group] || [];
+  };
+
   // Handle column resize
   const handleMouseDown = (e: React.MouseEvent, columnKey: string, group: string) => {
     e.preventDefault();
@@ -258,14 +271,26 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     const resizeKey = `${group}_${columnKey}`;
     setResizingColumn(resizeKey);
     
-    const startX = e.clientX;
-    const startWidth = getColumnWidth(columnKey, group);
+    const columns = getColumnOrder(group);
+    const currentIndex = columns.indexOf(columnKey);
+    const nextColumn = currentIndex < columns.length - 1 ? columns[currentIndex + 1] : null;
+    
+    if (!nextColumn) return; // Last column cannot be resized
+    
+    setStartX(e.clientX);
+    const currentWidth = getColumnWidth(columnKey, group);
+    const nextWidth = getColumnWidth(nextColumn, group);
+    setStartWidths({ current: currentWidth, next: nextWidth });
     
     const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.max(50, startWidth + (e.clientX - startX));
+      const deltaX = e.clientX - startX;
+      const newCurrentWidth = Math.max(50, startWidths.current + deltaX);
+      const newNextWidth = Math.max(50, startWidths.next - deltaX);
+      
       setColumnWidths(prev => ({
         ...prev,
-        [resizeKey]: newWidth
+        [`${group}_${columnKey}`]: newCurrentWidth,
+        [`${group}_${nextColumn}`]: newNextWidth
       }));
     };
     
