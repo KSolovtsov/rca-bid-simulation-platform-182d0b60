@@ -214,6 +214,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         avgCvrRp2: parseFloat(row['Avg CVR Reporting Period # 2']) || 0,
         adSpend: parseFloat(row['J: Ad Spend']) || 0,
         clicks: parseFloat(row['L: Clicks']) || 0,
+        cvrWaterfallLevel: row['CVR Waterfall Level'] || '-',
       }))
       .slice(0, 50);
   }, [baseFilteredData]);
@@ -696,6 +697,16 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 Ad Spend
               </Button>
             </div>
+            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp3', 'cvrWaterfallLevel')}
+              >
+                CVR Waterfall Level
+              </Button>
+            </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[50px]">
               <Button
                 variant="ghost"
@@ -736,6 +747,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{formatCurrency(item.adSpend)}</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{item.cvrWaterfallLevel || '-'}</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[50px]">{item.clicks}</div>
               </div>
             ))}
