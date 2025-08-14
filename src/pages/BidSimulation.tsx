@@ -21,6 +21,9 @@ const BidSimulation = () => {
   const { toast } = useToast();
   
   const handleBack = () => {
+    console.log('Back button clicked');
+    console.log('Window history length:', window.history.length);
+    
     // Проверяем, есть ли история для возврата
     if (window.history.length > 1) {
       navigate(-1);
@@ -90,7 +93,15 @@ const BidSimulation = () => {
         const minSuggestedBid1 = toNumber(getValue('O: Min. Suggested Bid'));
         const currentBid1 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
         
-        // Debug logging removed
+        console.log('Agency Underbidding #1 filter check:', {
+          syncStatus: !syncStatus1,
+          appliedAcos: appliedAcos1,
+          adSpend: adSpend1,
+          tosPercent: tosPercent1,
+          minSuggestedBid: minSuggestedBid1,
+          currentBid: currentBid1,
+          result: !syncStatus1 && appliedAcos1 === 9999 && adSpend1 === 0 && tosPercent1 <= 0 && minSuggestedBid1 > currentBid1
+        });
         
         return !syncStatus1 && 
                appliedAcos1 === 9999 && 
@@ -104,7 +115,13 @@ const BidSimulation = () => {
         const targetAcos2 = toNumber(getValue('G: Target ACOS'));
         const currentBid2 = toNumber(getValue('Current Bid As displayed on Amazon Seller Central'));
         
-        // Debug logging removed
+        console.log('Agency Overbidding #1 filter check:', {
+          syncStatus: !syncStatus2,
+          appliedAcos: appliedAcos2,
+          targetAcos: targetAcos2,
+          currentBid: currentBid2,
+          result: !syncStatus2 && appliedAcos2 < 9999 && appliedAcos2 > targetAcos2 && currentBid2 > 0.2
+        });
         
         return !syncStatus2 && 
                appliedAcos2 < 9999 && 
@@ -139,7 +156,12 @@ const BidSimulation = () => {
         const targetAcos5 = toNumber(getValue('G: Target ACOS'));
         const latestBid5 = toNumber(getValue('Latest Bid Calculated by the System'));
         
-        // Debug logging removed
+        console.log('Portal Overbidding #1 filter check:', {
+          appliedAcos: appliedAcos5,
+          targetAcos: targetAcos5,
+          latestBid: latestBid5,
+          result: appliedAcos5 < 9999 && appliedAcos5 > targetAcos5 && latestBid5 > 0.02
+        });
         
         return appliedAcos5 < 9999 && 
                appliedAcos5 > targetAcos5 && 
@@ -163,7 +185,12 @@ const BidSimulation = () => {
         const targetAcos7 = toNumber(getValue('G: Target ACOS'));
         const latestBid7 = toNumber(getValue('Latest Bid Calculated by the System'));
         
-        // Debug logging removed
+        console.log('Portal Underbidding #1 filter check:', {
+          appliedAcos: appliedAcos7,
+          targetAcos: targetAcos7,
+          latestBid: latestBid7,
+          result: appliedAcos7 < 9999 && appliedAcos7 < targetAcos7 && latestBid7 === 0.02
+        });
         
         return appliedAcos7 < 9999 && 
                appliedAcos7 < targetAcos7 && 
@@ -176,7 +203,14 @@ const BidSimulation = () => {
         const price8 = toNumber(getValue('K: Price'));
         const latestBid8 = toNumber(getValue('Latest Bid Calculated by the System'));
         
-        // Debug logging removed
+        console.log('Portal Underbidding #2 filter check:', {
+          appliedAcos: appliedAcos8,
+          adSpend: adSpend8,
+          targetAcos: targetAcos8,
+          price: price8,
+          latestBid: latestBid8,
+          result: appliedAcos8 === 9999 && adSpend8 < (targetAcos8 * price8) && latestBid8 === 0.02
+        });
         
         return appliedAcos8 === 9999 && 
                adSpend8 < (targetAcos8 * price8) && 
@@ -187,7 +221,12 @@ const BidSimulation = () => {
         const latestBid9 = toNumber(getValue('Latest Bid Calculated by the System'));
         const adSpend9 = toNumber(getValue('J: Ad Spend'));
         
-        // Debug logging removed
+        console.log('Portal Underbidding #3 filter check:', {
+          minSuggestedBid: minSuggestedBid9,
+          latestBid: latestBid9,
+          adSpend: adSpend9,
+          result: minSuggestedBid9 > latestBid9 && adSpend9 === 0
+        });
         
         return minSuggestedBid9 > latestBid9 && 
                adSpend9 === 0;
@@ -200,7 +239,15 @@ const BidSimulation = () => {
         const latestBid10 = toNumber(getValue('Latest Bid Calculated by the System'));
         const delta10 = currentBidAmazon10 - latestBid10;
         
-        // Debug logging removed
+        console.log('Portal Underbidding #4 filter check:', {
+          syncStatus: syncStatus10,
+          appliedAcos: appliedAcos10,
+          targetAcos: targetAcos10,
+          currentBidAmazon: currentBidAmazon10,
+          latestBid: latestBid10,
+          delta: delta10,
+          result: !syncStatus10 && appliedAcos10 < targetAcos10 && delta10 > 0.26
+        });
         
         return !syncStatus10 && 
                appliedAcos10 < targetAcos10 && 
@@ -365,7 +412,11 @@ const BidSimulation = () => {
       // Handle RCA Portal/Agency format with complex logic
       const filterType = searchParams.get('filter_type');
       
-      // Debug logging removed
+      console.log('RCA Filter Debug:', {
+        source,
+        filterType,
+        allParams: Object.fromEntries(searchParams.entries())
+      });
       
       if (filterType) {
         // Store the complex filter type for special handling
@@ -374,7 +425,7 @@ const BidSimulation = () => {
           value: filterType
         };
         
-        // Debug logging removed
+        console.log('Applied RCA complex filter:', filterType);
       }
     }
     
@@ -408,7 +459,12 @@ const BidSimulation = () => {
             actualSource = 'agency';
           }
           
-          // Debug logging removed
+          console.log('RCA Complex Filter Apply:', {
+            filterValue: filter.value,
+            actualSource,
+            urlSource,
+            column
+          });
           
           return applyRcaComplexFilter(row, filter.value, actualSource);
         }
@@ -878,7 +934,7 @@ const BidSimulation = () => {
           }
         }
       } catch (error) {
-        // Debug logging removed
+        console.log('Date parsing failed for:', value, error);
       }
     }
     
@@ -938,7 +994,7 @@ const BidSimulation = () => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Debug logging removed
+                console.log('Back button clicked - event handler called');
                 handleBack();
               }}
               style={{ pointerEvents: 'auto' }}

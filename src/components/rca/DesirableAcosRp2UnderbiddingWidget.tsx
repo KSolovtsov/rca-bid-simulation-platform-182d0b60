@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { TrendingDown, Target, ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Copy } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useIndexedDbStorage } from '@/hooks/use-indexed-db-storage';
@@ -91,126 +91,84 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         cvrDateRange: row['CVR Date Range'] || '',
         avgCvrRp1: row['Avg CVR Reporting Period # 1'] || '',
         avgCvrRp2: row['Avg CVR Reporting Period # 2'] || '',
-      }))
-      .slice(0, 50);
+      }));
 
-    // GRP # 2: effective_ceiling = 0.03
-    const grp2 = globalFilteredData
-      .filter(row => {
-        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-        return effectiveCeiling === 0.03;
-      })
-      .map(row => ({
-        asin: row['ASIN'] || '',
-        campaign: row['Campaign'] || '',
-        searchTerm: row['Search Term'] || '',
-        kw: row['KW'] || '',
-        matchType: row['Match Type'] || '',
-        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-        effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
-        adjustedBid: parseFloat(row['Adjusted Bid']) || 0,
-        bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Current Bid As displayed on Amazon Seller Central']) || 0),
-      }))
-      .slice(0, 50);
+    // GRP # 2: Latest Bid <= effective_ceiling && Δ < 0 && TOS% <= 0.5
+    const grp2Data = globalFilteredData.map(row => ({
+      asin: row['ASIN'] || '',
+      campaign: row['Campaign'] || '',
+      searchTerm: row['Search Term'] || '',
+      kw: row['KW'] || '',
+      matchType: row['Match Type'] || '',
+      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+      adjustedBid: parseFloat(row['adjusted_bid']) || 0,
+      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
+      mTos: parseFloat(row['M: TOS%']) || 0,
+    }));
+    
+    const grp2Violations = grp2Data.filter(item => {
+      return item.latestBid <= item.effectiveCeiling && item.bidDelta < 0 && item.mTos <= 50;
+    });
 
-    // GRP # 3: effective_ceiling = 0.04
-    const grp3 = globalFilteredData
-      .filter(row => {
-        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-        return effectiveCeiling === 0.04;
-      })
-      .map(row => ({
-        asin: row['ASIN'] || '',
-        campaign: row['Campaign'] || '',
-        searchTerm: row['Search Term'] || '',
-        kw: row['KW'] || '',
-        matchType: row['Match Type'] || '',
-        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-        effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
-        adjustedBid: parseFloat(row['Adjusted Bid']) || 0,
-      }))
-      .slice(0, 50);
+    // GRP # 3: Latest Bid < effective_ceiling && Δ > 0 && TOS% > 0.5
+    const grp3Data = globalFilteredData.map(row => ({
+      asin: row['ASIN'] || '',
+      campaign: row['Campaign'] || '',
+      searchTerm: row['Search Term'] || '',
+      kw: row['KW'] || '',
+      matchType: row['Match Type'] || '',
+      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
+      mTos: parseFloat(row['M: TOS%']) || 0,
+    }));
+    
+    const grp3Violations = grp3Data.filter(item => {
+      return item.latestBid < item.effectiveCeiling && item.bidDelta > 0 && item.mTos > 50;
+    });
 
-    // GRP # 4: effective_ceiling > 0.04
-    const grp4 = globalFilteredData
-      .filter(row => {
-        const effectiveCeiling = parseFloat(row['effective_ceiling']) || 0;
-        return effectiveCeiling > 0.04;
-      })
-      .map(row => ({
-        asin: row['ASIN'] || '',
-        campaign: row['Campaign'] || '',
-        searchTerm: row['Search Term'] || '',
-        kw: row['KW'] || '',
-        matchType: row['Match Type'] || '',
-        latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
-        mTos: row['M: TOS%'] || '',
-        minSuggestedBid: parseFloat(row['O: Min. Suggested Bid']) || 0,
-        bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Current Bid As displayed on Amazon Seller Central']) || 0),
-      }))
-      .slice(0, 50);
-
+    // GRP # 4: effective_ceiling > 0.02 && (Min. Suggested Bid - Latest Bid) > 0.5 && Δ <= 0 && TOS% <= 0.5
+    const grp4Data = globalFilteredData.map(row => ({
+      asin: row['ASIN'] || '',
+      campaign: row['Campaign'] || '',
+      searchTerm: row['Search Term'] || '',
+      kw: row['KW'] || '',
+      matchType: row['Match Type'] || '',
+      latestBid: parseFloat(row['Latest Bid Calculated by the System']) || 0,
+      minSuggestedBid: parseFloat(row['O: Min. Suggested Bid']) || 0,
+      effectiveCeiling: parseFloat(row['effective_ceiling']) || 0,
+      adjustedBid: parseFloat(row['adjusted_bid']) || 0,
+      bidDelta: (parseFloat(row['Latest Bid Calculated by the System']) || 0) - (parseFloat(row['Previous Bid Calculated by the System']) || 0),
+      mTos: parseFloat(row['M: TOS%']) || 0,
+    }));
+    
+    const grp4Violations = grp4Data.filter(item => {
+      const minSuggestedBidDelta = item.minSuggestedBid - item.latestBid;
+      return item.effectiveCeiling > 0.02 && minSuggestedBidDelta > 0.5 && item.bidDelta <= 0 && item.mTos <= 50;
+    });
+    
     return {
       grp1,
-      grp2,
-      grp3,
-      grp4,
+      grp2: grp2Violations,
+      grp3: grp3Violations,
+      grp4: grp4Violations,
+      grp2AllGood: grp2Violations.length === 0,
+      grp3AllGood: grp3Violations.length === 0,
+      grp4AllGood: grp4Violations.length === 0,
       filteredRows: globalFilteredData.length,
-      globalFilteredData
+      globalFilteredData: globalFilteredData,
     };
   }, [data]);
 
-  const { grp1, grp2, grp3, grp4 } = analysisData;
-
-  const getSortIcon = (group: 'grp1' | 'grp2' | 'grp3' | 'grp4', field: string) => {
-    const sort = sortConfig[group];
-    if (sort?.field !== field) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    return sort.direction === 'asc' 
-      ? <ArrowUp className="h-3 w-3" />
-      : <ArrowDown className="h-3 w-3" />;
-  };
-
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
-
-  const copyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      toast.success(`${type} copied to clipboard`);
-    }).catch(() => {
-      toast.error('Failed to copy to clipboard');
-    });
-  };
-
-  const renderCellWithCopy = (content: string, type: 'Search Term' | 'Campaign' | 'KW') => {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors truncate">
-            {content}
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copy {type}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
-
-  const handleMatchTypeClick = (item: any) => {
-    const params = new URLSearchParams();
-    params.set('source', 'rca_analysis');
-    params.set('filter_kw', 'KW');
-    params.set('value_kw', item.kw);
-    params.set('operator_kw', 'equals');
-    params.set('filter_campaign', 'Campaign');
-    params.set('value_campaign', item.campaign);
-    params.set('operator_campaign', 'equals');
-    params.set('filter_match', 'Match Type');
-    params.set('value_match', item.matchType);
-    params.set('operator_match', 'equals');
-    navigate(`/bid-simulation?${params.toString()}`);
+  const formatAcos = (value: number) => `${value.toFixed(1)}%`;
+  
+  const totalRows = data ? data.length : 0;
+  
+  // Calculate percentages
+  const getPercentage = (count: number) => {
+    return totalRows > 0 ? ((count / totalRows) * 100).toFixed(1) : '0.0';
   };
 
   const handleSort = (group: 'grp1' | 'grp2' | 'grp3' | 'grp4', field: string) => {
@@ -231,25 +189,76 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       const aVal = a[sort.field];
       const bVal = b[sort.field];
       
-      // Special handling for numeric fields
-      if (sort.field === 'latestBid' || sort.field === 'effectiveCeiling' || sort.field === 'adjustedBid' || 
-          sort.field === 'bidDelta' || sort.field === 'minSuggestedBid') {
+      // Special handling for numeric fields that might be stored as strings
+      if (sort.field === 'adSpend' || sort.field === 'latestBid' || sort.field === 'effectiveCeiling' || 
+          sort.field === 'minSuggestedBid' || sort.field === 'adjustedBid' || sort.field === 'mTos' || 
+          sort.field === 'bidDelta') {
         const aNum = parseFloat(aVal) || 0;
         const bNum = parseFloat(bVal) || 0;
         return sort.direction === 'asc' ? aNum - bNum : bNum - aNum;
       }
       
-      // String comparison
-      const aStr = String(aVal || '').toLowerCase();
-      const bStr = String(bVal || '').toLowerCase();
-      if (aStr < bStr) return sort.direction === 'asc' ? -1 : 1;
-      if (aStr > bStr) return sort.direction === 'asc' ? 1 : -1;
-      return 0;
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sort.direction === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+      
+      return sort.direction === 'asc' ? aVal - bVal : bVal - aVal;
     });
   };
 
-  const renderGrp1Table = () => {
-    if (grp1.length === 0) {
+  const getSortIcon = (group: 'grp1' | 'grp2' | 'grp3' | 'grp4', field: string) => {
+    const sort = sortConfig[group];
+    if (sort?.field !== field) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
+    return sort.direction === 'asc' 
+      ? <ArrowUp className="h-3 w-3" />
+      : <ArrowDown className="h-3 w-3" />;
+  };
+
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success(`${type} copied to clipboard`);
+    }).catch(() => {
+      toast.error('Failed to copy to clipboard');
+    });
+  };
+
+  const handleMatchTypeClick = (item: any) => {
+    const params = new URLSearchParams();
+    params.set('source', 'rca_analysis');
+    params.set('filter_kw', 'KW');
+    params.set('value_kw', item.kw || item.searchTerm);
+    params.set('operator_kw', 'equals');
+    params.set('filter_campaign', 'Campaign');
+    params.set('value_campaign', item.campaign);
+    params.set('operator_campaign', 'equals');
+    params.set('filter_match', 'Match Type');
+    params.set('value_match', item.matchType);
+    params.set('operator_match', 'equals');
+    navigate(`/bid-simulation?${params.toString()}`);
+  };
+
+  const renderCellWithCopy = (content: string, type: 'Campaign' | 'KW' | 'Search Term') => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors">
+            {content}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => copyToClipboard(content, type)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy {type}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
+  const renderGrp1Table = (groupData: any[]) => {
+    if (groupData.length === 0) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -261,153 +270,159 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(grp1, 'grp1');
+    const sortedData = sortData(groupData, 'grp1');
     
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'asin')}
               >
-                ASIN {getSortIcon('grp1', 'asin')}
+                ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'campaign')}
               >
-                Campaign {getSortIcon('grp1', 'campaign')}
+                Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp1', 'searchTerm')}
+                Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'kw')}
               >
-                KW {getSortIcon('grp1', 'kw')}
+                KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'matchType')}
               >
-                Match {getSortIcon('grp1', 'matchType')}
+                Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[63px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'adSpend')}
               >
-                Ad Spend {getSortIcon('grp1', 'adSpend')}
+                Spend
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'nCvr')}
               >
-                N CVR {getSortIcon('grp1', 'nCvr')}
+                N: CVR
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[106px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'cvrDateRange')}
               >
-                CVR Date Range {getSortIcon('grp1', 'cvrDateRange')}
+                CVR Date Range
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[85px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'avgCvrRp1')}
               >
-                Avg CVR RP1 {getSortIcon('grp1', 'avgCvrRp1')}
+                Avg CVR RP1
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[85px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[40px]">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'avgCvrRp2')}
               >
-                Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
+                Avg CVR RP2
               </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="min-w-full">
+          <div className="space-y-0">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
+                <div className="px-1 py-0.5 w-[63px] border-r border-border">
                   <Badge 
                     variant="outline" 
-                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{item.adSpend}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{item.nCvr}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">{item.cvrDateRange}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{item.avgCvrRp1}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px]">{item.avgCvrRp2}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[63px] border-r border-border">{formatCurrency(parseFloat(item.adSpend) || 0)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[106px] border-r border-border truncate" title={item.cvrDateRange}>{item.cvrDateRange}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[85px] border-r border-border">{item.avgCvrRp1}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[40px]">{item.avgCvrRp2}</div>
               </div>
             ))}
           </div>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No keywords found in this group
+            </div>
+          )}
         </ScrollArea>
       </div>
     );
   };
 
-  const renderGrp2Table = () => {
-    if (grp2.length === 0) {
+  const renderGrp2Table = (groupData: any[]) => {
+    if (analysisData.grp2AllGood) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -419,142 +434,148 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(grp2, 'grp2');
-    
+    const sortedData = sortData(groupData, 'grp2');
+
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'asin')}
               >
-                ASIN {getSortIcon('grp2', 'asin')}
+                ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'campaign')}
               >
-                Campaign {getSortIcon('grp2', 'campaign')}
+                Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp2', 'searchTerm')}
+                Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'kw')}
               >
-                KW {getSortIcon('grp2', 'kw')}
+                KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'matchType')}
               >
-                Match {getSortIcon('grp2', 'matchType')}
+                Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp2', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'effectiveCeiling')}
               >
-                Effective Ceiling {getSortIcon('grp2', 'effectiveCeiling')}
+                Effective
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[66px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'adjustedBid')}
               >
-                Adjusted Bid {getSortIcon('grp2', 'adjustedBid')}
+                Adjusted
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[54px]">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp2', 'bidDelta')}
+                onClick={() => handleSort('grp2', 'mTos')}
               >
-                Bid Δ {getSortIcon('grp2', 'bidDelta')}
+                TOS%
               </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="min-w-full">
+          <div className="space-y-0">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
+                <div className="px-1 py-0.5 w-[70px] border-r border-border">
                   <Badge 
                     variant="outline" 
-                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">{item.effectiveCeiling.toFixed(2)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[70px]">{formatCurrency(item.bidDelta)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[66px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[54px]">{item.mTos.toFixed(1)}%</div>
               </div>
             ))}
           </div>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No keywords found in this group
+            </div>
+          )}
         </ScrollArea>
       </div>
     );
   };
 
-  const renderGrp3Table = () => {
-    if (grp3.length === 0) {
+  const renderGrp3Table = (groupData: any[]) => {
+    if (analysisData.grp3AllGood) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -566,131 +587,137 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(grp3, 'grp3');
-    
+    const sortedData = sortData(groupData, 'grp3');
+
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'asin')}
               >
-                ASIN {getSortIcon('grp3', 'asin')}
+                ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'campaign')}
               >
-                Campaign {getSortIcon('grp3', 'campaign')}
+                Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp3', 'searchTerm')}
+                Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'kw')}
               >
-                KW {getSortIcon('grp3', 'kw')}
+                KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'matchType')}
               >
-                Match {getSortIcon('grp3', 'matchType')}
+                Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp3', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'effectiveCeiling')}
               >
-                Effective Ceiling {getSortIcon('grp3', 'effectiveCeiling')}
+                Effective
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[85px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[60px]">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp3', 'adjustedBid')}
+                onClick={() => handleSort('grp3', 'mTos')}
               >
-                Adjusted Bid {getSortIcon('grp3', 'adjustedBid')}
+                TOS%
               </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="min-w-full">
+          <div className="space-y-0">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
+                <div className="px-1 py-0.5 w-[70px] border-r border-border">
                   <Badge 
                     variant="outline" 
-                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">{item.effectiveCeiling.toFixed(2)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[85px]">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[60px]">{formatAcos(item.mTos)}</div>
               </div>
             ))}
           </div>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No keywords found in this group
+            </div>
+          )}
         </ScrollArea>
       </div>
     );
   };
 
-  const renderGrp4Table = () => {
-    if (grp4.length === 0) {
+  const renderGrp4Table = (groupData: any[]) => {
+    if (analysisData.grp4AllGood) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -702,135 +729,152 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
       );
     }
 
-    const sortedData = sortData(grp4, 'grp4');
-    
+    const sortedData = sortData(groupData, 'grp4');
+
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
           <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-1 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'asin')}
               >
-                ASIN {getSortIcon('grp4', 'asin')}
+                ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'campaign')}
               >
-                Campaign {getSortIcon('grp4', 'campaign')}
+                Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[120px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp4', 'searchTerm')}
+                Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'kw')}
               >
-                KW {getSortIcon('grp4', 'kw')}
+                KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'matchType')}
               >
-                Match {getSortIcon('grp4', 'matchType')}
+                Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp4', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp4', 'mTos')}
-              >
-                M TOS {getSortIcon('grp4', 'mTos')}
-              </Button>
-            </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[92px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp4', 'minSuggestedBid')}
               >
-                Min Suggested Bid {getSortIcon('grp4', 'minSuggestedBid')}
+                Min. Suggested Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[70px]">
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
-                onClick={() => handleSort('grp4', 'bidDelta')}
+                onClick={() => handleSort('grp4', 'effectiveCeiling')}
               >
-                Bid Δ {getSortIcon('grp4', 'bidDelta')}
+                Effective
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'adjustedBid')}
+              >
+                Adjusted
+              </Button>
+            </div>
+            <div className="font-semibold text-[10px] px-1 py-2 w-[48px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
+                onClick={() => handleSort('grp4', 'mTos')}
+              >
+                TOS%
               </Button>
             </div>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="min-w-full">
+          <div className="space-y-0">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border/30">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border/30 truncate">{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">
+              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
+                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>
                   {renderCellWithCopy(item.campaign, 'Campaign')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[120px] border-r border-border/30" title={item.searchTerm}>
+                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>
                   {renderCellWithCopy(item.searchTerm, 'Search Term')}
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border/30">
+                <div className="text-[10px] py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>
                   {renderCellWithCopy(item.kw, 'KW')}
                 </div>
-                <div className="px-1 py-0.5 w-[65px] border-r border-border/30">
+                <div className="px-1 py-0.5 w-[70px] border-r border-border">
                   <Badge 
                     variant="outline" 
-                    className="text-[8px] px-1 py-0 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                     onClick={() => handleMatchTypeClick(item)}
                   >
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[70px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[60px] border-r border-border/30">{item.mTos}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[100px] border-r border-border/30">{formatCurrency(item.minSuggestedBid)}</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[70px]">{formatCurrency(item.bidDelta)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[92px] border-r border-border">{formatCurrency(item.minSuggestedBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 w-[48px]">{formatAcos(item.mTos)}</div>
               </div>
             ))}
           </div>
+          
+          {sortedData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No keywords found in this group
+            </div>
+          )}
         </ScrollArea>
       </div>
     );
@@ -842,17 +886,37 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/10 rounded-lg">
-              <TrendingDown className="h-5 w-5 text-emerald-600" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Target className="h-5 w-5 text-emerald-600 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-md">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Global Widget Filter:</p>
+                    <div className="text-xs space-y-1">
+                      <p><strong>Condition 1:</strong> Applied ACOS &lt; 9999 AND Applied ACOS &lt; Target ACOS</p>
+                      <p><strong>OR</strong></p>
+                      <p><strong>Condition 2:</strong> Applied ACOS = 9999 AND Ad Spend &lt; (Target ACOS × Price)</p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div>
               <CardTitle className="text-lg text-emerald-700">
                 KWs with desirable ACOS in RP # 2, why are we underbidding?
               </CardTitle>
-              {activeFileName && (
-                <CardDescription className="text-sm text-muted-foreground mt-1">
-                  Active file: {activeFileName.replace('.csv', '')}
-                </CardDescription>
-              )}
+              <CardDescription className="text-sm">
+                Active file: {activeFileName.replace('.csv', '')}
+              </CardDescription>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <Badge variant="outline" className="text-xs">
+              Filtered: {analysisData.filteredRows} / {totalRows}
+            </Badge>
+            <div className="text-xs text-muted-foreground">
+              Global filter applied
             </div>
           </div>
         </div>
@@ -866,7 +930,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp1" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#1 ({grp1.length})</span>
+                      <span className="truncate">GRP#1 ({analysisData.grp1.length} - {getPercentage(analysisData.grp1.length)}%)</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -880,13 +944,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp2" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#2 ({grp2.length})</span>
+                      <span className="truncate">GRP#2 ({analysisData.grp2.length} - {getPercentage(analysisData.grp2.length)}%)</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 2 Filter Logic:</p>
-                  <p className="text-xs">effective_ceiling = 0.03</p>
+                  <p className="text-xs">Latest Bid ≤ effective_ceiling AND Δ &lt; 0 AND TOS% ≤ 50</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -894,13 +958,13 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp3" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#3 ({grp3.length})</span>
+                      <span className="truncate">GRP#3 ({analysisData.grp3.length} - {getPercentage(analysisData.grp3.length)}%)</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 3 Filter Logic:</p>
-                  <p className="text-xs">effective_ceiling = 0.04</p>
+                  <p className="text-xs">Latest Bid &lt; effective_ceiling AND Δ &gt; 0 AND TOS% &gt; 50</p>
                 </TooltipContent>
               </Tooltip>
               
@@ -908,32 +972,32 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 <TooltipTrigger asChild>
                   <TabsTrigger value="grp4" className="text-[9px] px-0.5 data-[state=active]:bg-primary/20 data-[state=active]:text-primary-foreground">
                     <div className="flex items-center justify-between w-full">
-                      <span className="truncate">GRP#4 ({grp4.length})</span>
+                      <span className="truncate">GRP#4 ({analysisData.grp4.length} - {getPercentage(analysisData.grp4.length)}%)</span>
                     </div>
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 4 Filter Logic:</p>
-                  <p className="text-xs">effective_ceiling &gt; 0.04</p>
+                  <p className="text-xs">effective_ceiling &gt; 0.02 AND (Min. Suggested Bid - Latest Bid) &gt; 0.5 AND Δ ≤ 0 AND TOS% ≤ 50</p>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
           </TooltipProvider>
           
-          <TabsContent value="grp1" className="h-[calc(100%-50px)] mt-4">
-            {renderGrp1Table()}
+          <TabsContent value="grp1" className="mt-4 h-[calc(100%-56px)]">
+            {renderGrp1Table(analysisData.grp1)}
           </TabsContent>
           
-          <TabsContent value="grp2" className="h-[calc(100%-50px)] mt-4">
-            {renderGrp2Table()}
+          <TabsContent value="grp2" className="mt-4 h-[calc(100%-56px)]">
+            {renderGrp2Table(analysisData.grp2)}
           </TabsContent>
           
-          <TabsContent value="grp3" className="h-[calc(100%-50px)] mt-4">
-            {renderGrp3Table()}
+          <TabsContent value="grp3" className="mt-4 h-[calc(100%-56px)]">
+            {renderGrp3Table(analysisData.grp3)}
           </TabsContent>
-          
-          <TabsContent value="grp4" className="h-[calc(100%-50px)] mt-4">
-            {renderGrp4Table()}
+
+          <TabsContent value="grp4" className="mt-4 h-[calc(100%-56px)]">
+            {renderGrp4Table(analysisData.grp4)}
           </TabsContent>
         </Tabs>
       </CardContent>

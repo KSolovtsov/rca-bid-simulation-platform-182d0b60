@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { TrendingUp, AlertTriangle, Copy, ArrowUpDown, ArrowUp, ArrowDown, Info } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Copy, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAppSettings } from '@/hooks/use-app-settings';
@@ -27,12 +27,22 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
     grp2?: { field: string; direction: 'asc' | 'desc' };
     grp3?: { field: string; direction: 'asc' | 'desc' };
   }>({});
-
+  
   // Apply global Desire ACOS filter
   const baseFilteredData = useMemo(() => {
     if (!data || !Array.isArray(data)) {
+      console.log('DesirableAcosRp2Overbidding - No data or not array:', data?.length || 0);
       return [];
     }
+    
+    console.log('🔍 DesirableAcosRp2Overbidding - Input data length:', data.length);
+    
+    if (data.length > 0) {
+      console.log('📋 Available columns:', Object.keys(data[0]));
+      console.log('📋 Sample row:', data[0]);
+    }
+    
+    let passedCount = 0;
     
     const filtered = data.filter((row, index) => {
       const appliedAcos = parseFloat(row['I: Applied ACOS']) || 0;
@@ -48,7 +58,34 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         passes = true;
       }
       
+      // Log first 5 rows for debugging
+      if (index < 5) {
+        console.log(`🔍 BaseFilter Row ${index}:`, {
+          'I: Applied ACOS': row['I: Applied ACOS'],
+          appliedAcos,
+          'G: Target ACOS': row['G: Target ACOS'], 
+          targetAcos,
+          'J: Ad Spend': row['J: Ad Spend'],
+          adSpend,
+          'K: Price': row['K: Price'],
+          price,
+          condition1: appliedAcos < 9999 && appliedAcos < targetAcos,
+          condition2: appliedAcos === 9999 && adSpend < (targetAcos * price),
+          passes
+        });
+      }
+      
+      if (passes) {
+        passedCount++;
+      }
+      
       return passes;
+    });
+    
+    console.log('🎯 BaseFilter results:', {
+      totalInput: data.length,
+      totalPassed: filtered.length,
+      passedCount
     });
     
     return filtered;
@@ -106,6 +143,14 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
   
   // GRP#3 Analysis (Simplified: CVR > Avg CVR RP2 AND Clicks >= 5)
   const grp3Data = useMemo(() => {
+    console.log('🔍 GRP#3 Debug - Starting analysis...');
+    console.log('📊 BaseFilteredData length:', baseFilteredData.length);
+    
+    if (baseFilteredData.length > 0) {
+      console.log('📋 Sample row columns:', Object.keys(baseFilteredData[0]));
+      console.log('📋 Sample row values:', baseFilteredData[0]);
+    }
+    
     let matchCount = 0;
     
     const filtered = baseFilteredData.filter((row, index) => {
@@ -118,11 +163,43 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       
       const passes = cvrGreaterThanAvg && clicksAtLeast5;
       
+      // Log first 5 rows for debugging
+      if (index < 5) {
+        console.log(`🔍 Row ${index}:`, {
+          asin: row['ASIN'],
+          kw: row['KW'],
+          'N: CVR': row['N: CVR'],
+          cvr,
+          'Avg CVR Reporting Period # 2': row['Avg CVR Reporting Period # 2'],
+          avgCvrRp2,
+          'L: Clicks': row['L: Clicks'],
+          clicks,
+          cvrGreaterThanAvg,
+          clicksAtLeast5,
+          passes
+        });
+      }
+      
       if (passes) {
         matchCount++;
+        console.log(`✅ GRP#3 Match #${matchCount}:`, {
+          asin: row['ASIN'],
+          kw: row['KW'],
+          cvr,
+          avgCvrRp2,
+          clicks,
+          cvrGreaterThanAvg,
+          clicksAtLeast5
+        });
       }
       
       return passes;
+    });
+
+    console.log('🎯 GRP#3 final results:', {
+      totalProcessed: baseFilteredData.length,
+      totalMatches: filtered.length,
+      matchCount
     });
 
     return filtered
@@ -141,14 +218,6 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
       }))
       .slice(0, 50);
   }, [baseFilteredData]);
-
-  const getSortIcon = (group: 'grp1' | 'grp2' | 'grp3', field: string) => {
-    const sort = sortConfig[group];
-    if (sort?.field !== field) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    return sort.direction === 'asc' 
-      ? <ArrowUp className="h-3 w-3" />
-      : <ArrowDown className="h-3 w-3" />;
-  };
 
   const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
   const formatAcos = (value: number) => `${value.toFixed(1)}%`;
@@ -262,7 +331,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'asin')}
               >
-                ASIN {getSortIcon('grp1', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
@@ -272,7 +341,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp1', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
@@ -282,7 +351,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'campaign')}
               >
-                Campaign {getSortIcon('grp1', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
@@ -292,7 +361,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'kw')}
               >
-                KW {getSortIcon('grp1', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
@@ -302,7 +371,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'matchType')}
               >
-                Match {getSortIcon('grp1', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
@@ -312,7 +381,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'cvr')}
               >
-                CVR {getSortIcon('grp1', 'cvr')}
+                CVR
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
@@ -322,17 +391,17 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'avgCvrRp2')}
               >
-                Avg CVR RP2 {getSortIcon('grp1', 'avgCvrRp2')}
+                Avg CVR RP2
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[60px]">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[40px]">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp1', 'tosPercent')}
               >
-                TOS% {getSortIcon('grp1', 'tosPercent')}
+                TOS%
               </Button>
             </div>
           </div>
@@ -363,7 +432,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 </div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[60px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
               </div>
             ))}
           </div>
@@ -398,7 +467,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'asin')}
               >
-                ASIN {getSortIcon('grp2', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
@@ -408,7 +477,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp2', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
@@ -418,7 +487,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'campaign')}
               >
-                Campaign {getSortIcon('grp2', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
@@ -428,7 +497,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'kw')}
               >
-                KW {getSortIcon('grp2', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
@@ -438,7 +507,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'matchType')}
               >
-                Match {getSortIcon('grp2', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
@@ -448,7 +517,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp2', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
@@ -458,7 +527,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'cvr')}
               >
-                CVR {getSortIcon('grp2', 'cvr')}
+                CVR
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
@@ -468,17 +537,17 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'avgCvrRp2')}
               >
-                Avg CVR RP2 {getSortIcon('grp2', 'avgCvrRp2')}
+                Avg CVR RP2
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-1 w-[60px]">
+            <div className="font-semibold text-[10px] px-1 py-1 w-[40px]">
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp2', 'tosPercent')}
               >
-                TOS% {getSortIcon('grp2', 'tosPercent')}
+                TOS%
               </Button>
             </div>
           </div>
@@ -510,7 +579,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 <div className="text-center text-[10px] px-1 py-0.5 w-[65px] border-r border-border/30">{formatCurrency(item.latestBid)}</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[50px] border-r border-border/30">{(item.cvr * 100).toFixed(2)}%</div>
                 <div className="text-center text-[10px] px-1 py-0.5 w-[85px] border-r border-border/30">{(item.avgCvrRp2 * 100).toFixed(2)}%</div>
-                <div className="text-center text-[10px] px-1 py-0.5 w-[60px]">{(item.tosPercent * 100).toFixed(1)}%</div>
+                <div className="text-center text-[10px] px-1 py-0.5 w-[40px]">{(item.tosPercent * 100).toFixed(1)}%</div>
               </div>
             ))}
           </div>
@@ -545,7 +614,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'asin')}
               >
-                ASIN {getSortIcon('grp3', 'asin')}
+                ASIN
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
@@ -555,7 +624,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'searchTerm')}
               >
-                Search Term {getSortIcon('grp3', 'searchTerm')}
+                Search Term
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[100px] border-r border-border">
@@ -565,7 +634,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'campaign')}
               >
-                Campaign {getSortIcon('grp3', 'campaign')}
+                Campaign
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[90px] border-r border-border">
@@ -575,7 +644,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'kw')}
               >
-                KW {getSortIcon('grp3', 'kw')}
+                KW
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[63px] border-r border-border">
@@ -585,7 +654,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'matchType')}
               >
-                Match {getSortIcon('grp3', 'matchType')}
+                Match
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[65px] border-r border-border">
@@ -595,7 +664,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'latestBid')}
               >
-                Latest Bid {getSortIcon('grp3', 'latestBid')}
+                Latest Bid
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[50px] border-r border-border">
@@ -605,7 +674,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'cvr')}
               >
-                CVR {getSortIcon('grp3', 'cvr')}
+                CVR
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[85px] border-r border-border">
@@ -615,7 +684,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'avgCvrRp2')}
               >
-                Avg CVR RP2 {getSortIcon('grp3', 'avgCvrRp2')}
+                Avg CVR RP2
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
@@ -625,7 +694,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'adSpend')}
               >
-                Ad Spend {getSortIcon('grp3', 'adSpend')}
+                Ad Spend
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[60px] border-r border-border">
@@ -635,7 +704,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'cvrWaterfallLevel')}
               >
-                CVR Waterfall {getSortIcon('grp3', 'cvrWaterfallLevel')}
+                CVR Waterfall
               </Button>
             </div>
             <div className="font-semibold text-[10px] px-1 py-1 w-[50px]">
@@ -645,7 +714,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 className="h-auto p-0 font-semibold text-[10px] hover:bg-transparent w-full justify-start"
                 onClick={() => handleSort('grp3', 'clicks')}
               >
-                Clicks {getSortIcon('grp3', 'clicks')}
+                Clicks
               </Button>
             </div>
           </div>
