@@ -441,8 +441,8 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
     return (
       <div className="h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background border-b shadow-sm">
-          <div className="flex bg-muted/50">
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+          <div className="grid bg-muted/50" style={{ gridTemplateColumns: '80px 100px 90px 90px 70px 80px 70px 66px 54px 60px 106px' }}>
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -452,7 +452,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 ASIN
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[100px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -462,7 +462,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Campaign
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -472,7 +472,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Search Term
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[90px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -482,7 +482,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 KW
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -492,7 +492,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Match
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[80px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -502,7 +502,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Latest Bid
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[70px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -512,7 +512,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Effective
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[66px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -522,7 +522,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 Adjusted
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[54px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -532,7 +532,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 TOS%
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[60px] border-r border-border">
+            <div className="font-semibold text-[10px] px-1 py-2 border-r border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -542,7 +542,7 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                 CVR
               </Button>
             </div>
-            <div className="font-semibold text-[10px] px-1 py-2 w-[106px]">
+            <div className="font-semibold text-[10px] px-1 py-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -558,12 +558,12 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
         <ScrollArea className="flex-1">
           <div className="space-y-0">
             {sortedData.map((item, index) => (
-              <div key={index} className="flex hover:bg-muted/30 transition-colors border-b border-border">
-                <div className="font-mono text-[10px] px-1 py-0.5 w-[80px] border-r border-border truncate" title={item.asin}>{item.asin}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[100px] border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[90px] border-r border-border truncate" title={item.kw}>{item.kw}</div>
-                <div className="px-1 py-0.5 w-[70px] border-r border-border">
+              <div key={index} className="grid hover:bg-muted/30 transition-colors border-b border-border" style={{ gridTemplateColumns: '80px 100px 90px 90px 70px 80px 70px 66px 54px 60px 106px' }}>
+                <div className="font-mono text-[10px] px-1 py-0.5 border-r border-border truncate" title={item.asin}>{item.asin}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border truncate" title={item.campaign}>{item.campaign}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border truncate" title={item.searchTerm}>{item.searchTerm}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border truncate" title={item.kw}>{item.kw}</div>
+                <div className="px-1 py-0.5 border-r border-border">
                   <Badge 
                     variant="outline" 
                     className="text-[9px] px-1 py-0 h-4 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -572,12 +572,12 @@ const DesirableAcosRp2UnderbiddingWidget: React.FC<WidgetProps> = ({ data }) => 
                     {item.matchType}
                   </Badge>
                 </div>
-                <div className="text-[10px] px-1 py-0.5 w-[80px] border-r border-border">{formatCurrency(item.latestBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[70px] border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[66px] border-r border-border">{formatCurrency(item.adjustedBid)}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[54px] border-r border-border">{item.mTos.toFixed(1)}%</div>
-                <div className="text-[10px] px-1 py-0.5 w-[60px] border-r border-border">{item.nCvr}</div>
-                <div className="text-[10px] px-1 py-0.5 w-[106px] truncate" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border">{formatCurrency(item.latestBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border">{formatCurrency(item.effectiveCeiling)}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border">{formatCurrency(item.adjustedBid)}</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border">{item.mTos.toFixed(1)}%</div>
+                <div className="text-[10px] px-1 py-0.5 border-r border-border">{item.nCvr}</div>
+                <div className="text-[10px] px-1 py-0.5 truncate" title={item.cvrWaterfall}>{item.cvrWaterfall}</div>
               </div>
             ))}
           </div>
