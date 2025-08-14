@@ -81,7 +81,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
         const previousBid = parseFloat(row['Previous Bid Calculated by the System']) || 0;
         const bidDelta = latestBid - previousBid;
         
-        return cvr <= avgCvrRp2 && tosPercent <= 0.5 && bidDelta >= 0;
+        return cvr <= avgCvrRp2 && tosPercent <= 50 && bidDelta >= 0;
       })
       .map(row => ({
         asin: row['ASIN'] || '',
@@ -680,7 +680,7 @@ const DesirableAcosRp2OverbiddingWidget: React.FC<WidgetProps> = ({ data }) => {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm font-medium mb-1">GRP # 2 Filter Logic:</p>
-                  <p className="text-xs">CVR ≤ Avg CVR RP2 AND TOS% ≤ 0.5 AND Δ ≥ 0</p>
+                  <p className="text-xs">CVR ≤ Avg CVR RP2 AND TOS% ≤ 50 AND Δ ≥ 0</p>
                 </TooltipContent>
               </Tooltip>
               
